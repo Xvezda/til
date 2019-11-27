@@ -11,6 +11,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+# Backward compatible
 import six
 
 
@@ -52,6 +53,8 @@ class Exchanger(object):
 
 
 class Money(float):
+  # New overwrite required when extra arguments are given.
+  # https://stackoverflow.com/a/35944423
   def __new__(self, amount=1, sign=''):
     return float.__new__(self, amount)
 
@@ -60,6 +63,7 @@ class Money(float):
 
   def __str__(self):
     ret = u'%.2f%s' % (float(self), self._sign)
+    # Encode when python version 2
     if six.PY2: return ret.encode('utf-8')
     return ret
 
@@ -82,7 +86,7 @@ class Money(float):
 class Cent(Money):
   def __init__(self, amount=1):
     super(Cent, self).__init__(amount, sign='¢')
-
+# Alias
 Penny = Cent
 
 
@@ -94,7 +98,7 @@ class Dollar(Penny):
 class Won(Money):
   def __init__(self, amount=10):
     super(Won, self).__init__(amount, sign='₩')
-
+# Alias
 KRWon = Won
 
 class JPYen(Money):
@@ -112,8 +116,9 @@ def main():
   # 109.11 yen is 1 dollar
   ex.add(JPYen(109.11))
 
+  # Exchange 1000 won to japan yen
   result = ex.exchange(KRWon(1000), to=JPYen)
-  print('result:', result)
+  print('[1000 KRWon -> JPYen] result:', result)
 
 
 if __name__ == "__main__":
