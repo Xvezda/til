@@ -19,9 +19,18 @@ class B(A):
     print('__thisclass__:', s.__thisclass__)
 
 
+class C(B):
+  pass
+
+
 def main():
   # Test class B
   b = B()
+
+  # Can super called from main?
+  s = super(B, C)
+  print('main dir:', dir(s))
+  print('main __thisclass__:', s.__thisclass__)
 
 
 if __name__ == "__main__":
