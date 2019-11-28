@@ -10,4 +10,15 @@ if False:
   hello = 'world'
 
 # It will cause the error
-print hello
+try:
+  print hello
+except:
+  print 'error'
+
+# ---
+
+try:
+  x = 1
+except:
+  pass
+print x

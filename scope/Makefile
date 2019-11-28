@@ -1,0 +1,2 @@
+test:
+	python scope.py
