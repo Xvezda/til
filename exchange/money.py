@@ -17,11 +17,20 @@ import six
 
 class Exchanger(object):
   def __init__(self, unit=None):
-    if not isinstance(unit, Money):
-      raise ValueError('unit is not `Money` class instance')
-    self._unit = unit
     self._rate = {}
-    self._rate[unit.__class__] = unit
+    if unit:
+      self.unit = unit
+
+  @property
+  def unit(self):
+    return self._unit
+
+  @unit.setter
+  def unit(self, value):
+    if not isinstance(value, Money):
+      raise ValueError('unit is not `Money` class instance')
+    self._unit = value
+    self._rate[value.__class__] = value
 
   def add(self, currency):
     self._rate[currency.__class__] = currency
@@ -34,10 +43,10 @@ class Exchanger(object):
   def exchange(self, currency, to=None):
     try:
       from_amount = self._rate[currency.__class__]
-      unit_class = self._unit.__class__
-      unit_amount = currency / from_amount
     except KeyError as error:
       raise Exception('currency not defined')
+    unit_class = self._unit.__class__
+    unit_amount = currency / from_amount
     try:
       if to:
         to_amount = self._rate[to] * unit_amount
