@@ -30,7 +30,7 @@ class Exchanger(object):
     if not isinstance(value, Money):
       raise ValueError('unit is not `Money` class instance')
     self._unit = value
-    self._rate[value.__class__] = value
+    self.add(value)
 
   def add(self, currency):
     self._rate[currency.__class__] = currency
