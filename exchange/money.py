@@ -127,7 +127,7 @@ def main():
 
   # Exchange 1000 won to japan yen
   result = ex.exchange(KRWon(1000), to=JPYen)
-  print('[1000 KRWon -> JPYen] result:', result)
+  print('[1000 %s -> %s] result:' % (KRWon.__name__, JPYen.__name__), result)
 
 
 if __name__ == "__main__":
