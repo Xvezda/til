@@ -10,7 +10,7 @@ import textwrap
 
 
 def sub_with_test():
-  # Backslash will trim leading whitespaces
+  # Backslash will remove leading line break
   long_string = """\
     Hello, World!
     foo bar"""
