@@ -71,7 +71,7 @@ class Money(float):
     self._sign = sign
 
   def __str__(self):
-    ret = u'%.2f%s' % (float(self), self._sign)
+    ret = '%.2f%s' % (float(self), self._sign)
     # Encode when python version 2
     if six.PY2: return ret.encode('utf-8')
     return ret
