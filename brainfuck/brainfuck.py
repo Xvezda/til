@@ -18,7 +18,7 @@ def main():
   import argparse
 
   parser = argparse.ArgumentParser()
-  parser.add_argument('file', nargs='?', help='')
+  parser.add_argument('file', nargs='?', help='brainfuck source code file path')
 
   args = parser.parse_args()
   if not args.file:
