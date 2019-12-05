@@ -9,14 +9,23 @@ from __future__ import unicode_literals
 
 def main():
   # Implementation details
-  #
   # https://namu.wiki/w/BrainFuck
   # https://ko.wikipedia.org/wiki/brainfuck
   ptr = 0
   mem = bytearray(32768)
 
   import sys
-  with open(sys.argv[1], 'r') as f:
+  import argparse
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument('file', nargs='?', help='')
+
+  args = parser.parse_args()
+  if not args.file:
+    parser.print_help()
+    return 1
+
+  with open(args.file, 'r') as f:
     cur = 0
     code = f.read()
     while True:
