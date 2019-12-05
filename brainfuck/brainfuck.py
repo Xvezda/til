@@ -24,6 +24,13 @@ def main():
         c = code[cur]
       except IndexError as error:
         return
+
+      try:
+        m = mem[ptr]
+      except IndexError as error:
+        print('RuntimeError: out of memory', file=sys.stderr)
+        return 1
+
       if c == '>':
         ptr += 1
       elif c == '<':
@@ -38,13 +45,24 @@ def main():
         mem[ptr] = ord(sys.stdin.read(1))
       elif c == '[':
         if not mem[ptr]:
-          while code[cur] != ']':
-            cur += 1
+          try:
+            while code[cur] != ']':
+              cur += 1
+          except IndexError as error:
+            print('SyntaxError: following `]` cannot be found',
+                  file=sys.stderr)
+            return 1
       elif c == ']':
         if mem[ptr]:
-          while code[cur] != '[':
-            cur -= 1
+          try:
+            while code[cur] != '[':
+              cur -= 1
+          except IndexError as error:
+            print('SyntaxError: following `[` cannot be found',
+                  file=sys.stderr)
+            return 1
       else:
+        # Ignore non operators
         pass
       cur += 1
 
