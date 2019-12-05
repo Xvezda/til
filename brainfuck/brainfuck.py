@@ -36,18 +36,26 @@ def main():
       elif c == '<':
         ptr -= 1
       elif c == '+':
-        mem[ptr] += 1
+        mem[ptr] = (m+1) % 256
       elif c == '-':
-        mem[ptr] -= 1
+        mem[ptr] = (m-1) % 256
       elif c == '.':
-        sys.stdout.write(chr(mem[ptr]))
+        sys.stdout.write(chr(m))
+        sys.stdout.flush()
       elif c == ',':
-        mem[ptr] = ord(sys.stdin.read(1))
+        mem[ptr] = ord(sys.stdin.read(1)) % 256
       elif c == '[':
         if not mem[ptr]:
           try:
-            while code[cur] != ']':
+            depth = 0
+            while True:
               cur += 1
+              if code[cur] == ']' and not depth:
+                break
+              if code[cur] == '[':
+                depth += 1
+              elif code[cur] == ']':
+                depth -= 1
           except IndexError as error:
             print('SyntaxError: following `]` cannot be found',
                   file=sys.stderr)
@@ -55,14 +63,21 @@ def main():
       elif c == ']':
         if mem[ptr]:
           try:
-            while code[cur] != '[':
+            depth = 0
+            while True:
               cur -= 1
+              if code[cur] == '[' and not depth:
+                break
+              if code[cur] == ']':
+                depth += 1
+              elif code[cur] == '[':
+                depth -= 1
           except IndexError as error:
             print('SyntaxError: following `[` cannot be found',
                   file=sys.stderr)
             return 1
       else:
-        # Ignore non operators
+        # Ignore on operators
         pass
       cur += 1
 
