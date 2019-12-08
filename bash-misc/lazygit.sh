@@ -34,7 +34,7 @@ do
     if [ "$(printf "%d" "'$chr")" -eq 9 ]
     then
         echo
-        if [ $i -eq -1 ]
+        if [ $i -eq -1 ] || [ $i -eq ${#list[@]} ]
         then
             # Print current file list
             echo ${list[@]}
@@ -68,7 +68,7 @@ do
         break
     fi
     # Increase index 'i' \w Keep i in range size of a list
-    (( i = (i + 1) % ${#list[@]} ))
+    (( i = (i + 1) % (${#list[@]} + 1) ))
 done
 
 
@@ -76,4 +76,3 @@ echo -n "Insert your commit: "
 read commit
 
 git $cmd $target && git commit -m "$commit" && git push
-
