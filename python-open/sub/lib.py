@@ -18,7 +18,7 @@ def relpath(base, path):
   import os
   abspath = os.path.abspath(base)
   try:
-    abspath = abspath[:abspath.rindex(os.sep)]
+    abspath = abspath[:abspath.rindex(os.sep)+1]
   except:
     pass
   return os.path.join(abspath, path)
