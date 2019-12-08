@@ -23,7 +23,7 @@ case $cmd in
         ;;
 esac
 
-list=($(ls))
+list=(*)
 for (( i=-1; ; ))
 do
     echo -n "Which files would you like to $cmd: "
