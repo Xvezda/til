@@ -22,7 +22,7 @@ def relpath(base, path):
       abspath = abspath[:abspath.rindex(os.sep)+1]
     except:
       pass
-  if abspath[-1:] != os.sep:
+  if not abspath.endswith(os.sep):
     abspath += os.sep
   return os.path.join(abspath, path)
 
