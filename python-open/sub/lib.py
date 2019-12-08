@@ -17,10 +17,13 @@ from __future__ import unicode_literals
 def relpath(base, path):
   import os
   abspath = os.path.abspath(base)
-  try:
-    abspath = abspath[:abspath.rindex(os.sep)+1]
-  except:
-    pass
+  if not os.path.isdir(base):
+    try:
+      abspath = abspath[:abspath.rindex(os.sep)+1]
+    except:
+      pass
+  if abspath[-1:] != os.sep:
+    abspath += os.sep
   return os.path.join(abspath, path)
 
 
