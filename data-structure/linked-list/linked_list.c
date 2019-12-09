@@ -6,7 +6,7 @@
 
 static linked_list_t* linked_list_wind(linked_list_t **ref);
 /* Getter, Setter */
-static inline size_t linked_list_get_size(linked_list_t *ptr);
+static inline size_t linked_list_get_size(const linked_list_t *ptr);
 static inline void linked_list_set_size(linked_list_t *ptr, size_t size);
 
 
@@ -64,7 +64,7 @@ void* linked_list_unshift(linked_list_t **ref) {
 }
 
 
-void linked_list_append(linked_list_t **ref, void *ptr, size_t size) {
+void linked_list_append(linked_list_t **ref, const void *ptr, size_t size) {
     if (!ref || !*ref) return;
     if (!ptr || !size) return;
 
@@ -123,7 +123,7 @@ linked_list_t* linked_list_wind(linked_list_t **ref) {
 }
 
 
-static inline size_t linked_list_get_size(linked_list_t *ptr) {
+static inline size_t linked_list_get_size(const linked_list_t *ptr) {
     if (!ptr) return 0;
     return ptr->_data_size;
 }
