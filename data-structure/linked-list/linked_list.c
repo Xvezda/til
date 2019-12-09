@@ -6,8 +6,9 @@
 
 static linked_list_t* linked_list_wind(linked_list_t **ref);
 /* Getter, Setter */
-inline static size_t linked_list_get_size(linked_list_t *ptr);
-inline static void linked_list_set_size(linked_list_t *ptr, size_t size);
+static inline size_t linked_list_get_size(linked_list_t *ptr);
+static inline void linked_list_set_size(linked_list_t *ptr, size_t size);
+
 
 linked_list_t* linked_list_new(void) {
     linked_list_t *ret = malloc(sizeof(linked_list_t));
@@ -16,6 +17,7 @@ linked_list_t* linked_list_new(void) {
     return ret;
 }
 
+
 void linked_list_init(linked_list_t **ref) {
     if (!ref || !*ref) return;
 
@@ -23,6 +25,7 @@ void linked_list_init(linked_list_t **ref) {
     (*ref)->_next = NULL;
     (*ref)->_data_size = 0;
 }
+
 
 void* linked_list_unshift(linked_list_t **ref) {
     if (!ref || !*ref) return NULL;
@@ -42,6 +45,7 @@ void* linked_list_unshift(linked_list_t **ref) {
 
     return ret;
 }
+
 
 void linked_list_append(linked_list_t **ref, void *ptr, size_t size) {
     if (!ref || !*ref) return;
@@ -66,6 +70,7 @@ void linked_list_append(linked_list_t **ref, void *ptr, size_t size) {
     last_node->_next = new_node;
 }
 
+
 void linked_list_del(linked_list_t **ref) {
     if (!ref || !*ref) return;
 
@@ -87,6 +92,7 @@ void linked_list_del(linked_list_t **ref) {
     *ref = NULL;
 }
 
+
 linked_list_t* linked_list_wind(linked_list_t **ref) {
     if (!ref || !*ref) return NULL;
 
@@ -97,12 +103,14 @@ linked_list_t* linked_list_wind(linked_list_t **ref) {
     return curitem;
 }
 
-inline size_t linked_list_get_size(linked_list_t *ptr) {
+
+static inline size_t linked_list_get_size(linked_list_t *ptr) {
     if (!ptr) return 0;
     return ptr->_data_size;
 }
 
-inline void linked_list_set_size(linked_list_t *ptr, size_t size) {
+
+static inline void linked_list_set_size(linked_list_t *ptr, size_t size) {
     if (!ptr) return;
     ptr->_data_size = size;
 }
