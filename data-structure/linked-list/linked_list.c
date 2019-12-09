@@ -23,7 +23,7 @@ void linked_list_init(linked_list_t **ref) {
 
     (*ref)->data = NULL;
     (*ref)->_next = NULL;
-    (*ref)->_data_size = 0;
+    linked_list_set_size(*ref, 0);
 }
 
 
