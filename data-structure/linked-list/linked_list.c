@@ -20,7 +20,7 @@ void linked_list_init(linked_list_t **ref) {
     if (!ref || !*ref) return;
 
     (*ref)->data = NULL;
-    (*ref)->next = NULL;
+    (*ref)->_next = NULL;
     (*ref)->_data_size = 0;
 }
 
@@ -38,7 +38,7 @@ void* linked_list_unshift(linked_list_t **ref) {
     free((*ref)->data);
     (*ref)->data = NULL;
 
-    *ref = (*ref)->next;
+    *ref = (*ref)->_next;
 
     return ret;
 }
@@ -55,7 +55,7 @@ void linked_list_append(linked_list_t **ref, void *ptr, size_t size) {
 
     new_node->data = new_item;
     linked_list_set_size(new_node, size);
-    new_node->next = NULL;
+    new_node->_next = NULL;
 
     linked_list_t *last_node = linked_list_wind(ref);
     if (!last_node) return;
@@ -63,7 +63,7 @@ void linked_list_append(linked_list_t **ref, void *ptr, size_t size) {
     if (last_node == *ref) {
         *ref = new_node;
     }
-    last_node->next = new_node;
+    last_node->_next = new_node;
 }
 
 void linked_list_del(linked_list_t **ref) {
@@ -78,7 +78,7 @@ void linked_list_del(linked_list_t **ref) {
 #endif
         linked_list_set_size(curitem, 0);
 
-        linked_list_t *next = curitem->next;
+        linked_list_t *next = curitem->_next;
         free(curitem);
         curitem = next;
     } while(curitem);
@@ -91,8 +91,8 @@ linked_list_t* linked_list_wind(linked_list_t **ref) {
     if (!ref || !*ref) return NULL;
 
     linked_list_t *curitem = *ref;
-    while (curitem->next) {
-        curitem = curitem->next;
+    while (curitem->_next) {
+        curitem = curitem->_next;
     }
     return curitem;
 }
