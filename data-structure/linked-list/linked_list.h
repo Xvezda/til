@@ -11,8 +11,10 @@
 #include <assert.h>
 
 #ifdef DEBUG
-  #define DEBUG_PRINT(...) \
-    do { fprintf(stderr, __VA_ARGS__); } while (0)
+  #define DEBUG_PRINT(fmt, ...) \
+    do { \
+      fprintf(stderr, "%s:%d: " fmt, __FILE__, __LINE__, __VA_ARGS__); \
+    } while (0)
 #else
   #define DEBUG_PRINT(...) \
     do { } while (0)

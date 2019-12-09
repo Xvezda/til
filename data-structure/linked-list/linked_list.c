@@ -48,8 +48,7 @@ void* linked_list_unshift(linked_list_t **ref) {
     void *data = (*ref)->_next->_next->data;
     size_t size = linked_list_get_size((*ref)->_next->_next);
 
-    DEBUG_PRINT("%s:%d: ref: %p, size: %zu\n",
-            __FILE__, __LINE__, (void*) (*ref)->_next->_next, size);
+    DEBUG_PRINT("ref: %p, size: %zu\n", (void*) (*ref)->_next->_next, size);
 
     if (data) {
         ret = malloc(size);
@@ -78,11 +77,11 @@ void linked_list_append(linked_list_t **ref, const void *ptr, size_t size) {
     linked_list_set_size(new_node, size);
     new_node->_next = NULL;
 
-    DEBUG_PRINT("%s:%d: ref: %p\n", __FILE__, __LINE__, (void*) *ref);
+    DEBUG_PRINT("ref: %p\n", (void*) *ref);
 
     linked_list_t *last_node = linked_list_wind(ref);
 
-    DEBUG_PRINT("%s:%d: last_node: %p\n", __FILE__, __LINE__, (void*) last_node);
+    DEBUG_PRINT("last_node: %p\n", (void*) last_node);
 
     assert(last_node != NULL);
     last_node->_next = new_node;
