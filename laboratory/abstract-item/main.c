@@ -26,14 +26,14 @@ int main(int argc, char **argv) {
     /* END */
 
     abs_item_t *item = item_new(null_e, NULL, 0, nulltype_handler);
-    printf("1st item: %s\n", GET_ITEM_C_STR(item));
+    printf("1st item: %s\n", GET_ITEM_CSTR(item));
 
     item_del(item);
 
     int number = 1234;
     item = item_new(int_e, &number, sizeof number, int_handler);
 
-    char *str = GET_ITEM_C_STR(item);
+    char *str = GET_ITEM_CSTR(item);
     printf("2nd item: %s\n", str);
     free(str);
 

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define GET_ITEM_C_STR(item) ((item)->c_str_(item))
+#define GET_ITEM_CSTR(item) ((item)->c_str_(item))
 
 
 enum item_type_e {
@@ -14,12 +14,22 @@ enum item_type_e {
   double_e, number_e, object_e, null_e
 };
 
+
+/*
+ *  warning: declaration of 'struct abs_item_s' will not be visible
+ *    outside of this function [-Wvisibility]
+ */
+struct abs_item_s;  // It will resolve error somehow ¯\_(ツ)_/¯ prototyping?
+
+/* Function pointer typedef */
+typedef char* (*cstr_handler_t)(struct abs_item_s* self);
+
 struct abs_item_s {
   enum item_type_e type;
   void *data;
   size_t size;
   // Mimick of obj.c_str() in C++
-  char* (*c_str_)(struct abs_item_s* self);
+  cstr_handler_t c_str_;
 };
 typedef struct abs_item_s abs_item_t;
 
