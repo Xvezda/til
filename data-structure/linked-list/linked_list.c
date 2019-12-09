@@ -5,6 +5,9 @@
 
 
 static linked_list_t* linked_list_wind(linked_list_t **ref);
+/* Getter, Setter */
+inline static size_t linked_list_get_size(linked_list_t *ptr);
+inline static void linked_list_set_size(linked_list_t *ptr, size_t size);
 
 linked_list_t* linked_list_new(void) {
     linked_list_t *ret = malloc(sizeof(linked_list_t));
@@ -18,7 +21,7 @@ void linked_list_init(linked_list_t **ref) {
 
     (*ref)->data = NULL;
     (*ref)->next = NULL;
-    (*ref)->size = 0;
+    (*ref)->_data_size = 0;
 }
 
 void* linked_list_unshift(linked_list_t **ref) {
@@ -26,7 +29,7 @@ void* linked_list_unshift(linked_list_t **ref) {
 
     void *ret = NULL;
     void *data = (*ref)->data;
-    size_t size = (*ref)->size;
+    size_t size = linked_list_get_size(*ref);
 
     if (data) {
         ret = malloc(size);
@@ -51,7 +54,7 @@ void linked_list_append(linked_list_t **ref, void *ptr, size_t size) {
     if (!new_node) return;
 
     new_node->data = new_item;
-    new_node->size = size;
+    linked_list_set_size(new_node, size);
     new_node->next = NULL;
 
     linked_list_t *last_node = linked_list_wind(ref);
@@ -71,9 +74,9 @@ void linked_list_del(linked_list_t **ref) {
         free(curitem->data);
         curitem->data = NULL;
 #ifdef DEBUG
-        printf("free item size: %zu\n", curitem->size);
+        printf("free item size: %zu\n", linked_list_get_size(curitem));
 #endif
-        curitem->size = 0;
+        linked_list_set_size(curitem, 0);
 
         linked_list_t *next = curitem->next;
         free(curitem);
@@ -93,3 +96,14 @@ linked_list_t* linked_list_wind(linked_list_t **ref) {
     }
     return curitem;
 }
+
+inline size_t linked_list_get_size(linked_list_t *ptr) {
+    if (!ptr) return 0;
+    return ptr->_data_size;
+}
+
+inline void linked_list_set_size(linked_list_t *ptr, size_t size) {
+    if (!ptr) return;
+    ptr->_data_size = size;
+}
+
