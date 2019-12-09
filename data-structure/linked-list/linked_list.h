@@ -19,6 +19,10 @@
 #endif
 
 
+/**
+ * First node of linked list is always ``entry''
+ * which prevents list pointer return to null when unshifting.
+ */
 struct linked_list_s {
   /* Public attributes */
   void *data;
