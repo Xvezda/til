@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -pedantic -DDEBUG -g
+# CFLAGS=-Wall -Wextra -pedantic -DDEBUG -g
+CFLAGS=-Wall -Wextra -pedantic
 TARGET=linked_list
 
 all: $(TARGET)

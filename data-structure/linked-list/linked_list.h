@@ -8,6 +8,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <assert.h>
+
+#ifdef DEBUG
+  #define DEBUG_PRINT(...) \
+    do { fprintf(stderr, __VA_ARGS__); } while (0)
+#else
+  #define DEBUG_PRINT(...) \
+    do { } while (0)
+#endif
 
 
 struct linked_list_s {
