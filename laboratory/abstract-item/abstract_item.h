@@ -28,7 +28,7 @@ typedef enum item_type_e {
 struct abs_item_s;  // It will resolve error somehow ¯\_(ツ)_/¯ prototyping?
 
 /* Function pointer typedef */
-typedef char* (*cstr_handler_t)(struct abs_item_s* self);
+typedef char *(*cstr_handler_t)(struct abs_item_s* self);
 
 struct abs_item_s {
   item_type_t type;
@@ -40,9 +40,9 @@ struct abs_item_s {
 typedef struct abs_item_s abs_item_t;
 
 
-abs_item_t* item_new(item_type_t type,
+abs_item_t *item_new(item_type_t type,
     void *ptr, size_t size, cstr_handler_t handler);
-void item_del(abs_item_t* item);
+void item_del(abs_item_t *item);
 
 #ifdef __cplusplus
 }

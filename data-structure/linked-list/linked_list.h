@@ -35,9 +35,9 @@ struct linked_list_s {
 typedef struct linked_list_s linked_list_t;
 
 
-linked_list_t* linked_list_new(void);
+linked_list_t *linked_list_new(void);
 void linked_list_init(linked_list_t **ref);
-void* linked_list_unshift(linked_list_t **ref);
+void *linked_list_unshift(linked_list_t **ref);
 void linked_list_append(linked_list_t **ref, const void *ptr, size_t size);
 void linked_list_del(linked_list_t **ref);
 

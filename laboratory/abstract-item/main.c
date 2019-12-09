@@ -1,11 +1,12 @@
 #include "abstract_item.h"
 
 
-static char* nulltype_handler(abs_item_t *self);
-static char* int_handler(abs_item_t *self);
+static char *nulltype_handler(abs_item_t *self);
+static char *int_handler(abs_item_t *self);
 
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     /* Unused variables */
     (void) argc;
     (void) argv;
@@ -29,20 +30,22 @@ int main(int argc, char **argv) {
 }
 
 
-static char* nulltype_handler(abs_item_t *self) {
+static char *nulltype_handler(abs_item_t *self)
+{
     (void) self;
     return "<Type 'NULL'>";
 }
 
 
-static char* int_handler(abs_item_t *self) {
+static char *int_handler(abs_item_t *self)
+{
     if (!self) return NULL;
 
-    int len = snprintf(NULL, 0, "%d", *(int*)self->data);
+    int len = snprintf(NULL, 0, "%d", *(int *)self->data);
     char *ret = malloc(len+1);
     if (!ret) return NULL;
 
-    snprintf(ret, len+1, "%d", *(int*)self->data);
+    snprintf(ret, len+1, "%d", *(int *)self->data);
     ret[len] = '\0';
 
     return ret;
