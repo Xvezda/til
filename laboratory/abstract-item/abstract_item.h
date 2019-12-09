@@ -9,10 +9,10 @@
 #define GET_ITEM_CSTR(item) ((item)->c_str_(item))
 
 
-enum item_type_e {
+typedef enum item_type_e {
   string_e, char_e, int_e, long_e, float_e,
   double_e, number_e, object_e, null_e
-};
+} item_type_t;
 
 
 /*
@@ -25,7 +25,7 @@ struct abs_item_s;  // It will resolve error somehow ¯\_(ツ)_/¯ prototyping?
 typedef char* (*cstr_handler_t)(struct abs_item_s* self);
 
 struct abs_item_s {
-  enum item_type_e type;
+  item_type_t type;
   void *data;
   size_t size;
   // Mimick of obj.c_str() in C++
@@ -34,8 +34,8 @@ struct abs_item_s {
 typedef struct abs_item_s abs_item_t;
 
 
-abs_item_t* item_new(enum item_type_e type,
-    void *ptr, size_t size, char* (*handler)(abs_item_t*));
+abs_item_t* item_new(item_type_t type,
+    void *ptr, size_t size, cstr_handler_t handler);
 void item_del(abs_item_t* item);
 
 

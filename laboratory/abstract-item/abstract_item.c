@@ -1,8 +1,8 @@
 #include "abstract_item.h"
 
 
-abs_item_t* item_new(enum item_type_e type,
-        void *ptr, size_t size, char* (*handler)(abs_item_t *handler)) {
+abs_item_t* item_new(item_type_t type,
+        void *ptr, size_t size, cstr_handler_t handler) {
     abs_item_t* ret = malloc(sizeof(abs_item_t));
 
     ret->type = type;
