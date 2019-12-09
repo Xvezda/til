@@ -29,13 +29,13 @@ static void run_test(void) {
     DEBUG_PRINT("before append: %p, %p\n",
             (void*) list, (void*) list->_next->_next);
     int tmp = 1;
-    linked_list_append(&list, &tmp, sizeof(int));
+    linked_list_append(&list, &tmp, sizeof(tmp));
     DEBUG_PRINT("after append: %p\n", (void*) list);
 
     DEBUG_PRINT("before append: %p, %p\n",
             (void*) list, (void*) list->_next->_next);
     tmp = 2;
-    linked_list_append(&list, &tmp, sizeof(int));
+    linked_list_append(&list, &tmp, sizeof(tmp));
     DEBUG_PRINT("after append: %p\n", (void*) list);
 
     DEBUG_PRINT("before unshift: %p\n", (void*) list);
@@ -54,8 +54,8 @@ static void run_test(void) {
     free(item);
 
     char tmp2[] = "Hello, World!";
-    DEBUG_PRINT("sizeof tmp2: %zu\n", sizeof tmp2);
-    linked_list_append(&list, tmp2, sizeof tmp2);
+    DEBUG_PRINT("sizeof tmp2: %zu\n", sizeof(tmp2));
+    linked_list_append(&list, tmp2, sizeof(tmp2));
 
     item = linked_list_unshift(&list);
     printf("last item: %s\n", item);

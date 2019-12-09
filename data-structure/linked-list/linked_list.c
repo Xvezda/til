@@ -11,7 +11,7 @@ static inline void linked_list_set_size(linked_list_t *ptr, size_t size);
 
 
 linked_list_t* linked_list_new(void) {
-    linked_list_t *ret = malloc(sizeof(linked_list_t));
+    linked_list_t *ret = malloc(sizeof(*ret));
     linked_list_init(&ret);
 
     return ret;
@@ -25,7 +25,7 @@ void linked_list_init(linked_list_t **ref) {
     linked_list_set_size(*ref, 0);
 
     // Create entry
-    linked_list_t *entry = malloc(sizeof(linked_list_t));
+    linked_list_t *entry = malloc(sizeof(*entry));
     entry->data = NULL;
     // Entry must has size 0 \w not null data
     linked_list_set_size(entry, 0);
@@ -70,7 +70,7 @@ void linked_list_append(linked_list_t **ref, const void *ptr, size_t size) {
     void *new_item = malloc(size);
     memcpy(new_item, ptr, size);
 
-    linked_list_t *new_node = malloc(sizeof(linked_list_t));
+    linked_list_t *new_node = malloc(sizeof(*new_node));
     if (!new_node) return;
 
     new_node->data = new_item;

@@ -3,7 +3,7 @@
 
 abs_item_t* item_new(item_type_t type,
         void *ptr, size_t size, cstr_handler_t handler) {
-    abs_item_t* ret = malloc(sizeof(abs_item_t));
+    abs_item_t* ret = malloc(sizeof *ret);
 
     ret->type = type;
     abs_item_t* data = malloc(size);

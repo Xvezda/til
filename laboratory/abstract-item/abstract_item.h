@@ -6,6 +6,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #define GET_ITEM_CSTR(item) ((item)->c_str_(item))
 
 
@@ -37,6 +43,10 @@ typedef struct abs_item_s abs_item_t;
 abs_item_t* item_new(item_type_t type,
     void *ptr, size_t size, cstr_handler_t handler);
 void item_del(abs_item_t* item);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif  // _ABSTRACT_ITEM_H
