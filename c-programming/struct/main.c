@@ -8,6 +8,7 @@
 #define type_str     1
 #define type_int     2
 #define type_int_ptr 3
+#define type_double  4
 
 
 obj_t *type_str_init_handler(obj_t *self, ...);
@@ -22,6 +23,10 @@ obj_t *type_int_ptr_init_handler(obj_t *self, ...);
 void type_int_ptr_del_handler(obj_t *self);
 char *type_int_ptr_cstr_handler(obj_t *self);
 
+obj_t *type_double_init_handler(obj_t *self, ...);
+void type_double_del_handler(obj_t *self);
+char *type_double_cstr_handler(obj_t *self);
+
 
 int main(void)
 {
@@ -33,6 +38,8 @@ int main(void)
     print_obj(OBJECT(type_int, 1234));
     int test = 31337;
     print_obj(OBJECT(type_int_ptr, &test));
+
+    print_obj(OBJECT(type_double, 987.654));
 
     return 0;
 }
@@ -138,7 +145,6 @@ void type_int_ptr_del_handler(obj_t *self)
     self->_ptr = NULL;
 }
 
-
 char *type_int_ptr_cstr_handler(obj_t *self)
 {
     char *ret = NULL;
@@ -152,4 +158,45 @@ char *type_int_ptr_cstr_handler(obj_t *self)
     return ret;
 }
 
+
+/**
+ * Type `double` method implementations
+ */
+obj_t *type_double_init_handler(obj_t *self, ...)
+{
+    va_list ap;
+    va_start(ap, self);
+
+    double data = va_arg(ap, double);
+    double *ret = malloc(self->_size);
+
+    memcpy(ret, &data, self->_size);
+    self->_ptr = ret;
+
+    va_end(ap);
+
+    return self;
+}
+
+
+void type_double_del_handler(obj_t *self)
+{
+    free(self->_ptr);
+    self->_ptr = NULL;
+}
+
+
+char *type_double_cstr_handler(obj_t *self)
+{
+    char *ret = NULL;
+
+    int len = snprintf(NULL, 0, "%lf", *(double *)self->_ptr);
+    ret = malloc(len+1);
+
+    snprintf(ret, len+1, "%lf", *(double *)self->_ptr);
+
+    ret[len] = '\0';
+
+    return ret;
+}
 
