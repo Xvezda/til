@@ -19,6 +19,7 @@ int main(void)
 {
     test_t *v = test_new();
 
+    /* v = &(test_t) { .msg = (char *)"foobar" }; */
     v = &(test_t) { .msg = strdup("foobar") };
 
     print_test(v);
