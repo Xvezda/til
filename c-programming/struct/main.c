@@ -2,6 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+/**
+ * Below is called ``compound literal''
+ * Reference: https://gcc.gnu.org/onlinedocs/gcc/Compound-Literals.html
+ */
 #define TEST_OBJ(msg_) &(test_t) { .msg = (char *)msg_ }
 
 
