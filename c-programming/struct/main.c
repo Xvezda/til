@@ -29,7 +29,8 @@ static void print_obj(obj_t *obj)
 {
     char *fmt;
     switch (obj->_type) {
-    case TYPE_INT:
+    // Mixing primitive type with pointer is actually not a good idea
+    case TYPE_INT:  // 😔
     case TYPE_INT_PTR:
         fmt = "%d\n";
         break;
