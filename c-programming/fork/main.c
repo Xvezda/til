@@ -4,14 +4,18 @@
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
+#define PID_TYPE DWORD
+#define PID_FMT "%ld"
 #else
 #include <unistd.h>
+#define PID_TYPE pid_t
+#define PID_FMT "%d"
 #endif
 
 
 typedef struct data_s {
     char *msg;
-    int id;
+    PID_TYPE id;
 } data_t;
 
 #if defined(_WIN32)
@@ -32,11 +36,12 @@ int main(void)
     HANDLE hThread;
 
     data.msg = "parent";
-    data.id = 0;
+    data.id = GetCurrentProcessId();
 
     print_msg(&data);
 
     data.msg = "child";
+    data.id = 0;
 
     hThread = CreateThread(
         NULL,
@@ -50,7 +55,7 @@ int main(void)
         WaitForSingleObject(hThread, INFINITE);
     }
 #else
-    pid_t pid;
+    PID_TYPE pid;
 
     if((pid=fork()) == 0) {
         // If pid == 0, it's parent process
@@ -79,7 +84,7 @@ DWORD WINAPI print_msg(LPVOID lpParam)
     hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
     data = (data_t *)lpParam;
 
-    StringCchPrintf(msgBuf, sizeof(msgBuf), TEXT("%s: %d\n"),
+    StringCchPrintf(msgBuf, sizeof(msgBuf), TEXT("%s: " PID_FMT "\n"),
         data->msg, data->id);
     (void)StringCchLength(msgBuf, sizeof(msgBuf), &cchStringSize);
     WriteConsole(hStdout, msgBuf, (DWORD)cchStringSize, &dwChars, NULL);
@@ -89,7 +94,7 @@ DWORD WINAPI print_msg(LPVOID lpParam)
 #else
 void print_msg(data_t *data)
 {
-    printf("%s: %d\n", data->msg, data->id);
+    printf("%s: " PID_FMT "\n", data->msg, data->id);
 }
 #endif
 
