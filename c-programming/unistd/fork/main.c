@@ -1,6 +1,5 @@
 #include <stdio.h>
-#if (defined(WIN32) || defined(_WIN32) || \
-     defined(__WIN32__) || defined(__NT__))
+#if defined(_WIN32)
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -13,6 +12,9 @@
 
 int main(void)
 {
+#if defined(_WIN32)
+	/* Windows implementation */
+#else
     pid_t pid;
 
     puts("=Before fork=");
@@ -22,6 +24,7 @@ int main(void)
     } else {
         PRINT_MSG(child, pid);
     }
+#endif
     return 0;
 }
 
