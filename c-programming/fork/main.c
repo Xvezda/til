@@ -4,18 +4,17 @@
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
-#define PID_TYPE DWORD
 #define PID_FMT "%ld"
+typedef DWORD pid_t;
 #else
 #include <unistd.h>
-#define PID_TYPE pid_t
 #define PID_FMT "%d"
 #endif
 
 
 typedef struct data_s {
     char *msg;
-    PID_TYPE id;
+    pid_t id;
 } data_t;
 
 #if defined(_WIN32)
@@ -55,7 +54,7 @@ int main(void)
         WaitForSingleObject(hThread, INFINITE);
     }
 #else
-    PID_TYPE pid;
+    pid_t pid;
 
     if((pid=fork()) == 0) {
         // If pid == 0, it's parent process
