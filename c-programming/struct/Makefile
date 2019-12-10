@@ -1,13 +1,13 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -pedantic -O2
+SOURCES=$(wildcard *.c)
+OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
 TARGET=main
 
 
 all: $(TARGET)
 
-$(TARGET): $(TARGET).o
-
-$(TARGET).o: $(TARGET).c
+$(TARGET): $(OBJECTS)
 
 run:
 	./$(TARGET)
