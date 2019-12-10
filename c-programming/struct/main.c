@@ -6,10 +6,10 @@
  * Below is called ``compound literal''
  * Reference: https://gcc.gnu.org/onlinedocs/gcc/Compound-Literals.html
  */
-#define OBJECT(type, data, size) \
+#define OBJECT(type, data) \
     &(obj_t) { \
         ._type = type, \
-        ._size = size, \
+        ._size = sizeof(data), \
         ._ptr = (void *)(data) \
     }
 
@@ -52,13 +52,13 @@ static void print_obj(obj_t *obj)
 int main(void)
 {
     // It works... now thats interesting 🤔
-    print_obj(OBJECT(TYPE_STR, "foobar", sizeof("foobar")));
+    print_obj(OBJECT(TYPE_STR, "foobar"));
     char foobar[] = "hello world";
-    print_obj(OBJECT(TYPE_STR, foobar, sizeof(foobar)));
+    print_obj(OBJECT(TYPE_STR, foobar));
 
-    print_obj(OBJECT(TYPE_INT, 1234, sizeof(1234)));
+    print_obj(OBJECT(TYPE_INT, 1234));
     int test = 31337;
-    print_obj(OBJECT(TYPE_INT_PTR, &test, sizeof(&test)));
+    print_obj(OBJECT(TYPE_INT_PTR, &test));
 
     return 0;
 }
