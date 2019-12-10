@@ -24,6 +24,8 @@ void print_msg(data_t *data);
 int main(void)
 {
     data_t data;
+
+    puts("=Before fork=");
 #if defined(_WIN32)
 
     DWORD dwThreadId;
@@ -50,7 +52,6 @@ int main(void)
 #else
     pid_t pid;
 
-    puts("=Before fork=");
     if((pid=fork()) == 0) {
         // If pid == 0, it's parent process
         data.msg = "parent";
