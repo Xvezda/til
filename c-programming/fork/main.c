@@ -23,21 +23,26 @@ void print_msg(data_t *data);
 
 int main(void)
 {
+    data_t data;
+
+    puts("=Before fork=");
 #if defined(_WIN32)
 
     DWORD dwThreadId;
     HANDLE hThread;
 
-    data_t parentData = { .msg = "parent", .id = 0 };
-    data_t childData = { .msg = "child", .id = 0 };
+    data.msg = "parent";
+    data.id = 0;
 
-    print_msg(&parentData);
+    print_msg(&data);
+
+    data.msg = "child";
 
     hThread = CreateThread(
         NULL,
         0,
         print_msg,
-        &childData,
+        &data,
         0,
         &dwThreadId);
 
@@ -46,9 +51,7 @@ int main(void)
     }
 #else
     pid_t pid;
-    data_t data;
 
-    puts("=Before fork=");
     if((pid=fork()) == 0) {
         // If pid == 0, it's parent process
         data.msg = "parent";
