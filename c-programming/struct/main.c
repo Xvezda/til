@@ -10,8 +10,10 @@
 
 
 typedef struct test_s {
-    int dummy;
-    char *msg;
+    union {
+        int dummy;
+        char *msg;
+    };
 } test_t;
 
 
