@@ -6,10 +6,11 @@
  * Below is called ``compound literal''
  * Reference: https://gcc.gnu.org/onlinedocs/gcc/Compound-Literals.html
  */
-#define TEST_OBJ(msg_) &(test_t) { .msg = (char *)msg_ }
+#define TEST_OBJ(msg_) &(test_t) { .size = sizeof(msg_), .msg = (char *)msg_ }
 
 
 typedef struct test_s {
+    size_t size;
     union {
         int dummy;
         char *msg;
