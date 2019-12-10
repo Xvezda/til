@@ -60,7 +60,7 @@ static void run_test(void)
     linked_list_append(&list, tmp2, sizeof(tmp2));
 
     item = linked_list_unshift(&list);
-    printf("last item: %s\n", item);
+    printf("last item: %s\n", (char *) item);
     free(item);
 
     // Try extra unshifting
