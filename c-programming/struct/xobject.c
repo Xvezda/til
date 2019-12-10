@@ -1,9 +1,8 @@
 #include "xobject.h"
 
 
-void print_obj(obj_t *obj)
+inline void print_obj(obj_t *obj)
 {
-    printf("%s\n", CALL_OBJECT_HANDLER(obj, cstr));
 #if 0
     char *fmt;
     switch (obj->_type) {
@@ -26,5 +25,7 @@ void print_obj(obj_t *obj)
     }
     printf(fmt, obj->_ptr);
 #endif
+    // Now it's safer 🙂
+    printf("%s\n", CALL_OBJECT_HANDLER(obj, cstr));
 }
 
