@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define _TEST_S(msg_) &(test_t) { .msg = (char *)msg_ }
+#define TEST_OBJ(msg_) &(test_t) { .msg = (char *)msg_ }
 
 
 typedef struct test_s {
@@ -20,7 +20,7 @@ static void print_test(test_t *test)
 int main(void)
 {
     // It works... now thats interesting 🤔
-    print_test(_TEST_S("foobar"));
+    print_test(TEST_OBJ("foobar"));
 
     return 0;
 }
