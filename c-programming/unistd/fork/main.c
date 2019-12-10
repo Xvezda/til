@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #if defined(_WIN32)
 #include <windows.h>
 #include <tchar.h>
@@ -6,6 +7,7 @@
 #else
 #include <unistd.h>
 #endif
+
 
 typedef struct data_s {
     char *msg;
@@ -44,14 +46,17 @@ int main(void)
     }
 #else
     pid_t pid;
+    data_t data;
 
     puts("=Before fork=");
     if((pid=fork()) == 0) {
         // If pid == 0, it's parent process
-        print_msg("parent", pid);
+        data.msg = "parent";
     } else {
-        print_msg("child", pid);
+        data.msg = "child";
     }
+    data.id = pid;
+    print_msg(&data);
 #endif
     return 0;
 }
