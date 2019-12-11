@@ -1,5 +1,5 @@
-#ifndef _XOBJECT_H
-#define _XOBJECT_H
+#ifndef XOBJECT_H_
+#define XOBJECT_H_
 
 #include <stdio.h>
 #include <string.h>
@@ -46,4 +46,4 @@ typedef struct obj_s {
 void print_obj(obj_t *obj);
 
 
-#endif  // _XOBJECT_H
+#endif  // XOBJECT_H_

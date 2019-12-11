@@ -1,5 +1,5 @@
-#ifndef _ABSTRACT_ITEM_H
-#define _ABSTRACT_ITEM_H
+#ifndef ABSTRACT_ITEM_H_
+#define ABSTRACT_ITEM_H_
 
 
 #include <stdio.h>
@@ -49,4 +49,4 @@ void item_del(abs_item_t *item);
 #endif
 
 
-#endif  // _ABSTRACT_ITEM_H
+#endif  // ABSTRACT_ITEM_H_

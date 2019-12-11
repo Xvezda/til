@@ -1,5 +1,5 @@
-#ifndef _HANDLERS_H
-#define _HANDLERS_H
+#ifndef HANDLERS_H_
+#define HANDLERS_H_
 
 #include <stdio.h>
 #include <string.h>
@@ -25,4 +25,4 @@ void type_double_del_handler(obj_t *self);
 char *type_double_cstr_handler(obj_t *self);
 
 
-#endif  // _HANDLERS_H
+#endif  // HANDLERS_H_

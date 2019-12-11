@@ -1,8 +1,8 @@
 /**
  * @copyright (C) 2019 Xvezda <https://xvezda.com/>
  */
-#ifndef _LINKED_LIST_H
-#define _LINKED_LIST_H
+#ifndef LINKED_LIST_H_
+#define LINKED_LIST_H_
 
 #include <stdio.h>
 #include <string.h>
@@ -42,5 +42,5 @@ void linked_list_append(linked_list_t **ref, const void *ptr, size_t size);
 void linked_list_del(linked_list_t **ref);
 
 
-#endif  // _LINKED_LIST_H
+#endif  // LINKED_LIST_H_
 
