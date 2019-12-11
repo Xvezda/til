@@ -41,26 +41,27 @@ void *linked_list_unshift(linked_list_t **ref)
 {
     if (!ref || !*ref) return NULL;
 
-    if (!(*ref)->_next->_next) {
+    linked_list_t *entry = (*ref)->_next;
+    if (!entry->_next) {
         fprintf(stderr, "EmptyError: unshift operation failed."
                         " (linked list is empty)\n");
         return NULL;
     }
 
     void *ret = NULL;
-    void *data = (*ref)->_next->_next->data;
-    size_t size = linked_list_get_size((*ref)->_next->_next);
+    void *data = entry->_next->data;
+    size_t size = linked_list_get_size(entry->_next);
 
-    DEBUG_PRINT("ref: %p, size: %zu\n", (void*) (*ref)->_next->_next, size);
+    DEBUG_PRINT("ref: %p, size: %zu\n", (void*) entry->_next, size);
 
     if (data) {
         ret = malloc(size);
         memcpy(ret, data, size);
     }
-    free((*ref)->_next->_next->data);
-    (*ref)->_next->_next->data = NULL;
+    free(entry->_next->data);
+    entry->_next->data = NULL;
 
-    (*ref)->_next->_next = (*ref)->_next->_next->_next;
+    entry->_next = entry->_next->_next;
 
     return ret;
 }
