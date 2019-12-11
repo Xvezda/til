@@ -10,10 +10,10 @@ obj_t *type_str_init_handler(obj_t *self, ...)
     va_start(ap, self);
 
     char *str = va_arg(ap, char *);
-    char *ret = malloc(self->_size);
+    char *ret = malloc(self->size_);
 
-    memcpy(ret, str, self->_size);
-    self->_ptr = ret;
+    memcpy(ret, str, self->size_);
+    self->ptr_ = ret;
 
     va_end(ap);
 
@@ -23,14 +23,14 @@ obj_t *type_str_init_handler(obj_t *self, ...)
 
 void type_str_del_handler(obj_t *self)
 {
-    free(self->_ptr);
-    self->_ptr = NULL;
+    free(self->ptr_);
+    self->ptr_ = NULL;
 }
 
 
 char *type_str_cstr_handler(obj_t *self)
 {
-    return strdup(self->_ptr);
+    return strdup(self->ptr_);
 }
 
 
@@ -43,10 +43,10 @@ obj_t *type_int_init_handler(obj_t *self, ...)
     va_start(ap, self);
 
     int data = va_arg(ap, int);
-    int *ret = malloc(self->_size);
+    int *ret = malloc(self->size_);
 
-    memcpy(ret, &data, self->_size);
-    self->_ptr = ret;
+    memcpy(ret, &data, self->size_);
+    self->ptr_ = ret;
 
     va_end(ap);
 
@@ -56,18 +56,18 @@ obj_t *type_int_init_handler(obj_t *self, ...)
 
 void type_int_del_handler(obj_t *self)
 {
-    free(self->_ptr);
-    self->_ptr = NULL;
+    free(self->ptr_);
+    self->ptr_ = NULL;
 }
 
 
 char *type_int_cstr_handler(obj_t *self)
 {
     char *ret = NULL;
-    int len = snprintf(NULL, 0, "%d", *(int *)self->_ptr);
+    int len = snprintf(NULL, 0, "%d", *(int *)self->ptr_);
 
     ret = malloc(len+1);
-    snprintf(ret, len+1, "%d", *(int *)self->_ptr);
+    snprintf(ret, len+1, "%d", *(int *)self->ptr_);
 
     ret[len] = '\0';
 
@@ -84,10 +84,10 @@ obj_t *type_int_ptr_init_handler(obj_t *self, ...)
     va_start(ap, self);
 
     int *ptr = va_arg(ap, int *);
-    int *ret = malloc(self->_size);
+    int *ret = malloc(self->size_);
 
-    memcpy(ret, ptr, self->_size);
-    self->_ptr = ret;
+    memcpy(ret, ptr, self->size_);
+    self->ptr_ = ret;
 
     va_end(ap);
 
@@ -97,17 +97,17 @@ obj_t *type_int_ptr_init_handler(obj_t *self, ...)
 
 void type_int_ptr_del_handler(obj_t *self)
 {
-    free(self->_ptr);
-    self->_ptr = NULL;
+    free(self->ptr_);
+    self->ptr_ = NULL;
 }
 
 char *type_int_ptr_cstr_handler(obj_t *self)
 {
     char *ret = NULL;
-    int len = snprintf(NULL, 0, "%d", *(int *)self->_ptr);
+    int len = snprintf(NULL, 0, "%d", *(int *)self->ptr_);
 
     ret = malloc(len+1);
-    snprintf(ret, len+1, "%d", *(int *)self->_ptr);
+    snprintf(ret, len+1, "%d", *(int *)self->ptr_);
 
     ret[len] = '\0';
 
@@ -124,10 +124,10 @@ obj_t *type_double_init_handler(obj_t *self, ...)
     va_start(ap, self);
 
     double data = va_arg(ap, double);
-    double *ret = malloc(self->_size);
+    double *ret = malloc(self->size_);
 
-    memcpy(ret, &data, self->_size);
-    self->_ptr = ret;
+    memcpy(ret, &data, self->size_);
+    self->ptr_ = ret;
 
     va_end(ap);
 
@@ -137,8 +137,8 @@ obj_t *type_double_init_handler(obj_t *self, ...)
 
 void type_double_del_handler(obj_t *self)
 {
-    free(self->_ptr);
-    self->_ptr = NULL;
+    free(self->ptr_);
+    self->ptr_ = NULL;
 }
 
 
@@ -146,10 +146,10 @@ char *type_double_cstr_handler(obj_t *self)
 {
     char *ret = NULL;
 
-    int len = snprintf(NULL, 0, "%lf", *(double *)self->_ptr);
+    int len = snprintf(NULL, 0, "%lf", *(double *)self->ptr_);
     ret = malloc(len+1);
 
-    snprintf(ret, len+1, "%lf", *(double *)self->_ptr);
+    snprintf(ret, len+1, "%lf", *(double *)self->ptr_);
 
     ret[len] = '\0';
 

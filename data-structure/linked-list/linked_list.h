@@ -29,8 +29,8 @@ struct linked_list_s {
   /* Public attributes */
   void *data;
   /* Private attributes */
-  size_t _data_size;
-  struct linked_list_s *_next;
+  size_t data_size_;
+  struct linked_list_s *next_;
 };
 typedef struct linked_list_s linked_list_t;
 

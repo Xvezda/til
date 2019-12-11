@@ -31,9 +31,9 @@ void linked_list_init(linked_list_t **ref)
     entry->data = NULL;
     // Entry must has size 0 \w not null data
     linked_list_set_size(entry, 0);
-    entry->_next = NULL;
+    entry->next_ = NULL;
 
-    (*ref)->_next = entry;
+    (*ref)->next_ = entry;
 }
 
 
@@ -41,27 +41,27 @@ void *linked_list_unshift(linked_list_t **ref)
 {
     if (!ref || !*ref) return NULL;
 
-    linked_list_t *entry = (*ref)->_next;
-    if (!entry->_next) {
+    linked_list_t *entry = (*ref)->next_;
+    if (!entry->next_) {
         fprintf(stderr, "EmptyError: unshift operation failed."
                         " (linked list is empty)\n");
         return NULL;
     }
 
     void *ret = NULL;
-    void *data = entry->_next->data;
-    size_t size = linked_list_get_size(entry->_next);
+    void *data = entry->next_->data;
+    size_t size = linked_list_get_size(entry->next_);
 
-    DEBUG_PRINT("ref: %p, size: %zu\n", (void*) entry->_next, size);
+    DEBUG_PRINT("ref: %p, size: %zu\n", (void*) entry->next_, size);
 
     if (data) {
         ret = malloc(size);
         memcpy(ret, data, size);
     }
-    free(entry->_next->data);
-    entry->_next->data = NULL;
+    free(entry->next_->data);
+    entry->next_->data = NULL;
 
-    entry->_next = entry->_next->_next;
+    entry->next_ = entry->next_->next_;
 
     return ret;
 }
@@ -80,7 +80,7 @@ void linked_list_append(linked_list_t **ref, const void *ptr, size_t size)
 
     new_node->data = new_item;
     linked_list_set_size(new_node, size);
-    new_node->_next = NULL;
+    new_node->next_ = NULL;
 
     DEBUG_PRINT("ref: %p\n", (void*) *ref);
 
@@ -89,7 +89,7 @@ void linked_list_append(linked_list_t **ref, const void *ptr, size_t size)
     DEBUG_PRINT("last_node: %p\n", (void*) last_node);
 
     assert(last_node != NULL);
-    last_node->_next = new_node;
+    last_node->next_ = new_node;
 }
 
 
@@ -97,7 +97,7 @@ void linked_list_del(linked_list_t **ref)
 {
     if (!ref || !*ref) return;
 
-    linked_list_t *curitem = (*ref)->_next;
+    linked_list_t *curitem = (*ref)->next_;
     do {
         if (curitem->data) free(curitem->data);
         curitem->data = NULL;
@@ -106,7 +106,7 @@ void linked_list_del(linked_list_t **ref)
 
         linked_list_set_size(curitem, 0);
 
-        linked_list_t *next = curitem->_next;
+        linked_list_t *next = curitem->next_;
         free(curitem);
         curitem = next;
     } while (curitem);
@@ -122,8 +122,8 @@ linked_list_t *linked_list_wind(linked_list_t **ref)
     if (!ref || !*ref) return NULL;
 
     linked_list_t *curitem = *ref;
-    while (curitem->_next) {
-        curitem = curitem->_next;
+    while (curitem->next_) {
+        curitem = curitem->next_;
     }
     return curitem;
 }
@@ -133,7 +133,7 @@ static inline size_t
 linked_list_get_size(const linked_list_t *ptr)
 {
     if (!ptr) return 0;
-    return ptr->_data_size;
+    return ptr->data_size_;
 }
 
 
@@ -141,6 +141,6 @@ static inline void
 linked_list_set_size(linked_list_t *ptr, size_t size)
 {
     if (!ptr) return;
-    ptr->_data_size = size;
+    ptr->data_size_ = size;
 }
 
