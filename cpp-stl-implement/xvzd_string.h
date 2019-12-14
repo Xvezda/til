@@ -75,16 +75,17 @@ public:
 
   String(int number) {
     String();
-    size_t len = std::snprintf(nullptr, 0, "%d", number);
-    char *tmp = new char[len+1];
-    std::snprintf(tmp, len+1, "%d", number);
-    tmp[len] = '\0';
+    NumToStr("%d", number);
+  }
 
-    CopyStr(tmp, len);
+  String(long number) {
+    String();
+    NumToStr("%ld", number);
+  }
 
-    assert(tmp != nullptr);
-    delete[] tmp;
-    tmp = nullptr;
+  String(double number) {
+    String();
+    NumToStr("%lf", number);
   }
 
   ~String() {
@@ -267,6 +268,20 @@ private:
   inline void SetEnd(size_t end) {
     meta.ptr[end] = '\0';
     meta.len = end;
+  }
+
+  template <typename T>
+  void NumToStr(const char* fmt, T number) {
+    size_t len = std::snprintf(nullptr, 0, fmt, number);
+    char *tmp = new char[len+1];
+    std::snprintf(tmp, len+1, fmt, number);
+    tmp[len] = '\0';
+
+    CopyStr(tmp, len);
+
+    assert(tmp != nullptr);
+    delete[] tmp;
+    tmp = nullptr;
   }
 
   void CopyStr(const char *src, size_t size) {

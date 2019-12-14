@@ -52,5 +52,7 @@ int main(void) {
   str = String("A");
   std::cout << str.CharCodeAt(0) << std::endl;
 
+  std::cout << String(123.456) << std::endl;
+
   return 0;
 }
