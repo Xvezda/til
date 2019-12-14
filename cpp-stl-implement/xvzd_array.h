@@ -10,7 +10,7 @@
 namespace xvzd {
 
 
-const size_t LOWEST_CAPACITY = 0x10;
+const size_t kLowestCapacity = 0x10;
 
 template <typename T>
 class Array : public Object {
@@ -76,7 +76,7 @@ private:
   }
 
   void Init() {
-    capacity_ = LOWEST_CAPACITY;
+    capacity_ = kLowestCapacity;
     items = new T[capacity_];
     size = 0;
     unit = sizeof(T *);
@@ -84,7 +84,7 @@ private:
   }
 
   void Init(size_t size_) {
-    capacity_ = size_ & ~(LOWEST_CAPACITY | 1);
+    capacity_ = size_ & ~(kLowestCapacity | 1);
     items = new T[capacity_];
     size = size_;
     unit = sizeof(T *);
