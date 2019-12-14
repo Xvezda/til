@@ -13,11 +13,15 @@
 
 namespace xvzd {
 
+
+const auto kDefaultCapacity = 0x10;
+
 /**
  * TODO: Add exceptions
  */
 typedef struct StringMeta {
-  size_t len;
+  size_t len;  // null-terminated string length
+  size_t cap;  // capacity
   char  *ptr;
 } str_meta_t;
 
@@ -50,9 +54,9 @@ public:
     size_t len = std::strlen(other);
     size_t new_len = len * repeat;
 
-    meta.ptr = new char[new_len+1];
+    NewStr(new_len);
     meta.ptr[0] = '\0';
-    for (int i = repeat; i > 0; --i) {
+    for (auto i = repeat; i > 0; --i) {
       std::strncat(meta.ptr, other, len);
     }
     meta.len = new_len;
@@ -63,7 +67,7 @@ public:
     size_t len = 1;
     size_t new_len = len * repeat;
 
-    meta.ptr = new char[new_len+1];
+    NewStr(new_len);
     std::memset(meta.ptr, chr, new_len);
     SetEnd(new_len);
   }
@@ -123,7 +127,13 @@ public:
   }
 
   String& Append(const String& other) {
+    if (!meta.len) {
+      Clear();
+      CopyStr(other.CStr(), other.Length());
+      return *this;
+    }
     size_t other_len = other.Length();
+    if (!other_len) return *this;
     // Make temporal copy
     char *tmp = new char[meta.len + other_len + 1];
     std::memcpy(tmp, meta.ptr, meta.len);
@@ -138,17 +148,57 @@ public:
     return *this;
   }
 
+  String& Assign(const String& other) {
+    if (this == &other) return *this;
+
+    if (meta.cap >= other.Length()) {
+      CopyRawStr(meta.ptr, other.CStr(), other.Length());
+      SetEnd(other.Length());
+    } else {
+      Clear();
+      CopyStr(other.CStr(), other.Length());
+    }
+    return *this;
+  }
+
   String Concat(const String& other) {
+    if (!meta.ptr) {
+      return String(other);
+    }
     String cpy(*this);
     cpy += other;
     return cpy;
+  }
+
+  String& Erase(int offset, size_t len) {
+    String orig = String(*this);
+    *this = orig.Slice(0, offset) + orig.Slice(offset+len);
+    return *this;
+  }
+
+  String Insert(int offset, const String& other) {
+    String orig = String(*this);
+    return orig.Slice(0, offset) + other + orig.Slice(offset);
+  }
+
+  int IndexOf(const String& other) const {
+    size_t needle_len = other.Length();
+    size_t haystack_len = Length();
+
+    if (needle_len > haystack_len) goto notfound;
+
+    for (size_t i = 0; i < haystack_len - needle_len; ++i) {
+      if (!std::strncmp(CStr()+i, other.CStr(), needle_len)) return i;
+    }
+notfound:
+    return -1;
   }
 
   String Repeat(int repeat) {
     String tmp = String(*this);
     String result = String();
 
-    for (int cnt = repeat; cnt > 0; --cnt) {
+    for (auto cnt = repeat; cnt > 0; --cnt) {
       result += tmp;
     }
     return result;
@@ -168,6 +218,7 @@ public:
   }
 
   String Slice(int start, int end) {
+    if (!start && !end) return String();
     if (start < 0) {
       start = 0;
     }
@@ -175,7 +226,10 @@ public:
     String ret = String(*this).Slice(start);
 
     size_t len = ret.Length();
+    assert(len > 0);
     char *tmp = new char[len+1];
+
+    assert(tmp != nullptr);
 
     std::memcpy(tmp, ret.CStr(), len);
     tmp[end-start] = '\0';
@@ -195,15 +249,10 @@ public:
   }
 
   String& operator=(const String& other) {
-    if (this == &other) return *this;
-
-    Clear();
-    CopyStr(other.CStr(), other.Length());
-
-    return *this;
+    return Assign(other);
   }
 
-  const String operator+(const String& other) {
+  String operator+(const String& other) {
     String cpy(*this);
     return cpy.Concat(other);
   }
@@ -232,17 +281,26 @@ public:
   }
 
 private:
-  str_meta_t meta;
-
   inline void Init() {
     Reset();
-    meta.ptr = new char[1];
+    NewStr(kDefaultCapacity);
     meta.ptr[0] = '\0';
+    /* meta.ptr = nullptr; */
   }
 
   inline void Reset() {
     meta.ptr = nullptr;
     meta.len = 0;
+    meta.cap = 0;
+  }
+
+  void NewStr(size_t len) {
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "new string allocation -> size: " << len << std::endl;
+#endif
+    meta.cap = len+1;
+    meta.ptr = new char[meta.cap];
   }
 
   inline void DelStr() {
@@ -279,13 +337,18 @@ private:
     tmp = nullptr;
   }
 
-  void CopyStr(const char *src, size_t size) {
-    if (!src) return;
-    meta.ptr = new char[size+1];
+  void CopyRawStr(char *dst, const char *src, size_t size) {
+    if (!src || !dst) return;
 
     assert(meta.ptr != nullptr && src);
     std::memcpy(meta.ptr, src, size);
+  }
 
+  void CopyStr(const char *src, size_t size) {
+    if (!src) return;
+    NewStr(size);
+
+    CopyRawStr(meta.ptr, src, size);
     SetEnd(size);
   }
 
@@ -300,6 +363,8 @@ private:
     size_t other_len = other.Length();
     CopyStr(other.CStr(), other_len);
   }
+
+  str_meta_t meta;
 };
 
 }  // namespace xvzd

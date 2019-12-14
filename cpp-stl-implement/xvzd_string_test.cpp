@@ -49,10 +49,27 @@ int main(void) {
   std::cout << str.Slice(-28) << std::endl;
   std::cout << str.Substr(-24, 11).Repeat(3) << std::endl;
 
+  char word[] = "fox";
+  int idx = str.IndexOf(word);
+  std::cout << "IndexOf(" << word << "): " << idx << std::endl;
+
   str = String("A");
   std::cout << str.CharCodeAt(0) << std::endl;
 
   std::cout << String(123.456) << std::endl;
+
+  str = "no alloc no alloc no alloc no alloc no alloc";
+  str = "no new memory allocation";
+  std::cout << str << std::endl;
+
+  str = "foo baz";
+  str = str.Insert(4, "bar ");
+  std::cout << str << std::endl;
+  /* std::cout << str.Insert(4, 'z') << std::endl; */
+
+  str.Erase(0, 4);
+  std::cout << str << std::endl;
+
 
   return 0;
 }
