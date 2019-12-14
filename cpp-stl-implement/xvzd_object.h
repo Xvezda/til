@@ -3,17 +3,17 @@
 
 
 #include <iostream>
+#include "xvzd_base.h"
 
 namespace xvzd {
 
 
-class Object {
+class Object : public Base {
 public:
   Object() {}
   virtual ~Object() {}
   virtual const char* CStr() const {
-    const char* ret = "[object Object]";
-    return ret;
+    return "[object Object]";
   }
   friend std::ostream& operator<<(std::ostream& os, const Object& self) {
     os << self.CStr();
