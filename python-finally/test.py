@@ -32,11 +32,12 @@ def test2():
 
 
 def main():
-    test1()
+    ret = test1()
+    print(ret)
     try:
         test2()
     except:
-        pass
+        print('exception raised')
 
 
 if __name__ == '__main__':
