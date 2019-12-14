@@ -47,6 +47,10 @@ int main(void) {
   str = String("The quick brown fox jumps over the lazy dog.");
   std::cout << str.Slice(4, 19) << std::endl;
   std::cout << str.Slice(-28) << std::endl;
+  std::cout << str.Substr(-24, 11).Repeat(3) << std::endl;
+
+  str = String("A");
+  std::cout << str.CharCodeAt(0) << std::endl;
 
   return 0;
 }

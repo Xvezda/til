@@ -94,11 +94,28 @@ public:
     }
   }
 
-  size_t Length() const {
+  size_t SetLength(size_t len) {
+    if (meta.ptr) {
+      if (meta.len < len) {
+        len = meta.len;
+      } else if (len < 0) {
+        len = 0;
+      }
+      meta.ptr[len] = '\0';
+      meta.len = len;
+    }
+    return GetLength();
+  }
+
+  inline size_t GetLength() const {
     return meta.len;
   }
 
-  const char* CStr() const {
+  inline size_t Length() const {
+    return GetLength();
+  }
+
+  inline const char* CStr() const {
     return meta.ptr;
   }
 
@@ -122,13 +139,13 @@ public:
     return *this;
   }
 
-  const String Concat(const String& other) {
+  String Concat(const String& other) {
     String cpy(*this);
     cpy += other;
     return cpy;
   }
 
-  const String Repeat(int repeat) {
+  String Repeat(int repeat) {
     String tmp = String(*this);
     String result = String();
 
@@ -138,7 +155,7 @@ public:
     return result;
   }
 
-  const String Slice(int start) {
+  String Slice(int start) {
     if (!meta.ptr) return String();
     if (start < 0) {
       String ret = String(*this);
@@ -151,7 +168,7 @@ public:
     return String(meta.ptr+start);
   }
 
-  const String Slice(int start, int end) {
+  String Slice(int start, int end) {
     if (start < 0) {
       start = 0;
     }
@@ -167,6 +184,13 @@ public:
     ret = String(tmp);
     delete[] tmp;
     tmp = nullptr;
+
+    return ret;
+  }
+
+  String Substr(int from, size_t len) {
+    String ret = String(*this).Slice(from);
+    ret.SetLength(len);
 
     return ret;
   }
@@ -190,7 +214,11 @@ public:
     return *this;
   }
 
-  char operator[](int idx) const {
+  int CharCodeAt(int idx) const {
+    return CharAt(idx);
+  }
+
+  char CharAt(int idx) const {
     if (idx < 0) {
       size_t len = Length();
       int new_idx = len - std::abs(idx);
@@ -198,6 +226,10 @@ public:
       return meta.ptr[new_idx];
     }
     return meta.ptr[idx];
+  }
+
+  char operator[](int idx) const {
+    return CharAt(idx);
   }
 
   friend std::ostream& operator<<(std::ostream& os, const String& self) {
