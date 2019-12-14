@@ -138,6 +138,39 @@ public:
     return result;
   }
 
+  const String Slice(int start) {
+    if (!meta.ptr) return String();
+    if (start < 0) {
+      String ret = String(*this);
+      int offset = ret.Length() + start;
+      if (offset < 0) {
+        offset = 0;
+      }
+      return ret.Slice(offset);
+    }
+    return String(meta.ptr+start);
+  }
+
+  const String Slice(int start, int end) {
+    if (start < 0) {
+      start = 0;
+    }
+    if (end <= start) return String();
+    String ret = String(*this).Slice(start);
+
+    size_t len = ret.Length();
+    char *tmp = new char[len+1];
+
+    std::memcpy(tmp, ret.CStr(), len);
+    tmp[end-start] = '\0';
+
+    ret = String(tmp);
+    delete[] tmp;
+    tmp = nullptr;
+
+    return ret;
+  }
+
   String& operator=(const String& other) {
     if (this == &other) return *this;
 

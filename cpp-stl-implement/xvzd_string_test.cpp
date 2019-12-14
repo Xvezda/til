@@ -42,5 +42,11 @@ int main(void) {
   std::cout << String(String("a")) << std::endl;
   std::cout << String(String("uiop"), 3) << std::endl;
 
+  std::cout << String("-", 10) << std::endl;
+
+  str = String("The quick brown fox jumps over the lazy dog.");
+  std::cout << str.Slice(4, 19) << std::endl;
+  std::cout << str.Slice(-28) << std::endl;
+
   return 0;
 }
