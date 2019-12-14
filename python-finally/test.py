@@ -49,6 +49,15 @@ def main():
         print('exception raised')
     ret = test3()
     print(ret)
+    '''
+    Result:
+
+    print me
+    Immediate return
+    print me 2
+    exception raised
+    baz
+    '''
 
 
 if __name__ == '__main__':
