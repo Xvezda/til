@@ -190,7 +190,7 @@ public:
     return *this;
   }
 
-  String Insert(int offset, const String& other) {
+  String Insert(int offset, const String& other) const {
     String orig = String(*this);
     return orig.Slice(0, offset) + other + orig.Slice(offset);
   }
@@ -220,7 +220,7 @@ notfound:
     return (result != -1) ? result + from : -1;
   }
 
-  String Repeat(int repeat) {
+  String Repeat(int repeat) const {
     String tmp = String(*this);
     String result = String();
 
@@ -230,7 +230,7 @@ notfound:
     return result;
   }
 
-  String Slice(int start) {
+  String Slice(int start) const {
     if (!meta.ptr) return String();
     if (start < 0) {
       String ret = String(*this);
@@ -243,7 +243,7 @@ notfound:
     return String(meta.ptr+start);
   }
 
-  String Slice(int start, int end) {
+  String Slice(int start, int end) const {
     if (!start && !end) return String();
     if (start < 0) {
       start = 0;
@@ -267,7 +267,7 @@ notfound:
     return ret;
   }
 
-  String Substr(int from, size_t len) {
+  String Substr(int from, size_t len) const {
     String ret = String(*this).Slice(from);
     ret.SetLength(len);
 
@@ -287,7 +287,7 @@ notfound:
     return !(*this == other);
   }
 
-  String operator+(const String& other) {
+  String operator+(const String& other) const {
     String cpy(*this);
     return cpy.Concat(other);
   }
