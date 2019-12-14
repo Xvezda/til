@@ -101,20 +101,20 @@ public:
 private:
   str_meta_t meta;
 
-  void Init() {
+  inline void Init() {
     Reset();
   }
 
-  void Reset() {
+  inline void Reset() {
     meta.ptr = nullptr;
     meta.len = 0;
   }
 
-  void DelStr() {
+  inline void DelStr() {
     delete[] meta.ptr;
   }
 
-  void Clear() {
+  inline void Clear() {
     DelStr();
     Reset();
   }
