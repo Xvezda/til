@@ -295,6 +295,9 @@ private:
   }
 
   void NewStr(size_t len) {
+    if (len < kDefaultCapacity) {
+      len = kDefaultCapacity;
+    }
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
       << "new string allocation -> size: " << len << std::endl;
