@@ -31,6 +31,15 @@ def test2():
     print('with out finally 2')
 
 
+def test3():
+    try:
+        return 'foo'
+    except:
+        return 'bar'
+    finally:
+        return 'baz'
+
+
 def main():
     ret = test1()
     print(ret)
@@ -38,6 +47,8 @@ def main():
         test2()
     except:
         print('exception raised')
+    ret = test3()
+    print(ret)
 
 
 if __name__ == '__main__':
