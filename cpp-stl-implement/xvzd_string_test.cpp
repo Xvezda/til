@@ -70,6 +70,23 @@ int main(void) {
   str.Erase(0, 4);
   std::cout << str << std::endl;
 
+  str = "abcdefghijklmnopqrstuvwxyz";
+  std::cout << str.Find(10, 's') << std::endl;
+
+  String a = "cat";
+  String b = "dog";
+
+  std::cout << a.Compare(b) << std::endl;
+
+  std::cout << a << " == " << b << ": "
+    << (a == b ? "YES" : "NO") << std::endl;
+
+  std::cout << a << " != " << b << ": "
+    << (a != b ? "YES" : "NO") << std::endl;
+
+  b = "cat";
+  std::cout << a << " == " << b << ": "
+    << (a == b ? "YES" : "NO") << std::endl;
 
   return 0;
 }

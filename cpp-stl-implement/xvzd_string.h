@@ -14,6 +14,8 @@
 namespace xvzd {
 
 
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+
 const auto kDefaultCapacity = 0x10;
 
 /**
@@ -170,6 +172,18 @@ public:
     return cpy;
   }
 
+  int Compare(const String& other) const {
+    size_t this_len = Length();
+    size_t other_len = other.Length();
+    size_t minimum = MIN(this_len, other_len);
+    int result = std::strncmp(CStr(), other.CStr(), minimum);
+    if (!result) {
+      if (this_len == other_len) return 0;
+      else return (minimum == this_len) ? -1 : 1;
+    }
+    return result;
+  }
+
   String& Erase(int offset, size_t len) {
     String orig = String(*this);
     *this = orig.Slice(0, offset) + orig.Slice(offset+len);
@@ -192,6 +206,18 @@ public:
     }
 notfound:
     return -1;
+  }
+
+  int Find(int from, const String& other) const {
+    if (from < 0) {
+      from = other.Length() - std::abs(from);
+      if (from < 0) {
+        from = 0;
+      }
+    }
+    String target = String(*this).Slice(from);
+    int result = target.IndexOf(other);
+    return (result != -1) ? result + from : -1;
   }
 
   String Repeat(int repeat) {
@@ -250,6 +276,15 @@ notfound:
 
   String& operator=(const String& other) {
     return Assign(other);
+  }
+
+  bool operator==(const String& other) const {
+    if (!Compare(other)) return true;
+    else return false;
+  }
+
+  bool operator!=(const String& other) const {
+    return !(*this == other);
   }
 
   String operator+(const String& other) {
