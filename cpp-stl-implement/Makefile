@@ -7,4 +7,4 @@ TARGETS=$(patsubst %.cpp,%,$(wildcard *.cpp))
 all: $(TARGETS)
 
 clean:
-	rm -rf *.o $(TARGETS)
+	rm -rf *.o $(TARGETS) *.dSYM
