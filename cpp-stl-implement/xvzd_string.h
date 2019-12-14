@@ -7,11 +7,12 @@
 #include <cstdlib>
 #include <cassert>
 
+
 namespace xvzd {
 
 typedef struct StringMeta {
   size_t len;
-  char *ptr;
+  char  *ptr;
 } str_meta_t;
 
 class String {
