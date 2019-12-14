@@ -65,8 +65,7 @@ public:
 
     meta.ptr = new char[new_len+1];
     std::memset(meta.ptr, chr, new_len);
-    meta.ptr[new_len] = '\0';
-    meta.len = new_len;
+    SetEnd(new_len);
   }
 
   String(const String& other) {
@@ -101,8 +100,7 @@ public:
       } else if (len < 0) {
         len = 0;
       }
-      meta.ptr[len] = '\0';
-      meta.len = len;
+      SetEnd(len);
     }
     return GetLength();
   }
@@ -214,7 +212,7 @@ public:
     return *this;
   }
 
-  int CharCodeAt(int idx) const {
+  inline int CharCodeAt(int idx) const {
     return CharAt(idx);
   }
 
@@ -266,6 +264,11 @@ private:
     Reset();
   }
 
+  inline void SetEnd(size_t end) {
+    meta.ptr[end] = '\0';
+    meta.len = end;
+  }
+
   void CopyStr(const char *src, size_t size) {
     if (!src) return;
     meta.ptr = new char[size+1];
@@ -273,8 +276,7 @@ private:
     assert(meta.ptr != nullptr && src);
     std::memcpy(meta.ptr, src, size);
 
-    meta.ptr[size] = '\0';
-    meta.len = size;
+    SetEnd(size);
   }
 
   void CopyStr(const char *src) {
