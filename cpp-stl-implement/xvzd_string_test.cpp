@@ -18,7 +18,7 @@ int main(void) {
   String str("Hello");
 
   std::cout << str << std::endl;
-  std::cout << str.append(", World!") << std::endl;
+  std::cout << str.Append(", World!") << std::endl;
 
   str += " :)";
   std::cout << str << std::endl;

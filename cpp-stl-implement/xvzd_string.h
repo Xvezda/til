@@ -17,19 +17,19 @@ typedef struct StringMeta {
 class String {
 public:
   String() {
-    init();
+    Init();
   }
 
   String(char other) {
-    copy_str(&other, 1);
+    CopyStr(&other, 1);
   }
 
   String(const char* other) {
-    copy_str(other);
+    CopyStr(other);
   }
 
   String(const String& other) {
-    copy_str(other);
+    CopyStr(other);
   }
 
   String(int number) {
@@ -38,34 +38,34 @@ public:
     std::snprintf(tmp, len+1, "%d", number);
     tmp[len] = '\0';
 
-    copy_str(tmp, len);
+    CopyStr(tmp, len);
 
     delete[] tmp;
   }
 
   ~String() {
     if (!meta.ptr && meta.len) {
-      clear();
+      Clear();
     }
   }
 
-  size_t length() const {
+  size_t Length() const {
     return meta.len;
   }
 
-  const char* c_str() const {
+  const char* CStr() const {
     return meta.ptr;
   }
 
-  String& append(const String& other) {
-    size_t other_len = other.length();
+  String& Append(const String& other) {
+    size_t other_len = other.Length();
     // Make temporal copy
     char *tmp = new char[meta.len + other_len + 1];
     std::memcpy(tmp, meta.ptr, meta.len);
-    std::memcpy(tmp+meta.len, other.c_str(), other_len);
+    std::memcpy(tmp+meta.len, other.CStr(), other_len);
     tmp[meta.len + other_len] = '\0';
 
-    del_str();
+    DelStr();
     meta.ptr = tmp;
 
     meta.len += other_len;
@@ -76,8 +76,8 @@ public:
   String& operator=(const String& other) {
     if (this == &other) return *this;
 
-    clear();
-    copy_str(other.c_str(), other.length());
+    Clear();
+    CopyStr(other.CStr(), other.Length());
 
     return *this;
   }
@@ -89,37 +89,37 @@ public:
   }
 
   String& operator+=(const String& other) {
-    append(other);
+    Append(other);
     return *this;
   }
 
   friend std::ostream& operator<<(std::ostream& os, const String& self) {
-    os << self.c_str();
+    os << self.CStr();
     return os;
   }
 
 private:
   str_meta_t meta;
 
-  void init() {
-    reset();
+  void Init() {
+    Reset();
   }
 
-  void reset() {
+  void Reset() {
     meta.ptr = nullptr;
     meta.len = 0;
   }
 
-  void del_str() {
+  void DelStr() {
     delete[] meta.ptr;
   }
 
-  void clear() {
-    del_str();
-    reset();
+  void Clear() {
+    DelStr();
+    Reset();
   }
 
-  void copy_str(const char *src, size_t size) {
+  void CopyStr(const char *src, size_t size) {
     meta.ptr = new char[size+1];
 
     assert(meta.ptr != nullptr && src);
@@ -129,14 +129,14 @@ private:
     meta.len = size;
   }
 
-  void copy_str(const char *src) {
+  void CopyStr(const char *src) {
     size_t other_len = std::strlen(src);
-    copy_str(src, other_len);
+    CopyStr(src, other_len);
   }
 
-  void copy_str(const String& other) {
-    size_t other_len = other.length();
-    copy_str(other.c_str(), other_len);
+  void CopyStr(const String& other) {
+    size_t other_len = other.Length();
+    CopyStr(other.CStr(), other_len);
   }
 };
 
