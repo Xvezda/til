@@ -4,7 +4,7 @@
 #include "linked_list.h"
 
 
-static linked_list_t *linked_list_wind(linked_list_t **ref);
+static linked_list_t *linked_list_wind(const linked_list_t *ref);
 /* Getter, Setter */
 static inline size_t linked_list_get_size(const linked_list_t *ptr);
 static inline void linked_list_set_size(linked_list_t *ptr, size_t size);
@@ -84,7 +84,7 @@ void linked_list_append(linked_list_t **ref, const void *ptr, size_t size)
 
     DEBUG_PRINT("ref: %p\n", (void*) *ref);
 
-    linked_list_t *last_node = linked_list_wind(ref);
+    linked_list_t *last_node = linked_list_wind(*ref);
 
     DEBUG_PRINT("last_node: %p\n", (void*) last_node);
 
@@ -117,11 +117,11 @@ void linked_list_del(linked_list_t **ref)
 }
 
 
-linked_list_t *linked_list_wind(linked_list_t **ref)
+linked_list_t *linked_list_wind(const linked_list_t *ptr)
 {
-    if (!ref || !*ref) return NULL;
+    if (!ptr) return NULL;
 
-    linked_list_t *curitem = *ref;
+    linked_list_t *curitem = (linked_list_t *)ptr;
     while (curitem->next_) {
         curitem = curitem->next_;
     }
