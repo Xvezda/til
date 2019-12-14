@@ -17,8 +17,7 @@ typedef struct StringMeta {
 class String {
 public:
   String() {
-    meta.len = 0;
-    meta.ptr = nullptr;
+    init();
   }
 
   String(char other) {
@@ -101,6 +100,10 @@ public:
 
 private:
   str_meta_t meta;
+
+  void init() {
+    reset();
+  }
 
   void reset() {
     meta.ptr = nullptr;
