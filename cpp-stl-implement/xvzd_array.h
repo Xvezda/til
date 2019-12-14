@@ -64,6 +64,11 @@ public:
     return size;
   }
 
+  virtual const char* CStr() const {
+    const char* ret = "[object Array]";
+    return ret;
+  }
+
 private:
   inline void IncCapacity() {
     // Double current capacity

@@ -114,7 +114,7 @@ public:
     return GetLength();
   }
 
-  inline const char* CStr() const {
+  virtual const char* CStr() const {
     return meta.ptr;
   }
 
@@ -229,11 +229,6 @@ public:
 
   char operator[](int idx) const {
     return CharAt(idx);
-  }
-
-  friend std::ostream& operator<<(std::ostream& os, const String& self) {
-    os << self.CStr();
-    return os;
   }
 
 private:
