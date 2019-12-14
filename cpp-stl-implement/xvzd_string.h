@@ -9,8 +9,8 @@
 
 #include "xvzd_object.h"
 
-
 namespace xvzd {
+
 
 typedef struct StringMeta {
   size_t len;
@@ -144,7 +144,7 @@ private:
   }
 };
 
-} /* xvzd */
+}  // namespace xvzd
 
 
 #endif  // XVZD_STRING_H_
