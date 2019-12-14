@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <cassert>
 
+#include "xvzd_object.h"
+
 
 namespace xvzd {
 
@@ -15,7 +17,8 @@ typedef struct StringMeta {
   char  *ptr;
 } str_meta_t;
 
-class String {
+
+class String : public Object {
 public:
   String() {
     Init();
