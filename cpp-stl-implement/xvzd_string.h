@@ -11,6 +11,7 @@
 
 #include "xvzd_object.h"
 
+
 namespace xvzd {
 
 
@@ -28,7 +29,7 @@ typedef struct StringMeta {
 } str_meta_t;
 
 
-class String : public Object {
+class String : virtual public Object {
 public:
   String() {
     Init();

@@ -12,8 +12,9 @@ namespace xvzd {
 
 const size_t kLowestCapacity = 0x10;
 
+
 template <typename T>
-class Array : public Object {
+class Array : virtual public Object {
 public:
   Array() {
     Init();
@@ -30,14 +31,14 @@ public:
     }
   }
 
-  Array& Push(T item) {
+  Array& Push(const T& item) {
     items[idx++] = item;
     ++size;
     if (size > capacity_) IncCapacity();
     return *this;
   }
 
-  Array& Append(T item) {
+  Array& Append(const T& item) {
     return push(item);
   }
 

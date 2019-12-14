@@ -8,7 +8,7 @@
 namespace xvzd {
 
 
-class Object : public Base {
+class Object : virtual public Base {
 public:
   Object() {}
   virtual ~Object() {}
