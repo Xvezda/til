@@ -124,7 +124,7 @@ public:
     return meta.ptr;
   }
 
-  String& Append(const char *other) {
+  inline String& Append(const char *other) {
     return Append(String(other));
   }
 
