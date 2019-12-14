@@ -94,7 +94,7 @@ public:
     NumToStr("%lf", number);
   }
 
-  ~String() {
+  virtual ~String() {
     if (meta.ptr && meta.len) {
       Clear();
     }

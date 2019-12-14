@@ -23,7 +23,7 @@ public:
     Init(size);
   }
 
-  ~Array() {
+  virtual ~Array() {
     if (items) {
       delete[] items;
       items = nullptr;
