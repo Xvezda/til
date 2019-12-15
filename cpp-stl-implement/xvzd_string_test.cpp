@@ -20,7 +20,7 @@ int main(void) {
   strarr.Push(1234);
   strarr.Push('c');
 
-  for (auto i = 0; i < strarr.Size(); ++i) {
+  for (int i = 0, size = strarr.Size(); i < size; ++i) {
     std::cout << strarr[i] << std::endl;
   }
 
