@@ -1,6 +1,8 @@
 #include "xvzd.h"
 
 
+using xvzd::Object;
+
 using xvzd::Int;
 using xvzd::Char;
 
@@ -10,6 +12,10 @@ int main(void) {
 
   std::cout << n << std::endl;
   std::cout << c << std::endl;
+
+  Object o;
+
+  std::cout << o << std::endl;
 
   return 0;
 }

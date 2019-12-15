@@ -6,7 +6,10 @@ namespace xvzd {
 class Printable {
 public:
   virtual ~Printable() {}
-  const char *Cstr() = 0;
+
+  virtual const char *Cstr() = 0;
+  virtual size_t GetSize() const = 0;
+  virtual const char* GetFmt() const = 0;
 private:
 };
 

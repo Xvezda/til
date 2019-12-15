@@ -9,6 +9,11 @@ namespace xvzd {
 class Int : public Item<int> {
 public:
   Int(const int& num) : Item<int>(num) {}
+  virtual ~Int() {}
+
+  virtual xvzd_inline__ const char* GetFmt() const {
+    return "%d";
+  }
 };
 
 }  // namespace xvzd
