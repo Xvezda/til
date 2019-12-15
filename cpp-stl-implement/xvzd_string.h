@@ -80,6 +80,10 @@ public:
     CopyStr(other);
   }
 
+  String(const Object* other) {
+    String(other->CStr());
+  }
+
   String(int number) {
     String();
     NumToStr("%d", number);
@@ -273,6 +277,10 @@ notfound:
     ret.SetLength(len);
 
     return ret;
+  }
+
+  operator const char*() {
+    return CStr();
   }
 
   String& operator=(const String& other) {

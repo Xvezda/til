@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "xvzd_object.h"
+#include "xvzd_string.h"
 
 
 namespace xvzd {
@@ -61,13 +62,19 @@ public:
     return items[idx];
   }
 
-  inline size_t Size() {
+  inline size_t Size() const {
     return size;
   }
 
   const char* CStr() const {
-    const char* ret = "[object Array]";
-    return ret;
+    String tmp = String("[");
+
+    for (int i = 0, size = Size(); i < size; ++i) {
+      tmp += String(*items[i]) + (i < size - 1 ? ", " : "");
+    }
+    tmp += "]";
+
+    return tmp.CStr();
   }
 
 private:
@@ -98,6 +105,19 @@ private:
   int idx;
   T *items;
 };
+
+template <>
+const char* Array<String>::CStr() const {
+  String tmp = String("[");
+
+  for (int i = 0, size = Size(); i < size; ++i) {
+    tmp += String(items[i]) + (i < size - 1 ? ", " : "");
+  }
+  tmp += "]";
+
+  return tmp.CStr();
+}
+
 
 
 }  // namespace xvzd

@@ -27,6 +27,13 @@ int main(void) {
 
     arr.Pop();
   }
+
+  Array<String> strarr;
+  strarr.Push("hello");
+  strarr.Push("world");
+
+  std::cout << strarr << std::endl;
+
   return 0;
 }
 
