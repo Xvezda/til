@@ -31,7 +31,7 @@ public:
   };
   using str_meta_t = struct StringMeta;
 
-  String() {
+  String() : Object() {
     Init();
   }
 

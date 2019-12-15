@@ -16,11 +16,11 @@ const size_t kLowestCapacity = 0x10;
 template <typename T>
 class Array : virtual public Object {
 public:
-  Array() {
+   Array() : Object() {
     Init();
   }
 
-  Array(size_t size) {
+  Array(size_t size) : Object() {
     Init(size);
   }
 
