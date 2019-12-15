@@ -22,15 +22,15 @@ const auto kDefaultCapacity = 0x10;
 /**
  * TODO: Add exceptions
  */
-typedef struct StringMeta {
-  size_t len;  // null-terminated string length
-  size_t cap;  // capacity
-  char  *ptr;
-} str_meta_t;
-
-
 class String : virtual public Object {
 public:
+  struct StringMeta {
+    size_t len;  // null-terminated string length
+    size_t cap;  // capacity
+    char  *ptr;
+  };
+  using str_meta_t = struct StringMeta;
+
   String() {
     Init();
   }
