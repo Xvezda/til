@@ -15,9 +15,14 @@ public:
   virtual const char* CStr() const {
     return "[object Object]";
   }
+
   friend std::ostream& operator<<(std::ostream& os, const Object& self) {
     os << self.CStr();
     return os;
+  }
+
+  operator const char*() {
+    return CStr();
   }
 };
 

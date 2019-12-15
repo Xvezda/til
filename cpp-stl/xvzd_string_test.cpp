@@ -1,18 +1,27 @@
 #include <iostream>
 #include "xvzd_string.h"
+#include "xvzd_array.h"
 
 
 using xvzd::String;
+using xvzd::Array;
 
 int main(void) {
+  /*
   String str_arr[] = {
     String("foo bar"),
     String(1234),
     String('c')
   };
+  */
+  Array<String> strarr;
 
-  for (int i = 0; i < 3; ++i) {
-    std::cout << str_arr[i] << std::endl;
+  strarr.Push("foo bar");
+  strarr.Push(1234);
+  strarr.Push('c');
+
+  for (int i = 0, size = strarr.Size(); i < size; ++i) {
+    std::cout << strarr[i] << std::endl;
   }
 
   String str("Hello");

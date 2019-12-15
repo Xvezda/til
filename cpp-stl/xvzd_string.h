@@ -22,16 +22,16 @@ const auto kDefaultCapacity = 0x10;
 /**
  * TODO: Add exceptions
  */
-typedef struct StringMeta {
-  size_t len;  // null-terminated string length
-  size_t cap;  // capacity
-  char  *ptr;
-} str_meta_t;
-
-
 class String : virtual public Object {
 public:
-  String() {
+  struct StringMeta {
+    size_t len;  // null-terminated string length
+    size_t cap;  // capacity
+    char  *ptr;
+  };
+  using str_meta_t = struct StringMeta;
+
+  String() : Object() {
     Init();
   }
 
@@ -80,6 +80,10 @@ public:
     CopyStr(other);
   }
 
+  String(const Object* other) {
+    String(other->CStr());
+  }
+
   String(int number) {
     String();
     NumToStr("%d", number);
@@ -121,7 +125,7 @@ public:
     return GetLength();
   }
 
-  virtual const char* CStr() const {
+  const char* CStr() const {
     return meta.ptr;
   }
 
@@ -273,6 +277,10 @@ notfound:
     ret.SetLength(len);
 
     return ret;
+  }
+
+  operator const char*() {
+    return CStr();
   }
 
   String& operator=(const String& other) {
