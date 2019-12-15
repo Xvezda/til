@@ -65,7 +65,7 @@ public:
     return size;
   }
 
-  virtual const char* CStr() const {
+  const char* CStr() const {
     const char* ret = "[object Array]";
     return ret;
   }

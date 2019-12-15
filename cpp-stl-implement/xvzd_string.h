@@ -121,7 +121,7 @@ public:
     return GetLength();
   }
 
-  virtual const char* CStr() const {
+  const char* CStr() const {
     return meta.ptr;
   }
 
