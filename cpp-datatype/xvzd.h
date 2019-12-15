@@ -8,5 +8,7 @@
 #include <cmath>
 
 #include "xvzd_object.h"
+#include "xvzd_char.h"
+#include "xvzd_int.h"
 
 #endif  // XVZD_H_

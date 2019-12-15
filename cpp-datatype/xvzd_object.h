@@ -10,7 +10,8 @@ class Object : public Base {
 public:
   Object() {}
   virtual ~Object() {}
-private:
+protected:
+  void *ptr;
 };
 
 
