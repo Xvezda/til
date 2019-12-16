@@ -11,7 +11,9 @@ namespace xvzd {
 class String : public Array<Char> {
 public:
   String() {
-    cstr_ptr = nullptr;
+    Push('\0');
+    cstr_ptr = new char[1];
+    std::memset(cstr_ptr, 0, 1);
   }
   String(const char* other) {
     size_t len = std::strlen(other);
