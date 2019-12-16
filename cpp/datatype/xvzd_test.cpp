@@ -30,15 +30,21 @@ int main(void) {
   delete intptr;
 
   Array<Int> arr;
-  arr.Push(123);
-  arr.Push(456);
-  arr.Push(789);
+
+  arr += 123;
+  arr += 456;
+  arr += 789;
 
   std::cout << arr[0] << std::endl;
   std::cout << arr[1] << std::endl;
   std::cout << arr[-1] << std::endl;
 
   std::cout << arr << std::endl;
+
+  /* Array<Int> arrcpy; */
+  /* arrcpy = arr; */
+  Array<Int> arrcpy = arr;
+  std::cout << arrcpy << std::endl;
 
   String str("hello");
   std::cout << str << std::endl;

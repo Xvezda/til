@@ -7,7 +7,7 @@ class Printable {
 public:
   virtual ~Printable() {}
 
-  virtual const char *Cstr() = 0;
+  virtual const char *Cstr() const = 0;
   virtual size_t GetSize() const = 0;
   virtual const char* GetFmt() const = 0;
 private:

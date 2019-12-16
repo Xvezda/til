@@ -23,6 +23,10 @@ public:
 #endif
   }
 
+  Array(Array<T>& other) : Array(other.Size()) {
+    Assign(other);
+  }
+
   virtual ~Array() {
     if (items) {
 #ifdef DEBUG
@@ -40,6 +44,15 @@ public:
     }
   }
 
+  const Array<T>& Assign(const Array<T>& other) {
+    if (this == &other) return *this;
+
+    for (size_t i = 0; i < other.Size(); ++i) {
+      Push(other[i]);
+    }
+    return *this;
+  }
+
   const Array<T>& Push(const T& item) {
     items[idx++] = item;
 
@@ -51,6 +64,8 @@ public:
       }
       delete[] items;
       items = tmp;
+
+      cap = inc;
     }
     return *this;
   }
@@ -69,15 +84,23 @@ public:
     return items[idx];
   }
 
-  virtual xvzd_inline__ size_t Size() const {
+  virtual size_t Size() const {
     return idx;
   }
 
-  const T& operator[](int idx) {
+  const Array<T>& operator=(const Array<T>& other) {
+    return Assign(other);
+  }
+
+  const Array<T>& operator+=(const T& other) {
+    return Push(other);
+  }
+
+  const T& operator[](int idx) const {
     return At(idx);
   }
 
-  virtual const char* Cstr() {
+  virtual const char* Cstr() const {
     size_t total = 0;
 
     total += std::strlen("[");
@@ -113,7 +136,7 @@ private:
 };
 
 template <>
-const char* Array<Object*>::Cstr() {
+const char* Array<Object*>::Cstr() const {
   size_t total = 0;
 
   total += std::strlen("[");

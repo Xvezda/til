@@ -56,7 +56,7 @@ public:
     return *static_cast<T*>(ptr);
   }
 
-  virtual const char* Cstr() {
+  virtual const char* Cstr() const {
     cstr_ptr = new char[GetSize() + 1 /* Null terminated */];
     std::snprintf(cstr_ptr, GetSize()+1, GetFmt(), static_cast<T>(*this));
     cstr_ptr[GetSize()] = '\0';
@@ -64,7 +64,7 @@ public:
     return cstr_ptr;
   }
 
-  virtual xvzd_inline__ size_t GetSize() const {
+  virtual size_t GetSize() const {
     return std::snprintf(nullptr, 0, GetFmt(), static_cast<T>(*this));
   }
 };

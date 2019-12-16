@@ -29,7 +29,7 @@ public:
 #endif
   }
 
-  virtual xvzd_inline__ const char* GetFmt() const {
+  virtual const char* GetFmt() const {
     return "%d";
   }
 };

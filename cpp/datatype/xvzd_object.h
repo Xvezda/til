@@ -23,7 +23,7 @@ public:
 #endif
   }
 
-  virtual xvzd_inline__ const char* Cstr() {
+  virtual const char* Cstr() const {
     return GetFmt();
   }
 
@@ -47,7 +47,7 @@ protected:
   size_t size;
   char* fmt;
 
-  char* cstr_ptr;
+  mutable char* cstr_ptr;
   void* ptr;
 };
 

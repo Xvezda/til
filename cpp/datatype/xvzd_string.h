@@ -30,7 +30,7 @@ public:
     }
   }
 
-  virtual const char* Cstr() {
+  virtual const char* Cstr() const {
     if (!cstr_ptr) return nullptr;
     cstr_ptr[Size()] = '\0';
 
