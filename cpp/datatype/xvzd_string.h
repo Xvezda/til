@@ -20,7 +20,7 @@ public:
     for (size_t i = 0; i < len; ++i) {
       Push(other[i]);
     }
-    cstr_ptr = new char[Size()+1];
+    cstr_ptr = new char[Length()+1];
   }
 
   virtual ~String() {
@@ -32,9 +32,9 @@ public:
 
   virtual const char* Cstr() const {
     if (!cstr_ptr) return nullptr;
-    cstr_ptr[Size()] = '\0';
+    cstr_ptr[Length()] = '\0';
 
-    for (size_t i = 0; i < Size(); ++i) {
+    for (size_t i = 0; i < Length(); ++i) {
       cstr_ptr[i] = At(i);
     }
     return cstr_ptr;
