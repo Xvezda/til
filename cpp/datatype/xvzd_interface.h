@@ -10,15 +10,20 @@ public:
   virtual const char *Cstr() const = 0;
   virtual size_t GetSize() const = 0;
   virtual const char* GetFmt() const = 0;
-private:
 };
 
 
 class Iterable {
 public:
-  Iterable() {}
   virtual ~Iterable() {}
-private:
+  virtual const Iterable& Next() = 0;
+};
+
+
+class Comparable {
+public:
+  virtual ~Comparable() {}
+  virtual bool Equal(const Comparable& other) const = 0;
 };
 
 
