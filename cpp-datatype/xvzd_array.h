@@ -33,6 +33,11 @@ public:
       items = nullptr;
       cap = 0;
     }
+
+    if (cstr_ptr) {
+      delete[] cstr_ptr;
+      cstr_ptr = nullptr;
+    }
   }
 
   const Array<T>& Push(const T& item) {
@@ -54,7 +59,7 @@ public:
     return items[--idx];
   }
 
-  const T& At(int idx) const {
+  T& At(int idx) const {
     if (idx < 0) {
       idx = Size() + idx;
       if (idx < 0) {
@@ -72,6 +77,34 @@ public:
     return At(idx);
   }
 
+  virtual const char* Cstr() {
+    size_t total = 0;
+
+    total += std::strlen("[");
+    for (size_t i = 0; i < Size(); ++i) {
+      total += (std::strlen(At(i).Cstr()) + \
+          (i != Size() - 1 ? std::strlen(", ") : 0));
+    }
+    total += std::strlen("]");
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "total: " << total << std::endl;
+#endif
+    cstr_ptr = new char[total+1];
+    cstr_ptr[0] = '\0';
+
+    std::strncat(cstr_ptr, "[", std::strlen("["));
+    for (size_t i = 0; i < Size(); ++i) {
+      std::strncat(cstr_ptr, At(i).Cstr(), std::strlen(At(i).Cstr()));
+      const char* sep = (i != Size() - 1 ? ", " : "");
+      std::strncat(cstr_ptr, sep, std::strlen(sep));
+    }
+    std::strncat(cstr_ptr, "]", std::strlen("]"));
+    cstr_ptr[total] = '\0';
+
+    return cstr_ptr;
+  }
+
 private:
   size_t cap;
   int idx;
@@ -80,6 +113,5 @@ private:
 };
 
 }  // namespace xvzd
-
 
 #endif  // XVZD_ARRAY_H_

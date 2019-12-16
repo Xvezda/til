@@ -38,8 +38,9 @@ int main(void) {
   std::cout << arr[1] << std::endl;
   std::cout << arr[-1] << std::endl;
 
-  String str("hello");
+  std::cout << arr << std::endl;
 
+  String str("hello");
   std::cout << str << std::endl;
 
   return 0;
