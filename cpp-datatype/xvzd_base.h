@@ -5,11 +5,9 @@ namespace xvzd {
 
 class Base {
 public:
-  Base() {}
   virtual ~Base() {}
-  virtual const char* CStr() const = 0;
+private:
 };
-
 
 }  // namespace xvzd
 
