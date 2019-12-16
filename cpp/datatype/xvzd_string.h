@@ -39,6 +39,10 @@ public:
     }
     return cstr_ptr;
   }
+
+  size_t Length() const {
+    return Size();
+  }
 };
 
 }  // namespace xvzd

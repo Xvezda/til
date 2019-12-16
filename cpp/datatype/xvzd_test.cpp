@@ -45,6 +45,7 @@ int main(void) {
   /* arrcpy = arr; */
   Array<Int> arrcpy = arr;
   std::cout << arrcpy << std::endl;
+  std::cout << arr + arrcpy << std::endl;
 
   String str("hello");
   std::cout << str << std::endl;

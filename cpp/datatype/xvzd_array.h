@@ -23,7 +23,7 @@ public:
 #endif
   }
 
-  Array(Array<T>& other) : Array(other.Size()) {
+  Array(const Array<T>& other) : Array(other.Size()) {
     Assign(other);
   }
 
@@ -44,13 +44,29 @@ public:
     }
   }
 
-  const Array<T>& Assign(const Array<T>& other) {
+  virtual const Array<T>& Assign(const Array<T>& other) {
     if (this == &other) return *this;
 
     for (size_t i = 0; i < other.Size(); ++i) {
       Push(other[i]);
     }
     return *this;
+  }
+
+  const Array<T>& Append(const Array<T>& other) {
+    for (size_t i = 0; i < other.Size(); ++i) {
+      Push(other[i]);
+    }
+    return *this;
+  }
+
+  virtual const Array<T> Concat(const Array<T>& other) const {
+    Array<T> ret;
+
+    ret.Assign(*this);
+    ret.Append(other);
+
+    return ret;
   }
 
   const Array<T>& Push(const T& item) {
@@ -74,7 +90,7 @@ public:
     return items[--idx];
   }
 
-  T& At(int idx) const {
+  virtual const T& At(int idx) const {
     if (idx < 0) {
       idx = Size() + idx;
       if (idx < 0) {
@@ -90,6 +106,10 @@ public:
 
   const Array<T>& operator=(const Array<T>& other) {
     return Assign(other);
+  }
+
+  const Array<T> operator+(const Array<T>& other) {
+    return Array(*this).Concat(other);
   }
 
   const Array<T>& operator+=(const T& other) {

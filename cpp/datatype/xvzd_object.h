@@ -39,7 +39,7 @@ public:
     return "[object Object]";
   }
 
-  friend std::ostream& operator<<(std::ostream& os, Object& self) {
+  friend std::ostream& operator<<(std::ostream& os, const Object& self) {
     os << self.Cstr();
     return os;
   }
