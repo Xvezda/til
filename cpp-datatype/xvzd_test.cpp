@@ -43,5 +43,11 @@ int main(void) {
   String str("hello");
   std::cout << str << std::endl;
 
+  Array<Object*> oarr;
+  oarr.Push(new Int(123));
+  oarr.Push(new String("foobar"));
+
+  std::cout << oarr << std::endl;
+
   return 0;
 }
