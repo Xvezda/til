@@ -9,11 +9,26 @@ namespace xvzd {
 
 class Object : public Base, public Printable {
 public:
-  Object() : size(0), fmt(nullptr), cstr_ptr(nullptr) {}
-  virtual ~Object() {}
+  Object() : size(0), fmt(nullptr), cstr_ptr(nullptr), ptr(nullptr) {
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "new object" << std::endl;
+#endif
+  }
+
+  virtual ~Object() {
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "del object" << std::endl;
+#endif
+  }
 
   virtual xvzd_inline__ const char* Cstr() {
     return GetFmt();
+  }
+
+  virtual size_t Size() const {
+    return GetSize();
   }
 
   virtual size_t GetSize() const {
@@ -33,7 +48,7 @@ protected:
   char* fmt;
 
   char* cstr_ptr;
-  void *ptr;
+  void* ptr;
 };
 
 

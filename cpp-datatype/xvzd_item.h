@@ -10,14 +10,14 @@ namespace xvzd {
 template <typename T>
 class Item : public Object {
 public:
-  Item() : Object() {}
-  Item(const T& other) : Item() {
+  Item(const T& other) : Object() {
+    ptr = new T;
+    assert(ptr != nullptr);
+    *static_cast<T*>(ptr) = static_cast<T>(other);
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
       << "new item" << std::endl;
 #endif
-    ptr = new T;
-    *static_cast<T*>(ptr) = other;
   }
 
   virtual ~Item() {
@@ -29,10 +29,23 @@ public:
       delete static_cast<T*>(ptr);
       ptr = nullptr;
     }
+
     if (cstr_ptr) {
       delete[] cstr_ptr;
       cstr_ptr = nullptr;
     }
+  }
+
+  Item<T>& Assign(const Item<T>& other) {
+    if (this == &other) return *this;
+
+    *static_cast<T*>(ptr) = static_cast<T>(other);
+
+    return *this;
+  }
+
+  Item<T>& operator=(const Item<T>& other) {
+    return Assign(other);
   }
 
   operator T() {

@@ -10,9 +10,24 @@ namespace xvzd {
 
 class Char : public Item<char> {
 public:
-  Char() : Item<char>() {}
-  Char(const char& chr) : Item<char>(chr) {}
-  virtual ~Char() {}
+  Char() : Char('\0') {
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "new char" << std::endl;
+#endif
+  }
+  Char(const char& chr) : Item<char>(chr) {
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "new char: " << chr << std::endl;
+#endif
+  }
+  virtual ~Char() {
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "del char: " << Cstr() << std::endl;
+#endif
+  }
 
   virtual xvzd_inline__ const char* GetFmt() const {
     return "%c";
