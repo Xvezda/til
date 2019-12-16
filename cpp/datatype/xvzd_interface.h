@@ -13,6 +13,15 @@ public:
 private:
 };
 
+
+class Iterable {
+public:
+  Iterable() {}
+  virtual ~Iterable() {}
+private:
+};
+
+
 }  // namespace xvzd
 
 #endif  // XVZD_INTERFACE_H_
