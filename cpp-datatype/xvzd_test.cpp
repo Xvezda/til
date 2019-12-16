@@ -49,5 +49,8 @@ int main(void) {
 
   std::cout << oarr << std::endl;
 
+  for (size_t i = 0; i < oarr.Size(); ++i) {
+    delete oarr.Pop();
+  }
   return 0;
 }
