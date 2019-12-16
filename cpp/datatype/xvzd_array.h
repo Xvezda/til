@@ -69,7 +69,7 @@ public:
     return items[idx];
   }
 
-  virtual size_t Size() const {
+  virtual xvzd_inline__ size_t Size() const {
     return idx;
   }
 
