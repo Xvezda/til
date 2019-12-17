@@ -60,7 +60,7 @@ public:
     return *this;
   }
 
-  virtual const Array<T> Concat(const Array<T>& other) const {
+  const Array<T> Concat(const Array<T>& other) const {
     Array<T> ret(*this);
     ret.Append(other);
 

@@ -21,6 +21,12 @@ public:
     }
   }
 
+  String(const String& other) : Array() {
+    for (size_t i = 0; i < other.Length(); ++i) {
+      Push(other[i]);
+    }
+  }
+
   String(Char chr) : Array() {
     Push(chr);
   }
@@ -28,6 +34,12 @@ public:
   String(Char other, size_t repeat) : Array() {
     for (size_t i = repeat; i > 0; --i) {
       Push(other);
+    }
+  }
+
+  String(const String& other, size_t repeat) : Array() {
+    for (size_t i = repeat; i > 0; --i) {
+      Append(other);
     }
   }
 
@@ -57,6 +69,27 @@ public:
       Push(other[i]);
     }
     return *this;
+  }
+
+  const String Concat(const String& other) const {
+    String ret(*this);
+    return ret.Append(other);
+  }
+
+  const String Repeat(size_t repeat) const {
+    return String(*this, repeat);
+  }
+
+  const String& operator+=(const String& other) {
+    return Append(other);
+  }
+
+  const String operator+(const String& other) const {
+    return Concat(other);
+  }
+
+  const String operator*(size_t n) const {
+    return Repeat(n);
   }
 };
 

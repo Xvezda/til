@@ -67,5 +67,10 @@ int main(void) {
   std::cout << divider.Concat(String('+', 10)) << std::endl;
   std::cout << divider.Append(String('-', 20)) << std::endl;
 
+  String s1("abc");
+  String s2(s1);
+
+  std::cout << (s2 + "def") * 2 << std::endl;
+
   return 0;
 }
