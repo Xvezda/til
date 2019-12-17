@@ -59,5 +59,12 @@ int main(void) {
   for (size_t i = 0; i < oarr.Size(); ++i) {
     delete oarr.Pop();
   }
+
+  String sc('c');
+  std::cout << sc << std::endl;
+
+  String divider('-', 10);
+  std::cout << divider.Append(String('-', 20)) << std::endl;
+
   return 0;
 }

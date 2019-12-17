@@ -72,10 +72,10 @@ public:
   const Array<T>& Push(const T& item) {
     items[idx++] = item;
 
-    if (idx > static_cast<int>(cap)) {
+    if (idx >= static_cast<int>(cap)) {
       size_t inc = cap << 1;
       T* tmp = new T[inc];
-      for (size_t i = 0; i < inc; ++i) {
+      for (int i = 0; i < idx; ++i) {
         tmp[i] = At(i);
       }
       delete[] items;

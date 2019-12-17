@@ -11,9 +11,9 @@ template <typename T>
 class Item : public Object {
 public:
   Item(const T& other) : Object() {
-    ptr = new T;
+    ptr = static_cast<T*>(new T);
     assert(ptr != nullptr);
-    *static_cast<T*>(ptr) = static_cast<T>(other);
+    *static_cast<T*>(ptr) = other;
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
       << "new item" << std::endl;
@@ -39,7 +39,8 @@ public:
   Item<T>& Assign(const Item<T>& other) {
     if (this == &other) return *this;
 
-    *static_cast<T*>(ptr) = static_cast<T>(other);
+    assert(ptr != nullptr);
+    *static_cast<T*>(ptr) = other;
 
     return *this;
   }

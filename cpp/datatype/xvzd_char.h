@@ -10,6 +10,8 @@
 namespace xvzd {
 
 
+class String;
+
 class Char : public Item<char> {
 public:
   Char() : Char('\0') {
@@ -38,7 +40,18 @@ public:
   virtual const char* GetFmt() const {
     return "%c";
   }
+
+  const String& Repeat(size_t n);
 };
+
+
+/*
+#include "xvzd_string.h"
+
+const String& Char::Repeat(size_t n) {
+}
+*/
+
 
 }  // namespace xvzd
 
