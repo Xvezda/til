@@ -42,6 +42,7 @@ int main(void) {
   xvzd::String str("hello");
   std::cout << str << std::endl;
 
+  // FIXME: Pointer array error
   /*
   Array<Object*> oarr;
   oarr.Push(new Int(123));
