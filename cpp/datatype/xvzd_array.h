@@ -94,6 +94,17 @@ public:
     return true;
   }
 
+  int Find(const T& needle) const {
+    for (size_t i = 0; i < needle.Size(); ++i) {
+      if (At(i) == needle.At(i)) return i;
+    }
+    return -1;
+  }
+
+  int IndexOf(const T& needle) const {
+    return Find(needle);
+  }
+
   const Array<T>& Push(const T& item) {
     items[idx++] = item;
 

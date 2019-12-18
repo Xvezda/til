@@ -112,6 +112,10 @@ public:
     return -1;
   }
 
+  int IndexOf(const String& needle) const {
+    return Find(needle);
+  }
+
   const String Slice(int start, int end) const {
     String ret("");
     if (start < 0) {
