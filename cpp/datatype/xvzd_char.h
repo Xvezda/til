@@ -20,6 +20,7 @@ public:
       << "new char" << std::endl;
 #endif
   }
+
   Char(const char& chr) : Item<char>(chr) {
 #ifdef DEBUG
     char* tmp = new char[1+1];
@@ -41,16 +42,9 @@ public:
     return "%c";
   }
 
-  const String& Repeat(size_t n);
+  const String Repeat(size_t n) const;
+  const String operator*(int n) const;
 };
-
-
-/*
-#include "xvzd_string.h"
-
-const String& Char::Repeat(size_t n) {
-}
-*/
 
 
 }  // namespace xvzd

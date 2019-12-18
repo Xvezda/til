@@ -1,17 +1,18 @@
 #ifndef XVZD_ITEM_H_
 #define XVZD_ITEM_H_
 
-#include <iostream>
+#include "xvzd_common.h"
 #include "xvzd_object.h"
 
 namespace xvzd {
 
 
 template <typename T>
-class Item : public Object {
+class Item
+  : public Object, public Assignable< Item<T> >, public Comparable< Item<T> > {
 public:
   Item(const T& other) : Object() {
-    ptr = static_cast<T*>(new T);
+    ptr = new T;
     assert(ptr != nullptr);
     *static_cast<T*>(ptr) = other;
 #ifdef DEBUG
@@ -36,16 +37,22 @@ public:
     }
   }
 
-  Item<T>& Assign(const Item<T>& other) {
+  const Item<T>& Assign(const Item<T>& other) {
     if (this == &other) return *this;
-
-    assert(ptr != nullptr);
     *static_cast<T*>(ptr) = other;
 
     return *this;
   }
 
-  Item<T>& operator=(const Item<T>& other) {
+  virtual int Compare(const Item<T>& other) const {
+    return static_cast<int>(*static_cast<T*>(ptr) - static_cast<T>(other));
+  }
+
+  virtual bool Equal(const Item<T>& other) const {
+    return !Compare(other);
+  }
+
+  const Item<T>& operator=(const Item<T>& other) {
     return Assign(other);
   }
 

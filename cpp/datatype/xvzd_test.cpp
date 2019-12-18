@@ -50,6 +50,7 @@ int main(void) {
   String str("hello");
   std::cout << str << std::endl;
 
+  /*
   Array<Object*> oarr;
   oarr.Push(new Int(123));
   oarr.Push(new String("foobar"));
@@ -59,6 +60,7 @@ int main(void) {
   for (size_t i = 0; i < oarr.Size(); ++i) {
     delete oarr.Pop();
   }
+  */
 
   String sc('c');
   std::cout << sc << std::endl;
@@ -71,6 +73,33 @@ int main(void) {
   String s2(s1);
 
   std::cout << (s2 + "def") * 2 << std::endl;
+  std::cout << Char('z') * 10 << std::endl;
+
+  String sentence = "The quick brown fox jumps over the lazy dog";
+  std::cout << sentence.Slice(5, -4) << std::endl;
+
+  std::cout << String("hello").Substr(-2, 2) << std::endl;
+  std::cout << String("hello").Substring(3, 1) << std::endl;
+  std::cout << String("hello").Substring(-2, 1) << std::endl;
+
+  std::cout << "fox idx: " << sentence.Find("fox") << std::endl;
+
+  std::cout << String("foo|bar|baz").Split("|") << std::endl;
+  String s3("asdf");
+  String s4("asdf");
+  std::cout << (s3 == s4) << std::endl;
+
+  Array<Int> a1;
+  Array<Int> a2;
+
+  a1.Push(1);
+  a2.Push(1);
+  a1.Push(2);
+  a2.Push(2);
+  a1.Push(3);
+  a2.Push(3);
+
+  std::cout << (a1 == a2) << std::endl;
 
   return 0;
 }

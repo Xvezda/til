@@ -3,6 +3,8 @@
 
 #include "xvzd_common.h"
 #include "xvzd_object.h"
+#include "xvzd_item.h"
+
 
 namespace xvzd {
 
@@ -10,7 +12,8 @@ namespace xvzd {
 const auto kMinimumCapacity = 0x10;
 
 template <typename T>
-class Array : public Object {
+class Array
+  : public Object, public Comparable< Array<T> >, public Assignable< Array<T> > {
 public:
   Array() : Array(kMinimumCapacity) {}
 
@@ -67,6 +70,30 @@ public:
     return ret;
   }
 
+  virtual int Compare(const Array<T>& other) const {
+    int result = -1;
+    for (size_t i = 0; i < Size() && i < other.Size(); ++i) {
+      result = At(i).Compare(other.At(i));
+      if (result) return result;
+    }
+    // If all elements are same in minimum range
+    // return value by size comparison
+    if (Size() < other.Size()) {
+      return -1;
+    } else if (Size() > other.Size()) {
+      return 1;
+    }
+    return 0;
+  }
+
+  virtual bool Equal(const Array<T>& other) const {
+    if (Size() != other.Size()) return false;
+    for (size_t i = 0; i < Size() && i < other.Size(); ++i) {
+      if (At(i) != other.At(i)) return false;
+    }
+    return true;
+  }
+
   const Array<T>& Push(const T& item) {
     items[idx++] = item;
 
@@ -88,7 +115,7 @@ public:
     return items[--idx];
   }
 
-  virtual const T& At(int idx) const {
+  const T& At(int idx) const {
     if (idx < 0) {
       idx = Size() + idx;
       if (idx < 0) {
@@ -98,12 +125,20 @@ public:
     return items[idx];
   }
 
-  virtual size_t Size() const {
+  size_t Size() const {
     return idx;
   }
 
   const Array<T>& operator=(const Array<T>& other) {
     return Assign(other);
+  }
+
+  bool operator==(const Array<T>& other) {
+    return Equal(other);
+  }
+
+  bool operator!=(const Array<T>& other) {
+    return !(*this == other);
   }
 
   const Array<T> operator+(const Array<T>& other) {
@@ -154,34 +189,10 @@ private:
 };
 
 template <>
-const char* Array<Object*>::Cstr() const {
-  size_t total = 0;
+int Array<Object*>::Compare(const Array<Object*>& other) const;
 
-  total += std::strlen("[");
-  for (size_t i = 0; i < Size(); ++i) {
-    total += (std::strlen(At(i)->Cstr()) + \
-        (i != Size() - 1 ? std::strlen(", ") : 0));
-  }
-  total += std::strlen("]");
-#ifdef DEBUG
-  std::cout << __FILE__ << ':' << __LINE__ << ": "
-    << "total: " << total << std::endl;
-#endif
-  cstr_ptr = new char[total+1];
-  cstr_ptr[0] = '\0';
-
-  std::strncat(cstr_ptr, "[", std::strlen("["));
-  for (size_t i = 0; i < Size(); ++i) {
-    std::strncat(cstr_ptr, At(i)->Cstr(), std::strlen(At(i)->Cstr()));
-    const char* sep = (i != Size() - 1 ? ", " : "");
-    std::strncat(cstr_ptr, sep, std::strlen(sep));
-  }
-  std::strncat(cstr_ptr, "]", std::strlen("]"));
-  cstr_ptr[total] = '\0';
-
-  return cstr_ptr;
-}
-
+template <>
+const char* Array<Object*>::Cstr() const;
 
 }  // namespace xvzd
 

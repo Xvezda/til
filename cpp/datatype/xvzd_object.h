@@ -2,7 +2,7 @@
 #define XVZD_OBJECT_H_
 
 #include "xvzd_base.h"
-#include "xvzd_interface.h"
+#include "xvzd_interfaces.h"
 
 namespace xvzd {
 

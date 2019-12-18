@@ -9,6 +9,8 @@
 #include <cmath>
 #include <cassert>
 
+#include "xvzd_interfaces.h"
+
 #define xvzd_inline__ inline
 
 #endif  // XVZD_COMMON_H_
