@@ -101,5 +101,8 @@ int main(void) {
 
   std::cout << (a1 == a2) << std::endl;
 
+  a2.Pop();
+  std::cout << (a1 == a2) << std::endl;
+
   return 0;
 }
