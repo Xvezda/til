@@ -7,10 +7,13 @@
 
 #define STRNULL_(s) ((!std::strlen(s) ? "(null)" : (s)))
 
+
+namespace xvzd {
+class String;
+}  // namespace xvzd
+
 namespace xvzd {
 
-
-class String;
 
 class Char : public Item<char> {
 public:

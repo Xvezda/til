@@ -5,6 +5,10 @@
 #include "xvzd_object.h"
 #include "xvzd_item.h"
 
+namespace xvzd {
+class String;
+}  // namespace xvzd
+
 
 namespace xvzd {
 
@@ -105,6 +109,8 @@ public:
     return Find(needle);
   }
 
+  const String Join(const String& sep) const;
+
   const Array<T>& Push(const T& item) {
     items[idx++] = item;
 
@@ -204,6 +210,7 @@ int Array<Object*>::Compare(const Array<Object*>& other) const;
 
 template <>
 const char* Array<Object*>::Cstr() const;
+
 
 }  // namespace xvzd
 

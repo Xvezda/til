@@ -2,8 +2,7 @@
 #include "xvzd_string.h"
 
 
-using xvzd::Array;
-using xvzd::String;
+namespace xvzd {
 
 
 const Array<String> String::Split(String token) const {
@@ -25,3 +24,5 @@ const Array<String> String::Split(String token) const {
   return ret;
 }
 
+
+}  // namespace xvzd

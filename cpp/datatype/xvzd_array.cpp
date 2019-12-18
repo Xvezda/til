@@ -4,11 +4,18 @@
 #include "xvzd_array.h"
 #include "xvzd_string.h"
 
+namespace xvzd {
 
-using xvzd::Object;
-using xvzd::Item;
-using xvzd::Array;
-using xvzd::String;
+
+template <typename T>
+const String Array<T>::Join(const String& sep) const {
+  String ret("");
+  for (size_t i = 0; i < Size(); ++i) {
+    ret += String((!i ? "" : sep.Cstr())) + String(At(i));
+  }
+  return ret;
+}
+template class Array<String>;
 
 template <>
 const char* Array<Object*>::Cstr() const {
@@ -39,3 +46,5 @@ const char* Array<Object*>::Cstr() const {
   return cstr_ptr;
 }
 
+
+}  // namespace xvzd

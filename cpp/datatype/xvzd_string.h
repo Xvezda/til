@@ -116,6 +116,16 @@ public:
     return Find(needle);
   }
 
+  template <typename T>
+  const String Join(const Array<T>& arr) const {
+    String ret("");
+
+    for (size_t i = 0; i < arr.Size(); ++i) {
+      ret += arr[i] + String(i != arr.Size() - 1 ? String(*this).Cstr() : "");
+    }
+    return ret;
+  }
+
   const String Slice(int start, int end) const {
     String ret("");
     if (start < 0) {

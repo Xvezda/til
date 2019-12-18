@@ -1,17 +1,9 @@
 #include "xvzd.h"
 
 
-using xvzd::Object;
-using xvzd::Array;
-using xvzd::String;
-
-using xvzd::Int;
-using xvzd::Char;
-using xvzd::Float;
-
 int main(void) {
-  Int n(31337);
-  Char c('A');
+  xvzd::Int n(31337);
+  xvzd::Char c('A');
 
   std::cout << n << std::endl;
   std::cout << c << std::endl;
@@ -19,17 +11,17 @@ int main(void) {
   c = 'B';
   std::cout << c << std::endl;
 
-  Object o;
+  xvzd::Object o;
   std::cout << o << std::endl;
 
-  Float f(123.456);
+  xvzd::Float f(123.456);
   std::cout << f << std::endl;
 
-  Int* intptr = new Int(12345);
+  xvzd::Int* intptr = new xvzd::Int(12345);
   std::cout << *intptr << std::endl;
   delete intptr;
 
-  Array<Int> arr;
+  xvzd::Array<xvzd::Int> arr;
 
   arr += 123;
   arr += 456;
@@ -43,11 +35,11 @@ int main(void) {
 
   /* Array<Int> arrcpy; */
   /* arrcpy = arr; */
-  Array<Int> arrcpy = arr;
+  xvzd::Array<xvzd::Int> arrcpy = arr;
   std::cout << arrcpy << std::endl;
   std::cout << arr + arrcpy << std::endl;
 
-  String str("hello");
+  xvzd::String str("hello");
   std::cout << str << std::endl;
 
   /*
@@ -62,35 +54,39 @@ int main(void) {
   }
   */
 
-  String sc('c');
+  xvzd::String sc('c');
   std::cout << sc << std::endl;
 
-  String divider('-', 10);
-  std::cout << divider.Concat(String('+', 10)) << std::endl;
-  std::cout << divider.Append(String('-', 20)) << std::endl;
+  xvzd::String divider('-', 10);
+  std::cout << divider.Concat(xvzd::String('+', 10)) << std::endl;
+  std::cout << divider.Append(xvzd::String('-', 20)) << std::endl;
 
-  String s1("abc");
-  String s2(s1);
+  xvzd::String s1("abc");
+  xvzd::String s2(s1);
 
   std::cout << (s2 + "def") * 2 << std::endl;
-  std::cout << Char('z') * 10 << std::endl;
+  std::cout << xvzd::Char('z') * 10 << std::endl;
 
-  String sentence = "The quick brown fox jumps over the lazy dog";
+  xvzd::String sentence = "The quick brown fox jumps over the lazy dog";
   std::cout << sentence.Slice(5, -4) << std::endl;
 
-  std::cout << String("hello").Substr(-2, 2) << std::endl;
-  std::cout << String("hello").Substring(3, 1) << std::endl;
-  std::cout << String("hello").Substring(-2, 1) << std::endl;
+  std::cout << xvzd::String("hello").Substr(-2, 2) << std::endl;
+  std::cout << xvzd::String("hello").Substring(3, 1) << std::endl;
+  std::cout << xvzd::String("hello").Substring(-2, 1) << std::endl;
 
   std::cout << "fox idx: " << sentence.Find("fox") << std::endl;
 
-  std::cout << String("foo|bar|baz").Split("|") << std::endl;
-  String s3("asdf");
-  String s4("asdf");
+  xvzd::Array<xvzd::String> sa = xvzd::String("foo|bar|baz").Split("|");
+  std::cout << sa << std::endl;
+  std::cout << sa.Join(", ") << std::endl;
+  std::cout << xvzd::String(":").Join(sa) << std::endl;
+
+  xvzd::String s3("asdf");
+  xvzd::String s4("asdf");
   std::cout << (s3 == s4) << std::endl;
 
-  Array<Int> a1;
-  Array<Int> a2;
+  xvzd::Array<xvzd::Int> a1;
+  xvzd::Array<xvzd::Int> a2;
 
   a1.Push(1);
   a2.Push(1);
