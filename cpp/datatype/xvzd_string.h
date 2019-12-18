@@ -14,7 +14,8 @@ template <typename T> class Array;
 namespace xvzd {
 
 class String
-  : public Array<Char>, public Assignable<String>, public Comparable<String> {
+  : public Array<Char>,
+    public Assignable<String>, public Comparable<String> {
 public:
   String() : Array() {
     Push('\0');
@@ -43,7 +44,8 @@ public:
     }
   }
 
-  String(const String& other, size_t repeat) : Array(other.Size() * repeat) {
+  String(const String& other, size_t repeat)
+    : Array(other.Size() * repeat) {
     for (size_t i = repeat; i > 0; --i) {
       Append(other);
     }
@@ -121,7 +123,9 @@ public:
     String ret("");
 
     for (size_t i = 0; i < arr.Size(); ++i) {
-      ret += arr[i] + String(i != arr.Size() - 1 ? String(*this).Cstr() : "");
+      ret += arr[i] + String(i != arr.Size() - 1
+          ? String(*this).Cstr()
+          : "");
     }
     return ret;
   }

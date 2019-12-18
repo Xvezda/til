@@ -17,7 +17,8 @@ const auto kMinimumCapacity = 0x10;
 
 template <typename T>
 class Array
-  : public Object, public Comparable< Array<T> >, public Assignable< Array<T> > {
+  : public Object,
+    public Comparable< Array<T> >, public Assignable< Array<T> > {
 public:
   Array() : Array(kMinimumCapacity) {}
 
@@ -188,7 +189,9 @@ public:
 
     std::strncat(cstr_ptr, "[", std::strlen("["));
     for (size_t i = 0; i < Size(); ++i) {
-      std::strncat(cstr_ptr, dereference(At(i)).Cstr(), std::strlen(dereference(At(i)).Cstr()));
+      std::strncat(cstr_ptr,
+          dereference(At(i)).Cstr(),
+          std::strlen(dereference(At(i)).Cstr()));
       const char* sep = (i != Size() - 1 ? ", " : "");
       std::strncat(cstr_ptr, sep, std::strlen(sep));
     }
