@@ -175,7 +175,7 @@ public:
 
     total += std::strlen("[");
     for (size_t i = 0; i < Size(); ++i) {
-      total += (std::strlen(At(i).Cstr()) + \
+      total += (std::strlen(dereference(At(i)).Cstr()) + \
           (i != Size() - 1 ? std::strlen(", ") : 0));
     }
     total += std::strlen("]");
@@ -188,7 +188,7 @@ public:
 
     std::strncat(cstr_ptr, "[", std::strlen("["));
     for (size_t i = 0; i < Size(); ++i) {
-      std::strncat(cstr_ptr, At(i).Cstr(), std::strlen(At(i).Cstr()));
+      std::strncat(cstr_ptr, dereference(At(i)).Cstr(), std::strlen(dereference(At(i)).Cstr()));
       const char* sep = (i != Size() - 1 ? ", " : "");
       std::strncat(cstr_ptr, sep, std::strlen(sep));
     }
@@ -207,9 +207,6 @@ private:
 
 template <>
 int Array<Object*>::Compare(const Array<Object*>& other) const;
-
-template <>
-const char* Array<Object*>::Cstr() const;
 
 
 }  // namespace xvzd
