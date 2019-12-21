@@ -7,8 +7,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 
-foo = 1
-bar = 'baz'
+foo = None
+bar = None
 
 def sub(re=None):
     print(foo, bar)
@@ -16,6 +16,9 @@ def sub(re=None):
         sub()
 
 def main():
+    # global foo, bar
+    foo = 1
+    bar = 'baz'
     sub(True)
 
 
