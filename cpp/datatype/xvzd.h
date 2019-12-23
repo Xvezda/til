@@ -9,5 +9,6 @@
 #include "xvzd_int.h"
 #include "xvzd_float.h"
 #include "xvzd_string.h"
+#include "xvzd_bigint.h"
 
 #endif  // XVZD_H_

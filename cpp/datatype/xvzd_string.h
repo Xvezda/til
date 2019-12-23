@@ -38,6 +38,8 @@ public:
     }
   }
 
+  String(const int other) : String(Int(other)) {}
+
   template <typename T>
   String(const T& other) : String(other.Cstr()) {}
 
@@ -123,10 +125,16 @@ public:
   const String Join(const Array<T>& arr) const {
     String ret("");
 
-    for (size_t i = 0; i < arr.Size(); ++i) {
-      ret += arr[i] + String(i != arr.Size() - 1
-          ? String(*this).Cstr()
-          : "");
+    if (!Length()) {
+      for (size_t i = 0; i < arr.Size(); ++i) {
+        ret += arr[i];
+      }
+    } else {
+      for (size_t i = 0; i < arr.Size(); ++i) {
+        ret += arr[i] + String(i != arr.Size() - 1
+            ? String(*this).Cstr()
+            : "");
+      }
     }
     return ret;
   }
@@ -205,6 +213,10 @@ public:
 
   const String Repeat(size_t repeat) const {
     return String(*this, repeat);
+  }
+
+  const String Reverse() const {
+    return String("").Join(Array<Char>::Reverse());
   }
 
   bool IsDigit() const {

@@ -47,6 +47,7 @@ public:
 
   const String Repeat(size_t n) const;
   const String operator*(int n) const;
+  const String operator+(const String& other) const;
 };
 
 

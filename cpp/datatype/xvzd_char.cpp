@@ -13,5 +13,9 @@ const String Char::operator*(int n) const {
   return Repeat(n);
 }
 
+const String Char::operator+(const String& other) const {
+  return String(String(*this) + String(other));
+}
+
 
 }  // namespace xvzd

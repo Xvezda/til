@@ -143,6 +143,15 @@ public:
     return items[idx];
   }
 
+  const Array<T> Reverse() const {
+    Array<T> ret;
+
+    for (size_t i = Size(); i != 0; --i) {
+      ret.Push(At(i-1));
+    }
+    return ret;
+  }
+
   size_t Size() const {
     return idx;
   }

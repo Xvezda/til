@@ -15,6 +15,12 @@ namespace xvzd {
 
 #define xvzd_inline__ inline
 
+#define MAX(x, y) ((x) < (y) ? (y) : (x))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+
+#define ctoi(c) ((c) == ' ' ? 0 : ((c) - '0'))
+#define itoc(i) ((i) + '0')
+
 /**
  * Dereference function
  * https://stackoverflow.com/a/36918194

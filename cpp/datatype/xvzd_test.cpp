@@ -104,5 +104,19 @@ int main(void) {
   std::cout << xvzd::String("hello").Lpad(10).Rpad(5) \
     + xvzd::String("world") << std::endl;
 
+  std::cout << xvzd::String("1234").IsDigit() << std::endl;
+  std::cout << xvzd::String("1234a").IsDigit() << std::endl;
+
+  std::cout << xvzd::String("").Length() << std::endl;
+
+  /* xvzd::BigInt ia("123456789"); */
+  /* xvzd::BigInt ib("876543"); */
+  xvzd::BigInt ia("123");
+  xvzd::BigInt ib("123");
+
+  std::cout << ia.Add(ib) << std::endl;
+
+  std::cout << xvzd::String("hello").Reverse() << std::endl;
+
   return 0;
 }
