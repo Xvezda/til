@@ -3,6 +3,8 @@
 
 
 #include "xvzd_common.h"
+#include "xvzd_int.h"
+#include "xvzd_float.h"
 #include "xvzd_char.h"
 #include "xvzd_array.h"
 
@@ -28,20 +30,19 @@ public:
     }
   }
 
+  String(char chr) : String(Char(chr)) {}
+
   String(const String& other) : Array() {
     for (size_t i = 0; i < other.Length(); ++i) {
       Push(other[i]);
     }
   }
 
+  template <typename T>
+  String(const T& other) : String(other.Cstr()) {}
+
   String(const Char& chr) : Array() {
     Push(chr);
-  }
-
-  String(const Char& other, size_t repeat) : Array(repeat) {
-    for (size_t i = repeat; i > 0; --i) {
-      Push(other);
-    }
   }
 
   String(const String& other, size_t repeat)
@@ -204,6 +205,21 @@ public:
 
   const String Repeat(size_t repeat) const {
     return String(*this, repeat);
+  }
+
+  bool IsDigit() const {
+    for (size_t i = 0; i < Size(); ++i) {
+      if ('0' > At(i) || '9' < At(i)) return false;
+    }
+    return true;
+  }
+
+  bool IsAlpha() const {
+    for (size_t i = 0; i < Size(); ++i) {
+      if (!(('A' <= At(i) && 'Z' >= At(i)) ||
+            ('a' <= At(i) && 'z' >= At(i)))) return false;
+    }
+    return false;
   }
 
   const String& operator=(const String& other) {
