@@ -257,10 +257,17 @@ public:
   const String operator*(size_t n) const {
     return Repeat(n);
   }
-private:
+
+  explicit operator bool() const {
+    return Size();
+  }
+
+protected:
   using Array<Char>::Assign;
   using Array<Char>::Compare;
   using Array<Char>::Equal;
+
+private:
 };
 
 }  // namespace xvzd
