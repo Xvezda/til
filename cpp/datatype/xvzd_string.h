@@ -130,6 +130,28 @@ public:
     return ret;
   }
 
+  const String Lpad(size_t repeat) const {
+    return Lpad(repeat, String(' '));
+  }
+
+  const String Lpad(size_t repeat, const String& character) const {
+    String ret("");
+    ret = character.Repeat(repeat) + String(*this);
+
+    return ret;
+  }
+
+  const String Rpad(size_t repeat) const {
+    return Rpad(repeat, String(' '));
+  }
+
+  const String Rpad(size_t repeat, const String& character) const {
+    String ret("");
+    ret = String(*this) + character.Repeat(repeat);
+
+    return ret;
+  }
+
   const String Slice(int start, int end) const {
     String ret("");
     if (start < 0) {

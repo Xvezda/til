@@ -101,5 +101,8 @@ int main(void) {
   a2.Pop();
   std::cout << (a1 == a2) << std::endl;
 
+  std::cout << xvzd::String("hello").Lpad(10).Rpad(5) \
+    + xvzd::String("world") << std::endl;
+
   return 0;
 }
