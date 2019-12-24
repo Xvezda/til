@@ -18,6 +18,7 @@ namespace xvzd {
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
+// Treat space character as 0
 #define ctoi(c) ((c) == ' ' ? 0 : ((c) - '0'))
 #define itoc(i) ((i) + '0')
 

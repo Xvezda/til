@@ -119,6 +119,21 @@ int main(void) {
 
   std::cout << ia + ib << std::endl;
 
+  ia = "321";
+  ib = "123";
+
+  std::cout << ia.Sub(ib) << std::endl;
+
+  ia = "3";
+  ib = "5";
+
+  std::cout << ia.Sub(ib) << std::endl;
+
+  ia = "123";
+  ib = "1234";
+
+  std::cout << ia.Sub(ib) << std::endl;
+
   std::cout << xvzd::String("hello").Reverse() << std::endl;
 
   return 0;
