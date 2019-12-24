@@ -36,7 +36,7 @@ public:
 
     // Padding gap with spaces
     size_t gap;
-    if (Length() < other_cpy.Length()) {
+    if (cpy.Length() < other_cpy.Length()) {
       gap = other_cpy.Length() - cpy.Length();
       cpy.Assign(cpy.Lpad(gap));
     } else {
@@ -46,24 +46,27 @@ public:
     // Now both are same length
     bool up = false;
     for (size_t i = cpy.Length(); i != 0; --i) {
-      if (cpy.At(i-1) == ' ' && other_cpy.At(i-1) == ' ') {
-        if (up) ret.Append('1');
-        break;
-      }
-      int sum = ctoi(cpy.At(i-1)) + ctoi(other_cpy.At(i-1)) + (up ? 1 : 0);
+      if (cpy.At(i-1) == ' ' && other_cpy.At(i-1) == ' ') break;
+      int sum = ctoi(cpy.At(i-1)) + ctoi(other_cpy.At(i-1)) + \
+                (up ? 1 : 0);
       if (sum / 10) {
         up = true;
       } else {
         up = false;
       }
       sum %= 10;
-      if (ret == "0") {
+      if (ret == 0 && (!up || i == cpy.Length())) {
         ret.Assign(String(sum));
       } else {
         ret.Append(sum);
       }
     }
+    if (up) ret.Append(1);
     return ret.Reverse();
+  }
+
+  const BigInt operator+(const BigInt& other) {
+    return Add(other);
   }
 private:
 };

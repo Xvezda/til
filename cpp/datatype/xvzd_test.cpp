@@ -101,20 +101,23 @@ int main(void) {
   a2.Pop();
   std::cout << (a1 == a2) << std::endl;
 
-  std::cout << xvzd::String("hello").Lpad(10).Rpad(5) \
-    + xvzd::String("world") << std::endl;
+  std::cout << xvzd::String("hello").Lpad(10).Rpad(5) + \
+    xvzd::String("world") << std::endl;
 
   std::cout << xvzd::String("1234").IsDigit() << std::endl;
   std::cout << xvzd::String("1234a").IsDigit() << std::endl;
 
   std::cout << xvzd::String("").Length() << std::endl;
 
-  /* xvzd::BigInt ia("123456789"); */
-  /* xvzd::BigInt ib("876543"); */
-  xvzd::BigInt ia("123");
-  xvzd::BigInt ib("123");
+  xvzd::BigInt ia("1099511627776");
+  xvzd::BigInt ib("1073741824");
 
-  std::cout << ia.Add(ib) << std::endl;
+  std::cout << ia + ib << std::endl;
+
+  ia = "123456789123456789123456789";
+  ib = "987654321987654321987654321";
+
+  std::cout << ia + ib << std::endl;
 
   std::cout << xvzd::String("hello").Reverse() << std::endl;
 
