@@ -78,7 +78,7 @@ public:
   virtual int Compare(const Array<T>& other) const {
     int result = -1;
     for (size_t i = 0; i < Size() && i < other.Size(); ++i) {
-      result = At(i).Compare(other.At(i));
+      result = dereference(At(i)).Compare(dereference(other.At(i)));
       if (result) return result;
     }
     // If all elements are same in minimum range
@@ -217,8 +217,10 @@ private:
   T* items;
 };
 
+/*
 template <>
 int Array<Object*>::Compare(const Array<Object*>& other) const;
+*/
 
 
 }  // namespace xvzd

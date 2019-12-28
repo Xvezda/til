@@ -7,7 +7,8 @@
 namespace xvzd {
 
 
-class Object : public Base, public Printable {
+class Object
+  : public Base, public Printable, public Comparable<Object> {
 public:
   Object() : size(0), fmt(nullptr), cstr_ptr(nullptr), ptr(nullptr) {
 #ifdef DEBUG
@@ -21,6 +22,16 @@ public:
     std::cout << __FILE__ << ':' << __LINE__ << ": "
       << "del object" << std::endl;
 #endif
+  }
+
+  virtual int Compare(const Object& other) const {
+    return reinterpret_cast<std::uintptr_t>(ptr) \
+      - reinterpret_cast<std::uintptr_t>(other.ptr);
+  }
+
+  virtual bool Equal(const Object& other) const {
+    if (ptr == other.ptr) return true;
+    return false;
   }
 
   virtual const char* Cstr() const {
