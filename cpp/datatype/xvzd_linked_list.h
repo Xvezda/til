@@ -17,31 +17,38 @@ struct node {
 template <typename T>
 class LinkedList : public Object {
 public:
-  LinkedList() : Object() {
-    entry.next = nullptr;
-  }
+  LinkedList() : Object(), head(nullptr) {}
 
   const LinkedList<T> Push(const T& item) {
-    node_t* current = entry.next;
-    for (; current->next != nullptr; current = current->next);
+    node_t* current;
+
+    for (current = head;
+        current && current->next; current = current->next);
 
     node_t* new_node_ptr = new node_t;
     new_node_ptr->data = item;
     new_node_ptr->next = nullptr;
 
-    current->next = new_node_ptr;
-
+    if (!head) {
+      head = new_node_ptr;
+    } else {
+      current->next = new_node_ptr;
+    }
     return *this;
   }
 
   const T Poll() {
     T ret;
 
-    ret = entry.data;
-    node_t* next = entry.next;
+    ret = head->data;
+    node_t* next = head->next;
 
-    entry.data = next->data;
-    entry.next = next->next;
+    if (next) {
+      head->next = next->next;
+      head->data = next->data;
+    } else {
+      head->next = nullptr;
+    }
 
     return ret;
   }
@@ -49,7 +56,7 @@ public:
   virtual ~LinkedList() {}
 private:
   using node_t = struct node<T>;
-  node_t entry;
+  node_t* head;
 };
 
 }  // namespace xvzd
