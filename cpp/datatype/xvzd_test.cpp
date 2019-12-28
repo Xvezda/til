@@ -118,5 +118,10 @@ int main(void) {
 
   std::cout << xvzd::String("hello").Reverse() << std::endl;
 
+  xvzd::LinkedList<xvzd::String> ll;
+  ll.Push("foo");
+  ll.Push("bar");
+  ll.Push("baz");
+
   return 0;
 }
