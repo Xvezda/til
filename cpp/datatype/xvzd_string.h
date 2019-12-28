@@ -19,6 +19,11 @@ class String
   : public Array<Char>,
     public Assignable<String>, public Comparable<String> {
 public:
+
+  using Array<Char>::Assign;
+  using Array<Char>::Compare;
+  using Array<Char>::Equal;
+
   String() : Array() {
     Push('\0');
   }
@@ -261,12 +266,6 @@ public:
   explicit operator bool() const {
     return Size();
   }
-
-protected:
-  using Array<Char>::Assign;
-  using Array<Char>::Compare;
-  using Array<Char>::Equal;
-
 private:
 };
 

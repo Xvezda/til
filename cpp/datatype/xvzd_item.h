@@ -11,6 +11,10 @@ template <typename T>
 class Item
   : public Object, public Assignable< Item<T> >, public Comparable< Item<T> > {
 public:
+
+  using Object::Compare;
+  using Object::Equal;
+
   Item(const T& other) : Object() {
     ptr = new T;
     assert(ptr != nullptr);

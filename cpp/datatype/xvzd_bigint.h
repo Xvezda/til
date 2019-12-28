@@ -9,14 +9,14 @@ namespace xvzd {
 
 class BigInt : public String {
 public:
+  using String::Assign;
+
   BigInt() : String("0") {}
 
   template <typename T>
   BigInt(const T& other) : String(other) {}
 
   virtual ~BigInt() {}
-
-  using String::Assign;
 
   virtual const BigInt& Assign(const BigInt& other) {
     if (this == &other) return *this;

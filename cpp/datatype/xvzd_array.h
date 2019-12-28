@@ -20,6 +20,10 @@ class Array
   : public Object,
     public Comparable< Array<T> >, public Assignable< Array<T> > {
 public:
+
+  using Object::Compare;
+  using Object::Equal;
+
   Array() : Array(kMinimumCapacity) {}
 
   Array(size_t size) : Object(), idx(0) {
@@ -209,18 +213,12 @@ public:
 
     return cstr_ptr;
   }
-
 private:
   size_t cap;
   int idx;
 
   T* items;
 };
-
-/*
-template <>
-int Array<Object*>::Compare(const Array<Object*>& other) const;
-*/
 
 
 }  // namespace xvzd
