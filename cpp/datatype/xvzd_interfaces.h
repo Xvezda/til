@@ -21,9 +21,11 @@ public:
 };
 
 
+template <typename T>
 class Collection {
 public:
   virtual ~Collection() {}
+  virtual const T& At(int idx) const = 0;
 };
 
 

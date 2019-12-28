@@ -15,25 +15,29 @@ struct node {
 };
 
 template <typename T>
-class LinkedList : public Object {
+class LinkedList : public Object, public Collection<T> {
 public:
-  LinkedList() : Object(), head(nullptr) {}
+  LinkedList() : Object(), head(nullptr), tail(nullptr) {}
+  virtual ~LinkedList() {
+    for (size_t i = size; i != 0; --i) {
+      Poll();
+    }
+  }
 
   const LinkedList<T> Push(const T& item) {
-    node_t* current;
-
-    for (current = head;
-        current && current->next; current = current->next);
-
     node_t* new_node_ptr = new node_t;
     new_node_ptr->data = item;
     new_node_ptr->next = nullptr;
 
     if (!head) {
       head = new_node_ptr;
+      tail = head;
     } else {
-      current->next = new_node_ptr;
+      tail->next = new_node_ptr;
+      tail = new_node_ptr;
     }
+    ++size;
+
     return *this;
   }
 
@@ -43,20 +47,54 @@ public:
     ret = head->data;
     node_t* next = head->next;
 
-    if (next) {
+    if (!next) {
+      head->next = nullptr;
+    } else {
       head->next = next->next;
       head->data = next->data;
-    } else {
-      head->next = nullptr;
     }
+    delete next;
+
+    --size;
 
     return ret;
   }
 
-  virtual ~LinkedList() {}
+  const T Pop() {
+    T ret = tail->data;
+
+    node_t* current = head;
+    for (; current && current->next != tail; current = current->next);
+
+    delete tail;
+    tail = current;
+
+    --size;
+
+    return ret;
+  }
+
+  const T& At(int idx) const {
+    node_t* current = head;
+    for (int i = 0; i < idx; ++i) {
+      if (!current->next) break;
+      current = current->next;
+    }
+    return current->data;
+  }
+
+  const T operator[](int idx) const {
+    return At(idx);
+  }
+
+  size_t Size() const {
+    return size;
+  }
+
 private:
   using node_t = struct node<T>;
   node_t* head;
+  node_t* tail;
 };
 
 }  // namespace xvzd
