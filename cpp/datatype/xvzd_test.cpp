@@ -121,5 +121,8 @@ int main(void) {
   ll.Push("bar");
   ll.Push("baz");
 
+  std::cout << ll.Poll() << std::endl;
+  std::cout << ll.Poll() << std::endl;
+
   return 0;
 }
