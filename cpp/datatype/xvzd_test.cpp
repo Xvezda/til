@@ -43,17 +43,15 @@ int main(void) {
   std::cout << str << std::endl;
 
   // FIXME: Pointer array error
-  /*
-  Array<Object*> oarr;
-  oarr.Push(new Int(123));
-  oarr.Push(new String("foobar"));
+  xvzd::Array<xvzd::Object*> oarr;
+  oarr.Push(new xvzd::Int(123));
+  oarr.Push(new xvzd::String("foobar"));
 
   std::cout << oarr << std::endl;
 
   for (size_t i = 0; i < oarr.Size(); ++i) {
     delete oarr.Pop();
   }
-  */
 
   xvzd::String sc('c');
   std::cout << sc << std::endl;
