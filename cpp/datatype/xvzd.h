@@ -11,4 +11,6 @@
 #include "xvzd_string.h"
 #include "xvzd_bigint.h"
 
+#include "xvzd_linked_list.h"
+
 #endif  // XVZD_H_
