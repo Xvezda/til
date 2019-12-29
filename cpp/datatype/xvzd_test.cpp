@@ -151,10 +151,12 @@ int main(void) {
   std::cout << llc.At(3) << std::endl;
   std::cout << llc.Poll() << std::endl;
 
+#ifdef DEBUG
   std::cout << "Enter something: ";
   xvzd::String test_str;
   std::cin >> test_str;
   std::cout << "Your input: " << test_str.Cstr() << std::endl;
+#endif
 
   return 0;
 }
