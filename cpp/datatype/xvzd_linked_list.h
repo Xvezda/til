@@ -9,6 +9,7 @@ namespace xvzd {
 
 template <typename T>
 struct node {
+  virtual ~node() = default;
   T data;
   struct node* next;
 };

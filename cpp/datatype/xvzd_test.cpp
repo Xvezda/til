@@ -132,5 +132,18 @@ int main(void) {
   /* std::cout << ll.Poll() << std::endl; */
   /* std::cout << ll.Poll() << std::endl; */
 
+  xvzd::DoublyLinkedList<xvzd::String> llb;
+  llb.Push("the");
+  llb.Push("quick");
+  llb.Push("brown");
+  llb.Push("fox");
+
+  std::cout << llb.At(1) << std::endl;
+  std::cout << llb.At(2) << std::endl;
+
+  // FIXME: Int linked list cause SIGABRT
+  /* xvzd::LinkedList<xvzd::Int> llc; */
+  /* llc.Push(123); */
+
   return 0;
 }

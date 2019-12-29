@@ -17,7 +17,7 @@ public:
 
   Item(const T& other) : Object() {
     ptr = new T;
-    assert(ptr != nullptr);
+
     *static_cast<T*>(ptr) = other;
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
