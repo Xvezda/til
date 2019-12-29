@@ -3,7 +3,6 @@
 
 #include "xvzd_common.h"
 #include "xvzd_object.h"
-#include "xvzd_item.h"
 
 
 namespace xvzd {
@@ -25,7 +24,7 @@ public:
     }
   }
 
-  const LinkedList<T>& Push(const T& item) {
+  virtual const LinkedList<T>& Push(const T& item) {
     node_t* new_node_ptr = new node_t;
     new_node_ptr->data = item;
     new_node_ptr->next = nullptr;
@@ -40,7 +39,6 @@ public:
     ++size;
 
     return *this;
-
   }
 
   const T Poll() {
@@ -81,15 +79,14 @@ public:
     return current->data;
   }
 
-  const T operator[](int idx) const {
+  const T& operator[](int idx) const {
     return At(idx);
   }
 
   size_t Size() const {
     return size;
   }
-
-private:
+protected:
   using node_t = struct node<T>;
   node_t* head;
   node_t* tail;
