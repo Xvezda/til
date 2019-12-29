@@ -9,7 +9,7 @@ OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 all: build
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c $< -o $@
 
 build: $(OBJS)
 	$(CXX) -shared -o ../lib/libxvzd.so $(OBJS)
