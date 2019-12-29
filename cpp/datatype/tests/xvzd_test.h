@@ -4,6 +4,9 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
+#include "xvzd_common.h"
+
+
 #define LOGGER(var)                                           \
   std::cerr <<  "\033[0;36m"                                  \
     << "[  LOGGER  ] " << __FILE__ << ':' << __LINE__ << ": " \

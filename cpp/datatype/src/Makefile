@@ -1,21 +1,21 @@
-.SUFFIXES: .cpp
-
 CC = g++
 CXX = $(CC)
 CXXFLAGS = -std=c++14 -Wall -Wextra -pedantic
 INC = -I../include/xvzd
 SRCS = $(wildcard *.cpp)
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
-TARGET = run_test
-LDLIBS = -lgtest_main -lgtest -pthread -L../lib -lxvzd
 
 
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
+all: build
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
 
+build: $(OBJS)
+	$(CXX) -shared -o ../lib/libxvzd.so $(OBJS)
+
+debug: CXXFLAGS+=-O0 -g -DDEBUG
+debug: $(OBJS)
+
 clean:
-	rm -rf *.o $(TARGET)
+	rm -rf *.o *.dSYM

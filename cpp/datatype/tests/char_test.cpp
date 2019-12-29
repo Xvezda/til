@@ -1,5 +1,5 @@
 #include "xvzd_test.h"
-#include "../xvzd_char.h"
+#include "xvzd_char.h"
 
 namespace xvzd {
 
@@ -19,6 +19,15 @@ TEST(xvzd_char_test, compare_value) {
 TEST(xvzd_char_test, print_value) {
   Char c('a');
   LOGGER(c);
+}
+
+TEST(xvzd_char_test, assign_value) {
+  Char c('a');
+  LOGGER(c);
+  EXPECT_TRUE(c == 'a');
+  c = 'b';
+  LOGGER(c);
+  EXPECT_TRUE(c == 'b');
 }
 
 

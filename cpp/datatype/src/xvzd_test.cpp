@@ -2,25 +2,6 @@
 
 
 int main(void) {
-  xvzd::Int n(31337);
-  xvzd::Char c('A');
-
-  std::cout << n << std::endl;
-  std::cout << c << std::endl;
-
-  c = 'B';
-  std::cout << c << std::endl;
-
-  xvzd::Object o;
-  std::cout << o << std::endl;
-
-  xvzd::Float f(123.456);
-  std::cout << f << std::endl;
-
-  xvzd::Int* intptr = new xvzd::Int(12345);
-  std::cout << *intptr << std::endl;
-  delete intptr;
-
   xvzd::Array<xvzd::Int> arr;
 
   arr += 123;

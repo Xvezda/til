@@ -5,6 +5,10 @@
 #include "xvzd_interfaces.h"
 
 namespace xvzd {
+class String;
+}  // namespace xvzd
+
+namespace xvzd {
 
 
 class Object
@@ -37,6 +41,8 @@ public:
   virtual const char* Cstr() const {
     return GetFmt();
   }
+
+  const String ToString() const;
 
   virtual size_t Size() const {
     return GetSize();
