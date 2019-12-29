@@ -26,6 +26,7 @@ class Collection {
 public:
   virtual ~Collection() {}
   virtual const T& At(int idx) const = 0;
+  virtual const Collection<T>& Push(const T& item) = 0;
 };
 
 

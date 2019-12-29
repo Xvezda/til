@@ -9,7 +9,7 @@ all: $(TARGETS)
 
 $(TARGETS): $(OBJECTS)
 
-debug: CPPFLAGS+=-O0 -g -DDEBUG
+debug: CXXFLAGS+=-O0 -g -DDEBUG
 debug: $(TARGETS)
 
 clean:

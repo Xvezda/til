@@ -20,10 +20,6 @@ class String
     public Assignable<String>, public Comparable<String> {
 public:
 
-  using Array<Char>::Assign;
-  using Array<Char>::Compare;
-  using Array<Char>::Equal;
-
   String() : Array() {
     Push('\0');
   }
@@ -66,7 +62,7 @@ public:
     }
   }
 
-  virtual const char* Cstr() const {
+  virtual const char* Cstr() const override {
     cstr_ptr = new char[Length() + 1];
     cstr_ptr[Length()] = '\0';
 
@@ -76,11 +72,11 @@ public:
     return cstr_ptr;
   }
 
-  size_t Length() const {
+  virtual size_t Length() const {
     return Size();
   }
 
-  virtual const String& Assign(const String& other) {
+  virtual const String& Assign(const String& other) override {
     if (this == &other) return *this;
     Clear();
     for (size_t i = 0; i < other.Length(); ++i) {
@@ -91,6 +87,10 @@ public:
 
   const String& Append(const String& other) {
     for (size_t i = 0; i < other.Length(); ++i) {
+      if (*this == '\0') {
+        Assign(other[i]);
+        continue;
+      }
       Push(other[i]);
     }
     return *this;
@@ -107,11 +107,11 @@ public:
     return ret.Append(other);
   }
 
-  virtual int Compare(const String& other) const {
+  virtual int Compare(const String& other) const override {
     return std::strcmp(Cstr(), other.Cstr());
   }
 
-  virtual bool Equal(const String& other) const {
+  virtual bool Equal(const String& other) const override {
     return !Compare(other);
   }
 
@@ -145,7 +145,7 @@ public:
   }
 
   const String Lpad(size_t repeat) const {
-    return Lpad(repeat, String(' '));
+    return Lpad(repeat, ' ');
   }
 
   const String Lpad(size_t repeat, const String& character) const {
@@ -156,7 +156,7 @@ public:
   }
 
   const String Rpad(size_t repeat) const {
-    return Rpad(repeat, String(' '));
+    return Rpad(repeat, ' ');
   }
 
   const String Rpad(size_t repeat, const String& character) const {
@@ -266,7 +266,31 @@ public:
   explicit operator bool() const {
     return Size();
   }
-private:
+
+  friend std::istream& operator>>(std::istream& is, String& self) {
+    int idx = 0;
+    char c[kDefaultBufferSize];
+    for (; !std::cin.eof(); ) {
+      c[idx] = std::cin.get();
+      if (c[idx] == '\n') {
+        c[idx] = '\0';
+        break;
+      }
+      if (idx >= kDefaultBufferSize - 1) {
+        c[kDefaultBufferSize - 1] = '\0';
+        self.Append(const_cast<const char*>(c));
+        idx = 0;
+      }
+      ++idx;
+    }
+    self.Append(const_cast<const char*>(c));
+
+    return is;
+  }
+protected:
+  using Array<Char>::Assign;
+  using Array<Char>::Compare;
+  using Array<Char>::Equal;
 };
 
 }  // namespace xvzd

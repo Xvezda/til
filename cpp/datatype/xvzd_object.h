@@ -54,6 +54,7 @@ public:
     os << self.Cstr();
     return os;
   }
+
 protected:
   size_t size;
   char* fmt;

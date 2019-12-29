@@ -16,11 +16,19 @@ namespace xvzd {
 
 #define xvzd_inline__ inline
 
+
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 #define ctoi(c) ((c) == ' ' ? 0 : ((c) - '0'))
 #define itoc(i) ((i) + '0')
+
+
+#define XVZD_DEFAULT_BUFFER_SIZE 0x100
+#if XVZD_DEFAULT_BUFFER_SIZE < 2
+  #error buffer size must bigger than 2
+#endif
+const auto kDefaultBufferSize = XVZD_DEFAULT_BUFFER_SIZE;
 
 /**
  * Dereference function
