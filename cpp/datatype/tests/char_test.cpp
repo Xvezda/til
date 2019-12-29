@@ -1,5 +1,4 @@
 #include "xvzd_test.h"
-#include "xvzd_char.h"
 
 namespace xvzd {
 

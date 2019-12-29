@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "xvzd_common.h"
+#include "xvzd.h"
 
 
 #define LOGGER(var)                                           \
