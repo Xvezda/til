@@ -25,7 +25,7 @@ public:
     }
   }
 
-  virtual const LinkedList<T>& Push(const T& item) {
+  virtual const Collection<T>& Push(const T& item) {
     node_t* new_node_ptr = new node_t;
     new_node_ptr->data = item;
     new_node_ptr->next = nullptr;

@@ -20,10 +20,6 @@ class String
     public Assignable<String>, public Comparable<String> {
 public:
 
-  using Array<Char>::Assign;
-  using Array<Char>::Compare;
-  using Array<Char>::Equal;
-
   String() : Array() {
     Push('\0');
   }
@@ -66,7 +62,7 @@ public:
     }
   }
 
-  virtual const char* Cstr() const {
+  virtual const char* Cstr() const override {
     cstr_ptr = new char[Length() + 1];
     cstr_ptr[Length()] = '\0';
 
@@ -76,11 +72,11 @@ public:
     return cstr_ptr;
   }
 
-  size_t Length() const {
+  virtual size_t Length() const {
     return Size();
   }
 
-  virtual const String& Assign(const String& other) {
+  virtual const String& Assign(const String& other) override {
     if (this == &other) return *this;
     Clear();
     for (size_t i = 0; i < other.Length(); ++i) {
@@ -107,11 +103,11 @@ public:
     return ret.Append(other);
   }
 
-  virtual int Compare(const String& other) const {
+  virtual int Compare(const String& other) const override {
     return std::strcmp(Cstr(), other.Cstr());
   }
 
-  virtual bool Equal(const String& other) const {
+  virtual bool Equal(const String& other) const override {
     return !Compare(other);
   }
 
@@ -266,7 +262,10 @@ public:
   explicit operator bool() const {
     return Size();
   }
-private:
+protected:
+  using Array<Char>::Assign;
+  using Array<Char>::Compare;
+  using Array<Char>::Equal;
 };
 
 }  // namespace xvzd

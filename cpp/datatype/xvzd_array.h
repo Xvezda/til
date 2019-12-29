@@ -21,9 +21,6 @@ class Array
     public Comparable< Array<T> >, public Assignable< Array<T> > {
 public:
 
-  using Object::Compare;
-  using Object::Equal;
-
   Array() : Array(kMinimumCapacity) {}
 
   Array(size_t size) : Object(), idx(0) {
@@ -56,13 +53,23 @@ public:
     }
   }
 
-  virtual const Array<T>& Assign(const Array<T>& other) {
+  virtual const Array<T>& Assign(const Array<T>& other) override {
     if (this == &other) return *this;
 
     for (size_t i = 0; i < other.Size(); ++i) {
       Push(other[i]);
     }
     return *this;
+  }
+
+  const T& At(int idx) const override {
+    if (idx < 0) {
+      idx = Size() + idx;
+      if (idx < 0) {
+        idx = 0;
+      }
+    }
+    return items[idx];
   }
 
   const Array<T>& Append(const Array<T>& other) {
@@ -79,7 +86,7 @@ public:
     return ret;
   }
 
-  virtual int Compare(const Array<T>& other) const {
+  virtual int Compare(const Array<T>& other) const override {
     int result = -1;
     for (size_t i = 0; i < Size() && i < other.Size(); ++i) {
       result = dereference(At(i)).Compare(dereference(other.At(i)));
@@ -95,7 +102,7 @@ public:
     return 0;
   }
 
-  virtual bool Equal(const Array<T>& other) const {
+  virtual bool Equal(const Array<T>& other) const override {
     if (Size() != other.Size()) return false;
     for (size_t i = 0; i < Size() && i < other.Size(); ++i) {
       if (At(i) != other.At(i)) return false;
@@ -116,7 +123,7 @@ public:
 
   const String Join(const String& sep) const;
 
-  const Array<T>& Push(const T& item) {
+  const Collection<T>& Push(const T& item) override {
     items[idx++] = item;
 
     if (idx >= static_cast<int>(cap)) {
@@ -137,16 +144,6 @@ public:
     return items[--idx];
   }
 
-  const T& At(int idx) const {
-    if (idx < 0) {
-      idx = Size() + idx;
-      if (idx < 0) {
-        idx = 0;
-      }
-    }
-    return items[idx];
-  }
-
   const Array<T> Reverse() const {
     Array<T> ret;
 
@@ -156,7 +153,7 @@ public:
     return ret;
   }
 
-  size_t Size() const {
+  size_t Size() const override {
     return idx;
   }
 
@@ -177,14 +174,15 @@ public:
   }
 
   const Array<T>& operator+=(const T& other) {
-    return Push(other);
+    Push(other);
+    return *this;
   }
 
   const T& operator[](int idx) const {
     return At(idx);
   }
 
-  virtual const char* Cstr() const {
+  virtual const char* Cstr() const override {
     size_t total = 0;
 
     total += std::strlen("[");
@@ -213,6 +211,11 @@ public:
 
     return cstr_ptr;
   }
+
+protected:
+  using Object::Compare;
+  using Object::Equal;
+
 private:
   size_t cap;
   int idx;
@@ -222,5 +225,4 @@ private:
 
 
 }  // namespace xvzd
-
 #endif  // XVZD_ARRAY_H_
