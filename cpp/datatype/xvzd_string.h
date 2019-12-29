@@ -268,12 +268,23 @@ public:
   }
 
   friend std::istream& operator>>(std::istream& is, String& self) {
-    char c;
+    int idx = 0;
+    char c[kDefaultBufferSize];
     for (; !std::cin.eof(); ) {
-      c = std::cin.get();
-      if (c == '\n') break;
-      self.Append(c);
+      c[idx] = std::cin.get();
+      if (c[idx] == '\n') {
+        c[idx] = '\0';
+        break;
+      }
+      if (idx >= kDefaultBufferSize - 1) {
+        c[kDefaultBufferSize - 1] = '\0';
+        self.Append(const_cast<const char*>(c));
+        idx = 0;
+      }
+      ++idx;
     }
+    self.Append(const_cast<const char*>(c));
+
     return is;
   }
 protected:

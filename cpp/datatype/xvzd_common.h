@@ -22,6 +22,8 @@ namespace xvzd {
 #define ctoi(c) ((c) == ' ' ? 0 : ((c) - '0'))
 #define itoc(i) ((i) + '0')
 
+const auto kDefaultBufferSize = 0x10;
+
 /**
  * Dereference function
  * https://stackoverflow.com/a/36918194
