@@ -87,6 +87,10 @@ public:
 
   const String& Append(const String& other) {
     for (size_t i = 0; i < other.Length(); ++i) {
+      if (*this == '\0') {
+        Assign(other[i]);
+        continue;
+      }
       Push(other[i]);
     }
     return *this;
@@ -261,6 +265,16 @@ public:
 
   explicit operator bool() const {
     return Size();
+  }
+
+  friend std::istream& operator>>(std::istream& is, String& self) {
+    char c;
+    for (; !std::cin.eof(); ) {
+      c = std::cin.get();
+      if (c == '\n') break;
+      self.Append(c);
+    }
+    return is;
   }
 protected:
   using Array<Char>::Assign;
