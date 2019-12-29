@@ -1,14 +1,17 @@
 .SUFFIXES: .cpp
 
-CXX=g++
-CXXFLAGS=-std=c++14 -Wall -Wextra -pedantic
-SRCS=$(wildcard *.cpp)
-OBJS=$(patsubst %.cpp,%.o,$(SRCS))
-TARGETS=$(patsubst %.o,%,$(OBJS))
-LDLIBS=-lgtest_main -lgtest -pthread
+CC = g++
+CXX = $(CC)
+CXXFLAGS = -std=c++14 -Wall -Wextra -pedantic
+SRCS = $(wildcard *.cpp)
+OBJS = $(patsubst %.cpp,%.o,$(SRCS))
+TARGET = run_test
+LDLIBS = -lgtest_main -lgtest -pthread
 
 
-all: $(TARGETS)
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
 
 clean:
-	rm -rf *.o $(TARGETS)
+	rm -rf *.o $(TARGET)

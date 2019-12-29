@@ -7,8 +7,10 @@ TEST(xvzd_int_test, ctors) {
 }
 
 TEST(xvzd_int_test, compare_value) {
-  xvzd::Int n(123);
-  EXPECT_TRUE(n == 123);
+  xvzd::Int n1;
+  EXPECT_TRUE(n1 == 0);
+  xvzd::Int n2(123);
+  EXPECT_TRUE(n2 == 123);
 }
 
 TEST(xvzd_int_test, print_value) {
