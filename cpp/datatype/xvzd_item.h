@@ -16,12 +16,18 @@ public:
   using Object::Equal;
 
   Item(const T& other) : Object() {
-    ptr = new T;
-
-    *static_cast<T*>(ptr) = other;
+    Assign(other);
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
-      << "new item" << std::endl;
+      << "new item - addr: " << ptr << std::endl;
+#endif
+  }
+
+  Item(const Item<T>& other) : Object() {
+    Assign(other);
+#ifdef DEBUG
+    std::cout << __FILE__ << ':' << __LINE__ << ": "
+      << "copy item - addr: " << ptr << std::endl;
 #endif
   }
 
@@ -29,7 +35,7 @@ public:
     if (ptr) {
 #ifdef DEBUG
       std::cout << __FILE__ << ':' << __LINE__ << ": "
-        << "del item" << std::endl;
+        << "del item - addr: " << ptr << std::endl;
 #endif
       delete static_cast<T*>(ptr);
       ptr = nullptr;
@@ -42,7 +48,13 @@ public:
   }
 
   const Item<T>& Assign(const Item<T>& other) {
-    if (this == &other) return *this;
+    return Assign(static_cast<T>(other));
+  }
+
+  const Item<T>& Assign(const T& other) {
+    if (!ptr) {
+      ptr = new T;
+    }
     *static_cast<T*>(ptr) = other;
 
     return *this;
@@ -79,6 +91,8 @@ public:
   virtual size_t GetSize() const {
     return std::snprintf(nullptr, 0, GetFmt(), static_cast<T>(*this));
   }
+private:
+  Item() : Object() {}
 };
 
 

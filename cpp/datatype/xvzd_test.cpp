@@ -141,9 +141,15 @@ int main(void) {
   std::cout << llb.At(1) << std::endl;
   std::cout << llb.At(2) << std::endl;
 
-  // FIXME: Int linked list cause SIGABRT
-  /* xvzd::LinkedList<xvzd::Int> llc; */
-  /* llc.Push(123); */
+  xvzd::DoublyLinkedList<xvzd::Int> llc;
+  llc.Push(12);
+  llc.Push(34);
+  llc.Push(56);
+  llc.Push(78);
+  llc.Push(90);
+
+  std::cout << llc.At(1) << std::endl;
+  std::cout << llc.Poll() << std::endl;
 
   return 0;
 }

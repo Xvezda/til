@@ -42,7 +42,7 @@ public:
     dnode_t* current;
     if (idx > static_cast<int>(size) / 2) {
       current = dynamic_cast<dnode_t*>(tail);
-      for (size_t i = size; static_cast<int>(i) != idx; --i) {
+      for (size_t i = size; static_cast<int>(i-1) != idx; --i) {
         current = dynamic_cast<dnode_t*>(current->prev);
       }
     } else {

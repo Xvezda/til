@@ -15,7 +15,7 @@ public:
 #endif
   }
 
-  Int(const int& num) : Item<int>(num) {
+  Int(int num) : Item<int>(num) {
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
       << "new int: " << num << std::endl;
