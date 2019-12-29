@@ -4,10 +4,11 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#define LOGGER(var) \
-  std::cerr <<  "\033[0;36m" \
+#define LOGGER(var)                                           \
+  std::cerr <<  "\033[0;36m"                                  \
     << "[  LOGGER  ] " << __FILE__ << ':' << __LINE__ << ": " \
-    << #var << ": " << var << std::endl
+    << #var << ": " << var                                    \
+    << "\033[0;0m" << std::endl
 
 
 #endif  // XVZD_TEST_H_
