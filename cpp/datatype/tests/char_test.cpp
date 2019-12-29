@@ -4,19 +4,19 @@
 namespace xvzd {
 
 
-TEST(xvzd_int_test, ctors) {
+TEST(xvzd_char_test, ctors) {
   Char c1;
   Char c2('a');
 }
 
-TEST(xvzd_int_test, compare_value) {
+TEST(xvzd_char_test, compare_value) {
   Char c1;
   EXPECT_TRUE(c1 == '\0');
   Char c2('a');
   EXPECT_TRUE(c2 == 'a');
 }
 
-TEST(xvzd_int_test, print_value) {
+TEST(xvzd_char_test, print_value) {
   Char c('a');
   LOGGER(c);
 }
