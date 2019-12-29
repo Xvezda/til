@@ -145,7 +145,7 @@ public:
   }
 
   const String Lpad(size_t repeat) const {
-    return Lpad(repeat, String(' '));
+    return Lpad(repeat, ' ');
   }
 
   const String Lpad(size_t repeat, const String& character) const {
@@ -156,7 +156,7 @@ public:
   }
 
   const String Rpad(size_t repeat) const {
-    return Rpad(repeat, String(' '));
+    return Rpad(repeat, ' ');
   }
 
   const String Rpad(size_t repeat, const String& character) const {
