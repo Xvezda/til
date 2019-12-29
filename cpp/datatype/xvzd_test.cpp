@@ -116,19 +116,21 @@ int main(void) {
 
   std::cout << xvzd::String("hello").Reverse() << std::endl;
 
-  xvzd::LinkedList<xvzd::String> ll;
-  ll.Push("foo");
-  ll.Push("bar");
-  ll.Push("baz");
+  xvzd::LinkedList<xvzd::String> lla;
+  lla.Push("foo");
+  lla.Push("bar");
+  lla.Push("baz");
 
-  /*
-  std::cout << ll.Poll() << std::endl;
-  std::cout << ll.Poll() << std::endl;
-  */
+  std::cout << lla.At(0) << std::endl;
+  std::cout << lla.At(1) << std::endl;
+  std::cout << lla.At(2) << std::endl;
 
-  std::cout << ll.At(1) << std::endl;
-  std::cout << ll.Size() << std::endl;
-  std::cout << ll.Pop() << std::endl;
+  std::cout << lla.Poll() << std::endl;
+  /* std::cout << lla.Poll() << std::endl; */
+  std::cout << lla.Pop() << std::endl;
+
+  /* std::cout << ll.Poll() << std::endl; */
+  /* std::cout << ll.Poll() << std::endl; */
 
   return 0;
 }

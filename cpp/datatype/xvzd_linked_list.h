@@ -18,13 +18,14 @@ template <typename T>
 class LinkedList : public Object, public Collection<T> {
 public:
   LinkedList() : Object(), head(nullptr), tail(nullptr) {}
+
   virtual ~LinkedList() {
-    for (size_t i = size; i != 0; --i) {
+    for (size_t i = Size(); i != 0; --i) {
       Poll();
     }
   }
 
-  const LinkedList<T> Push(const T& item) {
+  const LinkedList<T>& Push(const T& item) {
     node_t* new_node_ptr = new node_t;
     new_node_ptr->data = item;
     new_node_ptr->next = nullptr;
@@ -34,27 +35,24 @@ public:
       tail = head;
     } else {
       tail->next = new_node_ptr;
-      tail = new_node_ptr;
+      tail = tail->next;
     }
     ++size;
 
     return *this;
+
   }
 
   const T Poll() {
-    T ret;
-
-    ret = head->data;
+    T ret = head->data;
     node_t* next = head->next;
 
+    delete head;
     if (!next) {
-      head->next = nullptr;
+      head = nullptr;
     } else {
-      head->next = next->next;
-      head->data = next->data;
+      head = next;
     }
-    delete next;
-
     --size;
 
     return ret;
