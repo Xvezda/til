@@ -17,7 +17,7 @@ const auto kMinimumCapacity = 0x10;
 
 template <typename T>
 class Array
-  : public Object,
+  : public Object, public Collection<T>,
     public Comparable< Array<T> >, public Assignable< Array<T> > {
 public:
 

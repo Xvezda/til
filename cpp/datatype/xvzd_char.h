@@ -5,7 +5,7 @@
 #include "xvzd_common.h"
 #include "xvzd_item.h"
 
-#define STRNULL_(s) ((!std::strlen(s) ? "(null)" : (s)))
+#define STRNULL_(s) (((*(s)) == '\0' ? "(null)" : (s)))
 
 
 namespace xvzd {
@@ -24,7 +24,7 @@ public:
 #endif
   }
 
-  Char(const char& chr) : Item<char>(chr) {
+  Char(char chr) : Item<char>(chr) {
 #ifdef DEBUG
     char* tmp = new char[1+1];
     tmp[0] = chr;
@@ -34,10 +34,11 @@ public:
     delete[] tmp;
 #endif
   }
+
   virtual ~Char() {
 #ifdef DEBUG
     std::cout << __FILE__ << ':' << __LINE__ << ": "
-      << "del char: " << STRNULL_(Cstr()) << std::endl;
+      << "del char: " << STRNULL_(Cstr()) << ", addr: " << ptr << std::endl;
 #endif
   }
 

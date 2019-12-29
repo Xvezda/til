@@ -116,13 +116,40 @@ int main(void) {
 
   std::cout << xvzd::String("hello").Reverse() << std::endl;
 
-  xvzd::LinkedList<xvzd::String> ll;
-  ll.Push("foo");
-  ll.Push("bar");
-  ll.Push("baz");
+  xvzd::LinkedList<xvzd::String> lla;
+  lla.Push("foo");
+  lla.Push("bar");
+  lla.Push("baz");
 
-  std::cout << ll.Poll() << std::endl;
-  std::cout << ll.Poll() << std::endl;
+  std::cout << lla.At(0) << std::endl;
+  std::cout << lla.At(1) << std::endl;
+  std::cout << lla.At(2) << std::endl;
+
+  std::cout << lla.Poll() << std::endl;
+  /* std::cout << lla.Poll() << std::endl; */
+  std::cout << lla.Pop() << std::endl;
+
+  /* std::cout << ll.Poll() << std::endl; */
+  /* std::cout << ll.Poll() << std::endl; */
+
+  xvzd::DoublyLinkedList<xvzd::String> llb;
+  llb.Push("the");
+  llb.Push("quick");
+  llb.Push("brown");
+  llb.Push("fox");
+
+  std::cout << llb.At(1) << std::endl;
+  std::cout << llb.At(2) << std::endl;
+
+  xvzd::DoublyLinkedList<xvzd::Int> llc;
+  llc.Push(12);
+  llc.Push(34);
+  llc.Push(56);
+  llc.Push(78);
+  llc.Push(90);
+
+  std::cout << llc.At(1) << std::endl;
+  std::cout << llc.Poll() << std::endl;
 
   return 0;
 }
