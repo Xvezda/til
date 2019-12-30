@@ -42,7 +42,7 @@ public:
     return GetFmt();
   }
 
-  const String ToString() const;
+  virtual const String ToString() const;
 
   virtual size_t Size() const {
     return GetSize();
