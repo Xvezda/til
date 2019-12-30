@@ -1,6 +1,6 @@
-#include "xvzd_common.h"
-#include "xvzd_object.h"
-#include "xvzd_string.h"
+#include "xvzd/xvzd_common.h"
+#include "xvzd/xvzd_object.h"
+#include "xvzd/xvzd_string.h"
 
 namespace xvzd {
 

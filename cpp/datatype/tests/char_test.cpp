@@ -29,6 +29,10 @@ TEST(xvzd_char_test, assign_value) {
   EXPECT_TRUE(c == 'b');
 }
 
+TEST(xvzd_char_test, char_operator) {
+  EXPECT_TRUE(Char('z') * 10 == "zzzzzzzzzz");
+}
+
 
 }  // namespace xvzd
 

@@ -8,4 +8,17 @@ TEST(xvzd_object_test, object_print) {
   EXPECT_TRUE(o.ToString() == "[object Object]");
 }
 
+TEST(xvzd_object_test, object_ptr) {
+  Array<Object*> oarr;
+  oarr.Push(new Int(123));
+  oarr.Push(new String("foobar"));
+
+  LOGGER(oarr);
+  EXPECT_TRUE(oarr.ToString() == "[123, foobar]");
+
+  for (size_t i = 0; i < oarr.Size(); ++i) {
+    delete oarr.Pop();
+  }
+}
+
 }  // namespace xvzd

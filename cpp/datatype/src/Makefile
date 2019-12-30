@@ -1,7 +1,7 @@
 CC = g++
 CXX = $(CC)
 CXXFLAGS = -std=c++14 -Wall -Wextra -pedantic
-INC = -I../include/xvzd
+INC = -I../include
 SRCS = $(wildcard *.cpp)
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 
