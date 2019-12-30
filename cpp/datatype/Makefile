@@ -1,20 +1,16 @@
-CC=g++
-CXX=$(CC)
-CXXFLAGS=-std=c++14 -Wall -Wextra -pedantic
-OBJECTS=$(patsubst %.cpp,%.o,$(filter-out *_test.cpp,$(wildcard *.cpp)))
-TARGETS=$(patsubst %.cpp,%,$(wildcard *_test.cpp))
+.PHONY: lib test
 
 
-all: $(TARGETS) test
+all: lib test
 
-$(TARGETS): $(OBJECTS)
+lib:
+	cd src && $(MAKE)
 
 test:
 	cd tests && $(MAKE)
 
-debug: CXXFLAGS+=-O0 -g -DDEBUG
-debug: $(TARGETS)
-
 clean:
-	rm -rf $(TARGETS) *.o *.dSYM
+	cd lib && rm -rf *.so
+	cd src && $(MAKE) clean
 	cd tests && $(MAKE) clean
+

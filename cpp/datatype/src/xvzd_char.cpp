@@ -1,5 +1,5 @@
-#include "xvzd_char.h"
-#include "xvzd_string.h"
+#include "xvzd/xvzd_char.h"
+#include "xvzd/xvzd_string.h"
 
 
 namespace xvzd {

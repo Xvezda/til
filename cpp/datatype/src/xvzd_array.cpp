@@ -1,8 +1,8 @@
-#include "xvzd_common.h"
-#include "xvzd_object.h"
-#include "xvzd_item.h"
-#include "xvzd_array.h"
-#include "xvzd_string.h"
+#include "xvzd/xvzd_common.h"
+#include "xvzd/xvzd_object.h"
+#include "xvzd/xvzd_item.h"
+#include "xvzd/xvzd_array.h"
+#include "xvzd/xvzd_string.h"
 
 namespace xvzd {
 
