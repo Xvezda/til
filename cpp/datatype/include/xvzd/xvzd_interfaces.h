@@ -2,6 +2,10 @@
 #define XVZD_INTERFACE_H_
 
 namespace xvzd {
+class String;
+}  // namespace xvzd}
+
+namespace xvzd {
 
 
 template <typename T>
@@ -34,6 +38,7 @@ class Printable {
 public:
   virtual ~Printable() {}
   virtual const char *Cstr() const = 0;
+  virtual const String ToString() const = 0;
 };
 
 
