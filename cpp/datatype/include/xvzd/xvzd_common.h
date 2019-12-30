@@ -2,6 +2,7 @@
 #define XVZD_COMMON_H_
 
 #include <iostream>
+#include <fstream>
 
 #include <cstdio>
 #include <cstdlib>
@@ -24,7 +25,7 @@ namespace xvzd {
 #define itoc(i) ((i) + '0')
 
 
-#define XVZD_DEFAULT_BUFFER_SIZE 0x100
+#define XVZD_DEFAULT_BUFFER_SIZE 0x200
 #if XVZD_DEFAULT_BUFFER_SIZE < 2
   #error buffer size must bigger than 2
 #endif

@@ -63,4 +63,12 @@ TEST(xvzd_string_test, string_reverse) {
   EXPECT_TRUE(s.Reverse() == "olleh");
 }
 
+TEST(xvzd_string_test, string_read_file) {
+  String s;
+  std::ifstream in("lorem.txt");
+  in >> s;
+  LOGGER(s);
+}
+
+
 }  // namespace xvzd

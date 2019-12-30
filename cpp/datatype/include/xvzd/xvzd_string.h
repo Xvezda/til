@@ -287,6 +287,16 @@ public:
 
     return is;
   }
+
+  friend std::ifstream& operator>>(std::ifstream& is, String& self) {
+    char c[kDefaultBufferSize];
+    while (is) {
+      is.read(c, sizeof(c));
+      c[is.gcount()] = '\0';
+      self.Append(const_cast<const char*>(c));
+    }
+    return is;
+  }
 protected:
   using Array<Char>::Assign;
   using Array<Char>::Compare;
