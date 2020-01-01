@@ -2,6 +2,7 @@
 #define XVZD_INTERFACE_H_
 
 namespace xvzd {
+class Object;
 class String;
 }  // namespace xvzd}
 
@@ -22,6 +23,13 @@ public:
   virtual ~Comparable() {}
   virtual int Compare(const T& other) const = 0;
   virtual bool Equal(const T& other) const = 0;
+};
+
+
+class Callable {
+public:
+  virtual ~Callable() {}
+  virtual Object Call() = 0;
 };
 
 
