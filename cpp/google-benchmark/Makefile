@@ -11,7 +11,5 @@ TARGETS = $(patsubst %.o,%,$(OBJS))
 
 all: $(TARGETS)
 
-$(TARGETS): $(OBJS)
-
 clean:
 	rm -rf $(TARGETS) $(OBJS)
