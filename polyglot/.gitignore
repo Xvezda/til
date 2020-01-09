@@ -1,2 +1,4 @@
 polyglot_*
+polyglot.*
+!polyglot.txt
 *.o
