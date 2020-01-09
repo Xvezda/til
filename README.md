@@ -4,6 +4,7 @@ TIL
 Contents
 --------
 
++ [bash](bash)
 + [C++](cpp)
 + [Javascript](javascript)
 + [Python](python)
