@@ -7,7 +7,7 @@ TARGETS = polyglot_c polyglot_py
 # Executables
 all: $(TARGETS)
 
-test:
+test: all
 	./run_tests.sh
 
 polyglot.%:
