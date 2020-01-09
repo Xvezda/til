@@ -6,6 +6,9 @@ SOURCE = polyglot.txt
 # Executables
 all: polyglot_c polyglot_py
 
+test:
+	./run_tests.sh
+
 polyglot.%:
 	cp $(SOURCE) $@
 
