@@ -1,10 +1,11 @@
 CC = gcc
 CCFLAGS= -w
 SOURCE = polyglot.txt
+TARGETS = polyglot_c polyglot_py polyglot_php
 
 
 # Executables
-all: polyglot_c polyglot_py
+all: $(TARGETS)
 
 test:
 	./run_tests.sh
@@ -20,5 +21,10 @@ polyglot_py: polyglot.py
 	cat $< >> $@
 	chmod +x $@
 
+polyglot_php: polyglot.php
+	echo "#!/usr/bin/env bash" >> $@
+	echo "php $<" >> $@
+	chmod +x $@
+
 clean:
-	rm -f polyglot.c polyglot.py
+	rm -f $(TARGETS) $(shell echo $(TARGETS) | sed 's/_/./g')
