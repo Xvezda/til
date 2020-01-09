@@ -1,4 +1,7 @@
+#define _ /*<?php error_reporting(0); /*
+printf=lambda:__import__('sys').stdout.write("#define _ /*")
+#define _ */
 #include <stdio.h>
-#define print(text) main() { puts(text); }
-
-print("hello");
+#define printf(text) main() { printf("#define _ /*"); } /*
+#define _ *///printf=lambda x: print("#define _ /*") #*/
+printf();
