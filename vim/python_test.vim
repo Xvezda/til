@@ -7,7 +7,7 @@ import vim
 
 def hello():
     foo = vim.eval('a:foo')
-    bar = vim.eval('a:foo')
+    bar = vim.eval('a:bar')
     print('foo:', foo, ', bar:', bar)
 
 hello()
