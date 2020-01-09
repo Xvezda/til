@@ -14,3 +14,5 @@ Contents
     - [Python multiline string](python/docstring)
     - [BrainFuck interpreter](python/brainfuck)
 + [Vim](vim)
++ [Misc](misc)
+    - [Polyglot](misc/polyglot)
