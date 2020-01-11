@@ -4,8 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>DOM Clobbering test</title>
+    <script>
+      function showme(content) {
+        document.getElementById('output').innerHTML = content;
+      }
+    </script>
   </head>
   <body>
-    <div></div>
+    <div class="container">
+      <pre id="output"></pre>
+      <div id="x" data-foo="bar">x</div>
+    </div>
+    <script>
+      // Lagacy shortcut
+      showme(x.dataset.foo);
+    </script>
   </body>
 </html>
