@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>DOM Clobbering test</title>
+    <script>
+      function showme(content) {
+        document.getElementById('output').innerHTML = content;
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <pre id="output"></pre>
+      <div id="x" data-num="1">1</div>
+      <div id="x" data-num="2">2</div>
+      <div id="x" data-num="3">3</div>
+    </div>
+    <script>
+      // `id` actually can exists multiple times 🤔
+      // but, it will cause warning though
+      showme('x: ' + document.getElementById('x').dataset.num);
+    </script>
+  </body>
+</html>
