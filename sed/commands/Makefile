@@ -5,6 +5,7 @@ all: $(TARGET_FILES)
 
 %_test.sh: FORCE
 	./$@
+	@echo
 
 FORCE:
 
