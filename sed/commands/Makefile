@@ -1,5 +1,10 @@
 TARGET_FILES = $(wildcard *_test.sh)
 
 
-test: $(TARGET_FILES)
-	./$<
+all: $(TARGET_FILES)
+
+%_test.sh: FORCE
+	./$@
+
+FORCE:
+
