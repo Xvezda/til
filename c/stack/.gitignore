@@ -1,0 +1,5 @@
+*.dSYM
+*.o
+*.s
+*_test
+test_*
