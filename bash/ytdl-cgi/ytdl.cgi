@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Http Response Header
-# echo "Content-type: text/html"
-# echo
+#echo "Content-type: text/html"
+#echo
 
 # Http Body Start
 ytdlurls=$(echo $QUERY_STRING | sed -E 's/ytdlurls=([^&]*?).*/\1/')
@@ -10,6 +10,8 @@ ytid=${ytdlurls##*v\%3D}
 
 # If ID not exists
 if [ -z $ytid ]; then
+	echo "Content-Type: text/html"
+	echo
 	echo $(whoami)
 	exit 1
 fi
