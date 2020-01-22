@@ -7,7 +7,8 @@ INC = -I../include
 SRCS = $(wildcard *.cpp)
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 TARGET = run_test
-LDLIBS = -lgtest_main -lgtest -pthread -L../lib -lxvzd
+LDLIBS = -lgtest_main -lgtest -pthread -L../libs/static -lxvzd
+# LDLIBS = -lgtest_main -lgtest -pthread -L../libs/shared -lxvzd
 
 
 all: $(TARGET)

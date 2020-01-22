@@ -1,21 +1,32 @@
+AR = ar
 CC = g++
-CXX = $(CC)
-CXXFLAGS = -std=c++14 -Wall -Wextra -pedantic
+CPP = $(CC)
+CPPFLAGS = -std=c++14 -Wall -Wextra -pedantic
 INC = -I../include
 SRCS = $(wildcard *.cpp)
-OBJS = $(patsubst %.cpp,%.o,$(SRCS))
-
+OBJS = $(patsubst %.cpp, %.o, $(SRCS))
 
 all: build
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c $< -o $@
+	$(CPP) $(CPPFLAGS) $(INC) -c $< -o $@
 
-build: $(OBJS)
-	$(CXX) -shared -o ../lib/libxvzd.so $(OBJS)
+static: ../libs/static/libxvzd.a
 
-debug: CXXFLAGS+=-O0 -g -DDEBUG
+shared: ../libs/shared/libxvzd.so
+
+../libs/static/libxvzd.a: $(OBJS)
+	$(AR) rcs $@ $(OBJS)
+
+../libs/shared/libxvzd.so: CPPFLAGS += -fPIC
+../libs/shared/libxvzd.so: $(OBJS)
+	$(CPP) -shared -o $@ $(OBJS)
+
+build: static shared
+
+debug: CPPFLAGS+=-O0 -g -DDEBUG
 debug: $(OBJS)
 
 clean:
-	rm -rf *.o *.dSYM
+	rm -rf $(OBJS) *.dSYM
+

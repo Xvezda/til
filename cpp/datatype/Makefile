@@ -1,16 +1,19 @@
-.PHONY: lib test
+.PHONY: libs test
 
 
-all: lib test
+all: static shared test
 
-lib:
-	cd src && $(MAKE)
+static:
+	cd src && $(MAKE) static && $(MAKE) clean
+
+shared:
+	cd src && $(MAKE) shared && $(MAKE) clean
 
 test:
 	cd tests && $(MAKE)
 
 clean:
-	cd lib && rm -rf *.so
+	cd libs && rm -rf *.so *.a
 	cd src && $(MAKE) clean
 	cd tests && $(MAKE) clean
 
