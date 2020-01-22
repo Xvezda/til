@@ -18,5 +18,8 @@ $(TARGET): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $< -o $@
 
+test: $(TARGET)
+	./$(TARGET)
+
 clean:
 	rm -rf *.o $(TARGET)

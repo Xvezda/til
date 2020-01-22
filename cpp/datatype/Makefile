@@ -4,13 +4,13 @@
 all: static shared test
 
 static:
-	cd src && $(MAKE) static && $(MAKE) clean
+	cd src && $(MAKE) clean && $(MAKE) static
 
 shared:
-	cd src && $(MAKE) shared && $(MAKE) clean
+	cd src && $(MAKE) clean && $(MAKE) shared
 
 test:
-	cd tests && $(MAKE)
+	cd tests && $(MAKE) test
 
 clean:
 	cd libs && rm -rf *.so *.a
