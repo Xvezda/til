@@ -1,3 +1,4 @@
+GO = go
 SRCS = $(wildcard *.go)
 TARGETS = $(patsubst %.go,%,$(SRCS))
 
@@ -5,7 +6,7 @@ TARGETS = $(patsubst %.go,%,$(SRCS))
 all: $(TARGETS)
 
 %: %.go
-	go build $<
+	$(GO) build $<
 
 clean:
 	rm -rf $(TARGETS)
