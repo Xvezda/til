@@ -11,9 +11,10 @@ select opt in $OPTIONS; do
     case $opt in
         Ok)
             echo "OK :)"
+            break  # Select works as like for
             ;;
         Exit)
-            echo "I'm exit!"
+            echoerr "I'm exit!"
             exit 1
             ;;
         *)
