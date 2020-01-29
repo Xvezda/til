@@ -15,15 +15,9 @@ func (self *rot13Reader) Read(b []byte) (int, error) {
 	for i := 0; i < n; i += 1 {
 		switch {
 		case 'a' <= b[i] && b[i] <= 'z':
-			b[i] += 13
-			if 'z' < b[i] {
-				b[i] = (b[i]-1)%'z' + 'a'
-			}
+			b[i] = (b[i]-'a'+13)%('z'-'a'+1) + 'a'
 		case 'A' <= b[i] && b[i] <= 'Z':
-			b[i] += 13
-			if 'Z' < b[i] {
-				b[i] = (b[i]-1)%'Z' + 'A'
-			}
+			b[i] = (b[i]-'A'+13)%('Z'-'A'+1) + 'A'
 		default:
 		}
 	}
