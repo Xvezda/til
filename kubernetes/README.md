@@ -7,6 +7,7 @@ What is kubernetes?
 
 Manage containers deployed by multi hosts.
 
+
 Features
 --------
 
@@ -15,3 +16,9 @@ Features
 + Failure Resistance
 + Rolling Update
     - No down time
+
+
+Reference
+---------
+
+- https://youtu.be/JNc11rxLtmE
