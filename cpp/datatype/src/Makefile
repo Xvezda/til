@@ -3,30 +3,35 @@ CC = g++
 CPP = $(CC)
 CPPFLAGS = -std=c++14 -Wall -Wextra -pedantic
 INC = -I../include
-SRCS = $(wildcard *.cpp)
-OBJS = $(patsubst %.cpp, %.o, $(SRCS))
+SRC_FILES = $(wildcard *.cpp)
+OBJ_FILES = $(patsubst %.cpp, %.o, $(SRC_FILES))
+STATIC_PATH = ../libs/static
+SHARED_PATH = ../libs/shared
 
 all: build
 
-%.o: %.cpp
+$(STATIC_PATH)/%.o: %.cpp
 	$(CPP) $(CPPFLAGS) $(INC) -c $< -o $@
 
-static: ../libs/static/libxvzd.a
+$(SHARED_PATH)/%.o: %.cpp
+	$(CPP) $(CPPFLAGS) $(INC) -c $< -o $@
 
-shared: ../libs/shared/libxvzd.so
+static: $(STATIC_PATH)/libxvzd.a
 
-../libs/static/libxvzd.a: $(OBJS)
-	$(AR) rcs $@ $(OBJS)
+shared: $(SHARED_PATH)/libxvzd.so
 
-../libs/shared/libxvzd.so: CPPFLAGS += -fPIC
-../libs/shared/libxvzd.so: $(OBJS)
-	$(CPP) -shared -o $@ $(OBJS)
+$(STATIC_PATH)/libxvzd.a: $(addprefix $(STATIC_PATH)/, $(OBJ_FILES))
+	$(AR) rcs $@ $(addprefix $(STATIC_PATH)/, $(OBJ_FILES))
+
+$(SHARED_PATH)/libxvzd.so: CPPFLAGS += -fPIC
+$(SHARED_PATH)/libxvzd.so: $(addprefix $(SHARED_PATH)/, $(OBJ_FILES))
+	$(CPP) -shared -o $@ $(addprefix $(SHARED_PATH)/, $(OBJ_FILES))
 
 build: static shared
 
 debug: CPPFLAGS+=-O0 -g -DDEBUG
-debug: $(OBJS)
+debug: build
 
 clean:
-	rm -rf $(OBJS) *.dSYM
+	rm -rf $(SHARED_PATH)/*.o $(STATIC_PATH)/*.o *.dSYM
 
