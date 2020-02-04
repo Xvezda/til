@@ -7,7 +7,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 
-if __name__ == '__main__':
+def main():
     import sys
     if 2 < sys.version_info[0]:
         import os
@@ -20,3 +20,6 @@ if __name__ == '__main__':
         from SimpleHTTPServer import test
         test()
 
+
+if __name__ == '__main__':
+    main()
