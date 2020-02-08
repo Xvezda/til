@@ -10,11 +10,16 @@ import curses
 def main(stdscr):
     curses.noecho()
     curses.cbreak()
+    curses.curs_set(0)  # Hide cursor
+
+    stdscr.immedok(True)
     stdscr.clear()
-    win = curses.newwin(1, 20, 0, 0)
+    stdscr.border()
+
+    win = stdscr.subwin(curses.LINES-2, curses.COLS-2, 1, 1)
+    win.immedok(True)
     win.addstr('hello world')
-    stdscr.refresh()
-    win.refresh()
+
     while True:
         c = stdscr.getch()
         if c == ord('q'):
