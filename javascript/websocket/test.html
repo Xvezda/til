@@ -20,6 +20,16 @@
 
         send.call(this, data);
       };
+
+      // Uncaught TypeError: Illegal invocation
+      /*
+      var onmessage = WebSocket.prototype.onmessage;
+      WebSocket.prototype.onmessage = function(event) {
+        console.log('hooking message');
+
+        onmessage.call(this, event);
+      };
+      */
     </script>
     <!-- WebSocket things -->
     <script>
