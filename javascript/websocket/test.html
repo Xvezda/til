@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Websocket Test</title>
+  </head>
+  <body>
+    <div id="root">
+      <pre id="output"></pre>
+      <hr>
+      <textarea id="textbox" cols="40" rows="3"></textarea>
+      <button id="sendbtn" type="button">send</button>
+    </div>
+    <!-- Overwrite websocket object -->
+    <script>
+      var send = WebSocket.prototype.send;
+      WebSocket.prototype.send = function(data) {
+        outputlog(`sending message: ${data}`);
+
+        send.call(this, data);
+      };
+    </script>
+    <!-- WebSocket things -->
+    <script>
+      var websocket = new WebSocket("ws://echo.websocket.org/");
+
+      function striptag(content) {
+        return content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function outputlog(content) {
+        var output = document.getElementById('output');
+        output.innerText += striptag(content) + '\n';
+      }
+
+      websocket.onopen = function() {
+        outputlog('websocket is opened');
+        websocket.send('hello');
+      };
+
+      websocket.onmessage = function(event) {
+        outputlog(`message from websocket: ${event.data}`);
+      };
+
+      var sendbtn = document.getElementById('sendbtn');
+      sendbtn.onclick = function() {
+        var textbox = document.getElementById('textbox');
+        websocket.send(textbox.value);
+      };
+
+    </script>
+  </body>
+</html>
