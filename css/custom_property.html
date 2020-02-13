@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Custom property</title>
+    <style>
+      :root {
+        --box-padding: 20px;
+        --box-border-width: 1px;
+        --box-border-color: red;
+      }
+      body {
+        display: block;
+        padding: 0;
+        margin: 0;
+      }
+      .container {
+        margin: 8px;
+      }
+      .box {
+        border: var(--box-border-width) solid;
+        border-color: var(--box-border-color);
+        padding: var(--box-padding);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">I'm a box</div>
+    </div>
+  </body>
+</html>
