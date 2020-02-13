@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Clearfix</title>
+    <style>
+      * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      .container {
+        display: block;
+        width: 680px;
+        margin: 0 auto;
+      }
+      .box {
+        margin: 5px;
+        padding: 20px;
+        border: 1px solid darkgray;
+      }
+      .float-left {
+        float: left;
+      }
+      .float-right {
+        float: right;
+      }
+      /* Clearfixes */
+      .clearfix-alpha {
+        clear: both;
+      }
+      .clearfix-bravo {
+        overflow: auto;
+        zoom: 1;
+      }
+      .clearfix-charlie::after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="container">
+        <div class="box float-left">foo</div>
+        <div class="box float-right">bar</div>
+        <div class="clearfix-alpha"></div>
+        <div class="box float-left">foo</div>
+        <div class="box float-right">bar</div>
+        <div class="clearfix-alpha"></div>
+      </div>
+      <hr>
+      <div class="container">
+        <div class="clearfix-bravo">
+          <div class="box float-left">foo</div>
+          <div class="box float-right">bar</div>
+        </div>
+        <div class="clearfix-bravo">
+          <div class="box float-left">foo</div>
+          <div class="box float-right">bar</div>
+        </div>
+      </div>
+      <hr>
+      <div class="container">
+        <div class="clearfix-charlie">
+          <div class="box float-left">foo</div>
+          <div class="box float-right">bar</div>
+        </div>
+        <div class="clearfix-charlie">
+          <div class="box float-left">foo</div>
+          <div class="box float-right">bar</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
