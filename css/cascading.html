@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Cascading test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+    .container {
+      margin: 8px;
+    }
+    div#test span {
+      color: purple;
+    }
+    #test span {
+      color: green;
+    }
+    div span {
+      color: blue;
+    }
+    span {
+      color: red;
+    }
+  </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="test">
+        <span>Hello</span>
+      </div>
+    </div>
+  </body>
+</html>
