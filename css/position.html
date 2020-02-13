@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width">-->
+    <title>Position test</title>
+    <style>
+      * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      :root {
+        --footer-height: 100px;
+        --footer-color: darkgray;
+      }
+      .tall {
+        height: 2000px;
+        background: lightgray;
+      }
+      .noparent {
+        top: 10%;
+        left: 10%;
+        position: absolute;
+      }
+      body {
+        /* I want give addition 20px space to bottom */
+        margin-bottom: calc(var(--footer-height) + 20px);
+      }
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 25px;
+        height: var(--footer-height);
+        background: var(--footer-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="noparent">
+      <p>I have no parent :(</p>
+    </div>
+    <div class="container">
+      <div class="tall">
+        <h1>foo</h1>
+        <hr>
+        <div class="container">
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <p>I'm footer</p>
+    </div>
+  </body>
+</html>
