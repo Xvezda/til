@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <title>Fontsize test</title>
+    <style>
+      * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      body {
+        margin: 8px;
+      }
+      .relative-fontsize {
+        font-size: 1.25em;
+      }
+      .absolute-fontsize {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!--
+        on chrome:
+          zoom affects both,
+          `chrome://settings` fontsize to large affects only relative
+      -->
+      <span class="relative-fontsize">foo</span>
+      <span class="absolute-fontsize">bar</span>
+    </div>
+  </body>
+</html>
