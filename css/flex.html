@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <title>Flex</title>
+    <style>
+      :root {
+        --box-height: 150px;
+        --box-width: 150px;
+      }
+      * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      body {
+        padding: 0;
+        margin: 0;
+        display: block;
+        font-size: 1rem;
+      }
+      .container {
+        margin: 8px;
+      }
+      .flex {
+        display: flex;
+      }
+      .box {
+        display: flex;
+        background-color: lightgray;
+        border: 1px solid darkgray;
+        width: var(--box-width);
+        height: var(--box-height);
+        font-size: 2.4rem;
+      }
+      .box > span {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-grow: 1;
+        justify-content: center;
+        align-content: stretch;
+        align-items: center;
+      }
+      .order-low {
+        order: -1;
+      }
+      .order-mid {
+        order: 0;
+      }
+      .order-high {
+        order: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container flex">
+      <div class="box order-mid"><span>3</span></div>
+      <div class="box order-low"><span>1</span></div>
+      <div class="box order-high"><span>5</span></div>
+      <div class="box order-mid"><span>4</span></div>
+      <div class="box order-low"><span>2</span></div>
+    </div>
+  </body>
+</html>
