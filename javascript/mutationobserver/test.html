@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Mutation observer test</title>
+  </head>
+  <body>
+    <div class="container">
+      <button id="generate" type="button">generate</button>
+      <button id="observe" type="button">observe</button>
+      <button id="disconnect" type="button">disconnect</button>
+      <button id="clear" type="button">clear</button>
+      <div id="root"></div>
+    </div>
+    <script>
+      var callback = function(objArr, obs) {
+        console.log('DOM mutation detected', objArr, obs);
+      };
+      var observer = new MutationObserver(callback);
+
+      var root = document.getElementById("root");
+
+      document.getElementById("generate").onclick = function() {
+        var newelm = document.createElement('h1');
+        newelm.innerText = 'foo';
+        root.appendChild(newelm);
+      }
+
+      document.getElementById("observe").onclick = function() {
+        observer.observe(root, {
+          childList: true,
+          attributes: true,
+          characterData: true,
+          subtree: true,
+          attributeOldValue: true,
+          characterDataOldValue: true,
+          attributeFilter: [],
+        });
+      }
+
+      document.getElementById("disconnect").onclick = function() {
+        observer.disconnect();
+      }
+
+      document.getElementById("clear").onclick = function() {
+        root.innerHTML = '';
+      }
+    </script>
+  </body>
+</html>
