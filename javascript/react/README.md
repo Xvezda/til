@@ -43,3 +43,7 @@ Async state update
 ```javascript
 this.setState((state, props) => { foo: 'bar' });
 ```
+
+## Inputs
+
+`<input>`, `<textarea>` and `<select>` use `value` attribute to initialize.
