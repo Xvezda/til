@@ -47,3 +47,9 @@ this.setState((state, props) => { foo: 'bar' });
 ## Inputs
 
 `<input>`, `<textarea>` and `<select>` use `value` attribute to initialize.
+
+
+## Special `props.children`
+
+Works similar to `Vue.js` default slot.
+But, it can store more than just component because it's part of props.
