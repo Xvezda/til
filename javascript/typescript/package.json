@@ -1,0 +1,19 @@
+{
+  "name": "typescript-tests",
+  "version": "1.0.0",
+  "description": "Testing typescript.",
+  "main": "greeting.js",
+  "scripts": {
+    "script": "babel-node --extensions '.ts'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Xvezda",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/node": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3"
+  }
+}
