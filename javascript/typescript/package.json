@@ -4,8 +4,10 @@
   "description": "Testing typescript.",
   "main": "greeting.js",
   "scripts": {
-    "script": "babel-node --extensions '.ts'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "babel-node --extensions '.ts'",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "types": "tsc",
+    "watch:types": "tsc --watch"
   },
   "author": "Xvezda",
   "license": "ISC",
