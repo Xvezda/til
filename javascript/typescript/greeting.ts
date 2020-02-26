@@ -1,3 +1,7 @@
+import _ from 'fs';  // Import test
+import path from 'path';
+
+
 class Employee {
   fullName: string;
   constructor(public firstName: string, public lastName: string) {
