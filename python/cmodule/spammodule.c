@@ -2,6 +2,10 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#if PY_MAJOR_VERSION >= 3
+#   define PY3
+#endif
+
 #define SPAM_MODULE
 #include "spammodule.h"
 
@@ -16,6 +20,9 @@ static PyMethodDef SpamMethods[] = {
      "Execute a shell command."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
+
+
+#ifdef PY3
 
 static struct PyModuleDef spammodule = {
     PyModuleDef_HEAD_INIT,
@@ -52,6 +59,30 @@ PyInit_spam(void)
     return m;
 }
 
+#else  // ifdef PY3
+
+PyMODINIT_FUNC
+initspam(void)
+{
+    PyObject *m;
+    static void *PySpam_API[PySpam_API_pointers];
+    PyObject *c_api_object;
+
+    m = Py_InitModule("spam", SpamMethods);
+    if (m == NULL)
+        return;
+
+    /* Initialize the C API pointer array */
+    PySpam_API[PySpam_System_NUM] = (void *)PySpam_System;
+
+    /* Create a Capsule containing the API pointer array's address */
+    c_api_object = PyCapsule_New((void *)PySpam_API, "spam._C_API", NULL);
+
+    if (c_api_object != NULL)
+        PyModule_AddObject(m, "_C_API", c_api_object);
+}
+
+#endif  // ifdef PY3
 
 static int
 PySpam_System(const char *command)
