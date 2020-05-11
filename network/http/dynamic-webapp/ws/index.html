@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <title>Websocket</title>
+  </head>
+  <body>
+    <h1>ws</h1>
+    <pre id="output"></pre>
+    <textarea rows="1" cols="40" id="input" onkeypress="keyEventHandler()"></textarea>
+    <button type="button" id="send">send</button>
+    <script>
+      var ws = new WebSocket('ws://localhost:3000')
+      ws.onopen = function (event) {
+        console.log('connected')
+      }
+
+      ws.onmessage = function (event) {
+        console.log('message from server:', event.data)
+        output.innerText += event.data + '\n'
+      }
+
+      ws.onclose = function (event) {
+        console.log('disconnected')
+      }
+
+      function keyEventHandler () {
+        switch (event.keyCode) {
+          case 13:
+            sendMessage(event.target.value.trim())
+            event.target.value = ''
+            break;
+          default:
+            break;
+        }
+      }
+
+      function sendMessage (data) {
+        ws.send(data)
+      }
+
+      send.onclick = function (event) {
+        sendMessage(event.data)
+      }
+    </script>
+  </body>
+</html>

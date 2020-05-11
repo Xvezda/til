@@ -1,0 +1,22 @@
+{
+  "name": "websocket-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "config": {
+    "host": "localhost",
+    "port": 3000
+  },
+  "scripts": {
+    "start": "cross-var nodemon $npm_package_main",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "private": true,
+  "dependencies": {
+    "cross-var": "^1.1.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2",
+    "websocket": "^1.0.31"
+  }
+}

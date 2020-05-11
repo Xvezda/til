@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <title>SSE</title>
+  </head>
+  <body>
+    <pre id="output"></pre>
+    <button id="disconnect">disconnect</button>
+    <script>
+      var log = console.log;
+      console.log = function () {
+        output.innerText += Array.from(arguments).join(' ') + '\n';
+      };
+
+      var sse = new EventSource('/sse');
+      sse.onopen = function (event) {
+        console.log('[+]', 'SSE Connection Established!');
+      };
+
+      /** SSE has no `onclose` event :( */
+      /*
+      sse.onclose = function (event) {
+        console.log('[+]', 'SSE Connection Closed!');
+      }
+      */
+
+      sse.onmessage = function (event) {
+        console.log('[*]', 'data:', event.data);
+      }
+
+      disconnect.onclick = function (event) {
+        sse.close();
+      }
+      /*
+      sse.addEventListener('odd', function (event) {
+        console.log('[*]', 'odd:', event.data);
+      });
+      sse.addEventListener('even', function (event) {
+        console.log('[*]', 'even:', event.data);
+      });
+      */
+    </script>
+  </body>
+</html>
