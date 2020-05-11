@@ -31,7 +31,10 @@ def order(key):
 
 def repl(text, from_=' ', to='_'):
     result = text
-    regexs = [r'^(' + from_ +  '*)', r'(' + from_ + '*)$']
+    regexs = [
+        r'^(' + re.escape(from_) +  '*)',
+        r'(' + re.escape(from_) + '*)$'
+    ]
     for regex in regexs:
         result = re.sub(regex, lambda m: len(m.group(0))*to, result)
     return result
