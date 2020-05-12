@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
+        <title>FileReader Test</title>
+        <style>
+            #file-input {
+                margin-bottom: 15px;
+            }
+
+            #img-holder {
+                max-width: 500px;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="file" id="file-input">
+        <img src id="img-holder">
+        <script>
+            var imgHolder = document.getElementById('img-holder');
+            imgHolder.onerror = function (event) {
+                event.target.style.display = 'none';
+            };
+
+            imgHolder.onload = function (event) {
+                event.target.style.display = 'block';
+            };
+
+            var fileInput = document.getElementById('file-input');
+            fileInput.addEventListener('change', function (event) {
+                //console.log(event);
+                var file = event.target.files[0]
+                console.log(file);
+                var reader = new FileReader();
+                reader.addEventListener('load', function (event) {
+                    console.log(event);
+                    var img = document.getElementById('img-holder');
+                    img.src = event.target.result;
+
+                    var b64 = event.target.result.split(',')[1];
+                    var byteArr = atob(b64).split('').map(function (b) {
+                        return b.charCodeAt(0);
+                    });
+                    var imgArr = Uint8Array.from(byteArr);
+                    console.log(imgArr);
+                });
+                //reader.readAsArrayBuffer(file);
+                reader.readAsDataURL(file);
+            });
+        </script>
+    </body>
+</html>
