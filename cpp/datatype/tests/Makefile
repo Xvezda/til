@@ -11,7 +11,7 @@ LDLIBS = -lgtest_main -lgtest -pthread -L../libs/static -lxvzd
 # LDLIBS = -lgtest_main -lgtest -pthread -L../libs/shared -lxvzd
 
 
-all: $(TARGET)
+all: $(TARGET) ../libs/static/libxvzd.a
 
 $(TARGET): $(OBJS)
 

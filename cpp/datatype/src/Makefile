@@ -29,7 +29,7 @@ $(SHARED_PATH)/libxvzd.so: $(addprefix $(SHARED_PATH)/, $(OBJ_FILES))
 
 build: static shared
 
-debug: CPPFLAGS+=-O0 -g -DDEBUG
+debug: CPPFLAGS += -O0 -g -DDEBUG
 debug: build
 
 clean:

@@ -28,44 +28,59 @@ public:
   }
 
   const BigInt Add(const BigInt& other) const {
-    BigInt ret;
+    String ret = "";
 
     // Make copy of this and other
     BigInt cpy(*this);
     BigInt other_cpy(other);
 
-    // Padding gap with spaces
+    // Padding gap with zeros
     size_t gap;
     if (Length() < other_cpy.Length()) {
       gap = other_cpy.Length() - cpy.Length();
-      cpy.Assign(cpy.Lpad(gap));
+      cpy.Assign(cpy.Lpad(gap, "0"));
     } else {
       gap = cpy.Length() - other_cpy.Length();
-      other_cpy.Assign(other_cpy.Lpad(gap));
+      other_cpy.Assign(other_cpy.Lpad(gap, "0"));
     }
+
     // Now both are same length
-    bool up = false;
-    for (size_t i = cpy.Length(); i != 0; --i) {
-      if (cpy.At(i-1) == ' ' && other_cpy.At(i-1) == ' ') {
-        if (up) ret.Append('1');
-        break;
+    bool carriage = false;
+    for (size_t i = 0, len = cpy.Length(); i < len; ++i) {
+      int sum;
+      int offset = len - i - 1;
+
+      int a = ctoi(cpy[offset]);
+      int b = ctoi(other_cpy[offset]);
+
+      sum = a + b;
+
+      if (carriage) {
+        sum += 1;
       }
-      int sum = ctoi(cpy.At(i-1)) + ctoi(other_cpy.At(i-1)) + (up ? 1 : 0);
+
       if (sum / 10) {
-        up = true;
+        carriage = true;
       } else {
-        up = false;
+        carriage = false;
       }
-      sum %= 10;
-      if (ret == "0") {
-        ret.Assign(String(sum));
-      } else {
-        ret.Append(sum);
-      }
+      ret.Push(itoc(sum % 10));
     }
+
+    if (carriage) {
+      ret.Push('1');
+    } else if (ret.Length() == 0) {
+      ret = "0";
+    }
+
     return ret.Reverse();
   }
+
+  const BigInt operator+(const BigInt& other) {
+    return Add(other);
+  }
 private:
+  bool negative;
 };
 
 }  // namespace xvzd
