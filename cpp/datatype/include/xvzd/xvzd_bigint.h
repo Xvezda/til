@@ -9,8 +9,6 @@ namespace xvzd {
 
 class BigInt : public String {
 public:
-  using String::Assign;
-
   BigInt() : String("0") {}
 
   template <typename T>
@@ -27,6 +25,36 @@ public:
     return *this;
   }
 
+  virtual int Compare(const BigInt& other) const {
+    if (negative == other.negative) {
+      if (Length() != other.Length()) {
+        if (negative) {
+          return other.Length() - Length();
+        }
+        return Length() - other.Length();
+      }
+      for (size_t i = 0; i < Length(); ++i) {
+        int a = ctoi(At(i));
+        int b = ctoi(other.At(i));
+        if (a == b) continue;
+        if (negative) {
+          if (a > b) return -1;
+          if (a < b) return 1;
+        } else {
+          if (a < b) return -1;
+          if (a > b) return 1;
+        }
+      }
+    } else {
+      if (negative) {
+        return -1;
+      } else if (other.negative) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
   const BigInt Add(const BigInt& other) const {
     String ret = "";
 
@@ -35,13 +63,12 @@ public:
     BigInt other_cpy(other);
 
     // Padding gap with zeros
-    size_t gap;
-    if (Length() < other_cpy.Length()) {
-      gap = other_cpy.Length() - cpy.Length();
-      cpy.Assign(cpy.Lpad(gap, "0"));
+    int gap;
+    gap = Length() - other_cpy.Length();
+    if (0 < gap) {
+      other_cpy.Assign(other_cpy.Lpad(std::abs(gap), "0"));
     } else {
-      gap = cpy.Length() - other_cpy.Length();
-      other_cpy.Assign(other_cpy.Lpad(gap, "0"));
+      cpy.Assign(cpy.Lpad(std::abs(gap), "0"));
     }
 
     // Now both are same length
@@ -79,6 +106,10 @@ public:
   const BigInt operator+(const BigInt& other) {
     return Add(other);
   }
+protected:
+  using String::Assign;
+  using String::Compare;
+  using String::Equal;
 private:
   bool negative;
 };

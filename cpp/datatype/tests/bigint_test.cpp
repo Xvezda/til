@@ -12,6 +12,18 @@ TEST(xvzd_bigint_test, bigint_default) {
   EXPECT_TRUE(bi == "0");
 }
 
+TEST(xvzd_bigint_test, bigint_compare) {
+  BigInt bia = "123";
+  BigInt bib = "123";
+  EXPECT_TRUE(bia.Compare(bib) == 0);
+
+  bib = "124";
+  EXPECT_TRUE(bia.Compare(bib) < 0);
+
+  bib = "122";
+  EXPECT_TRUE(bia.Compare(bib) > 0);
+}
+
 TEST(xvzd_bigint_test, bigint_add_no_carriage) {
   BigInt bia = "123";
   BigInt bib = "456";

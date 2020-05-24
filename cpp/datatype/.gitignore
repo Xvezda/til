@@ -1,3 +1,4 @@
 *.o
 *_test
 *.dSYM
+tags
