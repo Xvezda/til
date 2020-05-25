@@ -56,31 +56,31 @@ public:
   }
 
   const BigInt Add(const BigInt& other) const {
-    String ret = "";
+    BigInt ret;
 
     // Make copy of this and other
-    BigInt cpy(*this);
-    BigInt other_cpy(other);
+    BigInt a(*this);
+    BigInt b(other);
 
     // Padding gap with zeros
     int gap;
-    gap = Length() - other_cpy.Length();
+    gap = a.Length() - b.Length();
     if (0 < gap) {
-      other_cpy.Assign(other_cpy.Lpad(std::abs(gap), "0"));
+      b.Assign(b.Lpad(std::abs(gap), "0"));
     } else {
-      cpy.Assign(cpy.Lpad(std::abs(gap), "0"));
+      a.Assign(a.Lpad(std::abs(gap), "0"));
     }
 
     // Now both are same length
     bool carriage = false;
-    for (size_t i = 0, len = cpy.Length(); i < len; ++i) {
+    for (size_t i = 0, len = b.Length(); i < len; ++i) {
       int sum;
       int offset = len - i - 1;
 
-      int a = ctoi(cpy[offset]);
-      int b = ctoi(other_cpy[offset]);
+      int a_ = ctoi(a[offset]);
+      int b_ = ctoi(b[offset]);
 
-      sum = a + b;
+      sum = a_ + b_;
 
       if (carriage) {
         sum += 1;
@@ -91,21 +91,100 @@ public:
       } else {
         carriage = false;
       }
-      ret.Push(itoc(sum % 10));
+
+      if (!i) {
+        ret.Assign(String(itoc(sum % 10)));
+      } else {
+        ret.Push(itoc(sum % 10));
+      }
     }
 
     if (carriage) {
       ret.Push('1');
-    } else if (ret.Length() == 0) {
-      ret = "0";
+    }
+    return ret.Reverse();
+  }
+
+  const BigInt Sub(const BigInt& other) const {
+    BigInt ret;
+
+    // Make copy of this and other
+    BigInt a(*this);
+    BigInt b(other);
+
+    if ((a.negative && !b.negative) || (!a.negative && b.negative)) {
+      ret = a.Add(b);
+      ret.negative = negative;
+      return ret;
     }
 
-    return ret.Reverse();
+    if (a.Compare(b) < 0) {
+      BigInt tmp = a;
+      a = b;
+      b = tmp;
+
+      ret.negative = true;
+    }
+
+    // Padding gap with zeros
+    int gap;
+    gap = a.Length() - b.Length();
+    if (0 < gap) {
+      b.Assign(b.Lpad(std::abs(gap), "0"));
+    } else {
+      a.Assign(a.Lpad(std::abs(gap), "0"));
+    }
+
+    // Now both are same length
+    bool carriage = false;
+    for (size_t i = 0, len = b.Length(); i < len; ++i) {
+      int sub;
+      int offset = len - i - 1;
+
+      int a_ = ctoi(a[offset]);
+      int b_ = ctoi(b[offset]);
+
+      sub = a_ + (10 - b_);
+
+      if (carriage) {
+        sub -= 1;
+      }
+
+      if (sub / 10) {
+        carriage = false;
+      } else {
+        carriage = true;
+      }
+
+      if (!i) {
+        ret.Assign(String(itoc(sub % 10)));
+      } else {
+        ret.Push(itoc(sub % 10));
+      }
+    }
+    ret = ret.Reverse();
+
+    if (Compare(other) < 0) {
+      ret.negative = true;
+    }
+    return ret;
   }
 
   const BigInt operator+(const BigInt& other) {
     return Add(other);
   }
+
+  const BigInt operator-(const BigInt& other) {
+    return Sub(other);
+  }
+
+  const String ToString() const {
+    if (negative) {
+      return String("-") + String::ToString();
+    }
+    return String::ToString();
+  }
+
 protected:
   using String::Assign;
   using String::Compare;

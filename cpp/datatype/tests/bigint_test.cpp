@@ -66,5 +66,32 @@ TEST(xvzd_bigint_test, bigint_add_diff_len_with_carriage) {
   EXPECT_TRUE(bic == "1098");
 }
 
+TEST(xvzd_bigint_test, bigint_sub_no_carriage) {
+  BigInt bia = "456";
+  BigInt bib = "123";
+  BigInt bic = bia - bib;
+
+  LOGGER(bic);
+  EXPECT_TRUE(bic == "333");
+}
+
+TEST(xvzd_bigint_test, bigint_sub_carriage) {
+  BigInt bia = "987";
+  BigInt bib = "789";
+  BigInt bic = bia - bib;
+
+  LOGGER(bic);
+  EXPECT_TRUE(bic == "198");
+}
+
+TEST(xvzd_bigint_test, bigint_sub_negative) {
+  BigInt bia = "654";
+  BigInt bib = "987";
+  BigInt bic = bia - bib;
+
+  LOGGER(bic);
+  EXPECT_TRUE(bic == "-333");
+}
+
 
 }  // namespace xvzd

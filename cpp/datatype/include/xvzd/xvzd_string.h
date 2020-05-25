@@ -62,12 +62,17 @@ public:
     }
   }
 
-  virtual const char* Cstr() const override {
-    cstr_ptr = new char[Length() + 1];
-    cstr_ptr[Length()] = '\0';
+  virtual const String ToString() const override {
+    return *this;
+  }
 
-    for (size_t i = 0; i < Length(); ++i) {
-      cstr_ptr[i] = At(i);
+  virtual const char* Cstr() const override {
+    String self = ToString();
+    cstr_ptr = new char[self.Length() + 1];
+    cstr_ptr[self.Length()] = '\0';
+
+    for (size_t i = 0; i < self.Length(); ++i) {
+      cstr_ptr[i] = self.At(i);
     }
     return cstr_ptr;
   }

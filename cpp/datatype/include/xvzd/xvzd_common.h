@@ -21,8 +21,8 @@ namespace xvzd {
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-#define ctoi(c) ((c) == ' ' ? 0 : ((c) - '0'))
-#define itoc(i) ((i) + '0')
+#define ctoi(c) (static_cast<int>(('0' <= (c) && (c) <= '9') ? ((c) - '0') : 0))
+#define itoc(i) (static_cast<char>((i) + '0'))
 
 
 #define XVZD_DEFAULT_BUFFER_SIZE 0x200
