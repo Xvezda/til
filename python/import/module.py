@@ -6,4 +6,4 @@ from __future__ import division
 from __future__ import print_function
 
 
-print('foobar')  # Trigger when imported
+print('hello')  # Trigger when imported
