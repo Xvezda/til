@@ -8,7 +8,7 @@ def foo():
 
 
 if __name__ == '__main__':
-    # How many times module say hello?
+    # How many times module say `imported`?
     foo()
     foo()
     foo()
