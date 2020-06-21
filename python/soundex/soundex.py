@@ -71,18 +71,20 @@ def soundex(text):
     logger.info('Step 2: %s' % mapped)
 
     # Step 3
-    if number_of(first_letter) == number_of(mapped[:1]):
-        mapped = mapped[1:]
+    first_letter_number = number_of(first_letter)
+    mapped = first_letter_number + mapped
 
     mapped = re.sub(r'([1-6])\1+', r'\1', mapped)
     logger.info('Step 3-1: %s' % mapped)
 
     mapped = re.sub(r'([1-6])[hw]\1', r'\1', mapped)
     logger.info('Step 3-2: %s' % mapped)
+
+    mapped = re.sub(r'^%s' % first_letter_number, '', mapped)
     mapped = mapped.replace('0', '')
 
-    result = mapped[:3].ljust(3, '0')
-    return first_letter.upper() + result
+    result = first_letter + mapped[:3].ljust(3, '0')
+    return result.upper()
 
 # TODO: Also add implementation of SQL soundex
 
