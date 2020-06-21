@@ -117,8 +117,10 @@ if __name__ == '__main__':
         assert soundex('Honeyman') == 'H555'
 
         print('All test passed')
-        parser.exit()
+        parser.exit(0)
 
     if args.text:
         print(soundex(args.text))
+    else:
+        parser.print_help()
 
