@@ -39,7 +39,7 @@ def soundex(text):
     # Step 1
     first_letter = text[:1]
 
-    occurrences = ['a', 'e', 'i', 'o', 'u', 'y']
+    occurrences = ['a', 'e', 'i', 'o', 'u', 'y']  # `h` and `w` will be ignored
     remain_text = text[1:].lower()
 
     for occurrence in occurrences:
@@ -80,13 +80,19 @@ def soundex(text):
     mapped = re.sub(r'([1-6])[hw]\1', r'\1', mapped)
     logger.info('Step 3-2: %s' % mapped)
 
+    # Remove prepended first letter
     mapped = re.sub(r'^%s' % first_letter_number, '', mapped)
+    # Remove occurrences
+    mapped = re.sub('[hw]', '', mapped)
     mapped = mapped.replace('0', '')
 
     result = first_letter + mapped[:3].ljust(3, '0')
     return result.upper()
 
-# TODO: Also add implementation of SQL soundex
+
+def soundex_sql(text):
+    # TODO: Also add implementation of SQL soundex
+    pass
 
 
 if __name__ == '__main__':
