@@ -39,16 +39,9 @@ def soundex(text):
     # Step 1
     first_letter = text[:1]
 
-    # occurrences = ['a', 'e', 'i', 'o', 'u', 'y', 'h', 'w']
-    # remain_text = ''
-
-    # for letter in text[1:]:
-    #     if letter in occurrences:
-    #         continue  # Drop
-    #     remain_text += letter
-
     occurrences = ['a', 'e', 'i', 'o', 'u', 'y']
     remain_text = text[1:].lower()
+
     for occurrence in occurrences:
         remain_text = remain_text.replace(occurrence, '0')
     logger.info('Step 1: %s' % remain_text)
@@ -56,12 +49,12 @@ def soundex(text):
     # Step 2
     mapping = [
         None,
-        ['b', 'f', 'p', 'v'],
-        ['c', 'g', 'j', 'k', 'q', 's', 'x', 'z'],
-        ['d', 't'],
-        ['l'],
-        ['m', 'n'],
-        ['r']
+        ['b', 'f', 'p', 'v'],                     # 1
+        ['c', 'g', 'j', 'k', 'q', 's', 'x', 'z'], # 2
+        ['d', 't'],                               # 3
+        ['l'],                                    # 4
+        ['m', 'n'],                               # 5
+        ['r']                                     # 6
     ]
 
     def number_of(letter):
@@ -70,7 +63,6 @@ def soundex(text):
                 continue
             if letter.lower() in seq:
                 return str(idx)
-        # raise Exception('"%s" not found' % char)
         return letter
 
     mapped = remain_text
