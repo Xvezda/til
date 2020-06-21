@@ -6,14 +6,15 @@ from __future__ import division
 from __future__ import print_function
 
 
-FOO = 1
+import scope2
 
-def egg(bar):
-    baz = 3
-    print('locals:', locals())
-    print('globals:', globals())
-    return locals(), globals()
-
+SPAM = 4
 
 if __name__ == '__main__':
-    egg(bar=2)
+    locals_, globals_ = scope2.egg(bar=2)
+    print(globals_['FOO'])
+
+    try:
+        print(globals_['SPAM'])
+    except KeyError:
+        print('nope')
