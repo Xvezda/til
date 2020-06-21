@@ -82,7 +82,7 @@ def soundex(text):
     mapped = mapped.replace('0', '')
 
     result = mapped[:3].ljust(3, '0')
-    return first_letter + result
+    return first_letter.upper() + result
 
 # TODO: Also add implementation of SQL soundex
 
