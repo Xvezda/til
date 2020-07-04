@@ -10,7 +10,7 @@ def levenshtein_matrix(a, b):
     matrix = []
     matrix.append(range(len(b)+1))
     for i in range(1, len(a)+1):
-        matrix.append([i] + [0]*len(b))
+        matrix.append([i] + [None]*len(b))
 
     for j, y in enumerate(list(a)):
         for i, x in enumerate(list(b)):
