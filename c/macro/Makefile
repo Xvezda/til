@@ -1,13 +1,18 @@
+.SUFFIXES: .c
+
+
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic
+TARGET = main
+OBJS = $(TARGET).o
 
 
-all: main
+all: $(TARGET)
 
-main: main.o
+$(TARGET): $(OBJS)
 
-main.o: main.c
+$(OBJS): $(TARGET).c
 
 clean:
-	$(RM) -rf ./main
+	$(RM) -rf $(TARGET) $(OBJS)
 
