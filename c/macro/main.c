@@ -5,10 +5,20 @@
 #define FOREACH(idx, iter) for (int (idx) = 0; (idx) < LEN(iter); ++(idx))
 
 
+int foo(void);
+
 int main(void) {
-    int arr[] = ARGS(1, 2, 3, 4);
+    // Interesting...
+    int arr[] = ARGS(1, 2, 3, 4, foo());
     FOREACH(i, arr) {
         printf("%d\n", arr[i]);
     }
     return 0;
 }
+
+
+int foo(void) {
+    return 5;
+}
+
+
