@@ -8,13 +8,16 @@ module.exports = (function() {
       var chain, retval;
       do {
         chain = this._chains.shift();
-        if (!chain) return;
+        if (!chain) return _finally();
       } while (chain.type === 'reject')
 
       try {
         retval = chain.handler(value);
         if (retval instanceof MyPromise) {
-          return retval.then(_resolve);
+          return retval
+            .then(_resolve)
+            .catch(_reject)
+            .finally(_finally);
         }
         _resolve(retval);
       } catch (err) {
@@ -26,11 +29,17 @@ module.exports = (function() {
       var chain, retval;
       do {
         chain = this._chains.shift();
-        if (!chain) return;
+        if (!chain) return _finally();
       } while (chain.type !== 'reject')
 
       try {
         retval = chain.handler(reason);
+        if (retval instanceof MyPromise) {
+          return retval
+            .then(_resolve)
+            .catch(_reject)
+            .finally(_finally);
+        }
         _finally();
       } catch (err) {
         _reject(err);
@@ -45,7 +54,15 @@ module.exports = (function() {
         retval = chain.handler();
       } while (chain.type === 'finally');
 
-      if (chain) _resolve(retval);
+      if (chain) {
+        if (retval instanceof MyPromise) {
+          return retval
+            .then(_resolve)
+            .catch(_reject)
+            .finally(_finally);
+        }
+        _resolve(retval);
+      }
     }).bind(this);
 
     callback(_resolve, _reject);

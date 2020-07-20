@@ -101,7 +101,16 @@ testPromiseCatch(5000)
   })
   .catch(function(err) {
     console.log(err.message);
-    throw new Error('error2!');
+    return new MyPromise(function(resolve, reject) {
+      setTimeout(function() {
+        try {
+          throw new Error('error2!');
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      }, 500);
+    });
   })
   .catch(function(err) {
     console.log(err.message);
