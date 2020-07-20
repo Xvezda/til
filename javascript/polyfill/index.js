@@ -101,9 +101,15 @@ testPromiseCatch(5000)
   })
   .catch(function(err) {
     console.log(err.message);
-    throw new Error('error!');
+    throw new Error('error2!');
   })
   .catch(function(err) {
+    console.log(err.message);
+    throw new Error('error3!');
+  })
+  .then(function(_) {
+    console.log('success?');
+  }, function(err) {
     console.log(err.message);
   })
   .finally(function() {

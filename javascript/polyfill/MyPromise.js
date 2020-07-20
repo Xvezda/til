@@ -4,7 +4,7 @@ module.exports = (function() {
     /* private */
     this._chains = [];
 
-    var _resolve = (function(data) {
+    var _resolve = (function(value) {
       var chain, retval;
       do {
         chain = this._chains.shift();
@@ -12,7 +12,7 @@ module.exports = (function() {
       } while (chain.type === 'reject')
 
       try {
-        retval = chain.handler(data);
+        retval = chain.handler(value);
         if (retval instanceof MyPromise) {
           return retval.then(_resolve);
         }
@@ -22,7 +22,7 @@ module.exports = (function() {
       }
     }).bind(this);
 
-    var _reject = (function(err) {
+    var _reject = (function(reason) {
       var chain, retval;
       do {
         chain = this._chains.shift();
@@ -30,7 +30,7 @@ module.exports = (function() {
       } while (chain.type !== 'reject')
 
       try {
-        retval = chain.handler(err);
+        retval = chain.handler(reason);
         _finally();
       } catch (err) {
         _reject(err);
@@ -52,20 +52,21 @@ module.exports = (function() {
   }
 
   /* public */
-  MyPromise.prototype.then = function(callback) {
-    this._chains.push({handler: callback, type: 'resolve'});
+  MyPromise.prototype.then = function(onFulfilled, onRejected) {
+    this._chains.push({handler: onFulfilled, type: 'resolve'});
+    if (onRejected) this.catch(onRejected);
 
     return this;
   };
 
-  MyPromise.prototype.catch = function(callback) {
-    this._chains.push({handler: callback, type: 'reject'});
+  MyPromise.prototype.catch = function(onRejected) {
+    this._chains.push({handler: onRejected, type: 'reject'});
 
     return this;
   };
 
-  MyPromise.prototype.finally = function(callback) {
-    this._chains.push({handler: callback, type: 'finally'});
+  MyPromise.prototype.finally = function(onFinally) {
+    this._chains.push({handler: onFinally, type: 'finally'});
 
     return this;
   };
