@@ -67,6 +67,20 @@ testPromiseChain(3000)
   .finally(function() {
     console.log('done');
   })
+  .finally(function() {
+    console.log('done2');
+  })
+  .then(function() {
+    return new MyPromise(function(resolve, reject) {
+      setTimeout(function() {
+        console.log('then after finally');
+        resolve();
+      }, 500);
+    });
+  })
+  .finally(function() {
+    console.log('done3');
+  })
 
 testPromiseCatch(4000)
   .then(function(data) {
