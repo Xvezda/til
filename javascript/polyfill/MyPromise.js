@@ -1,30 +1,52 @@
-
 module.exports = (function() {
-  /* private */
-  var _resolve = new Function,
-      _reject  = new Function;
-
   /* constructor */
   function MyPromise(callback) {
-    function resolve(data) {
-      _resolve(data);
-    }
+    /* private */
+    this._chains = [];
+    this._finally = new Function;
 
-    function reject(err) {
-      _reject(err);
-    }
+    var resolve = (function(data) {
+      var callback = this._chains.shift();
+      if (!callback) return this._finally();
 
-    callback(resolve, reject)
+      try {
+        var retval = callback(data);
+        if (retval instanceof MyPromise) {
+          return retval.then(resolve);
+        }
+        resolve(retval);
+      } catch (err) {
+        reject(err);
+      }
+    }).bind(this);
+
+    this._reject = new Function;
+    var reject = (function(err) {
+      this._reject(err);
+      this._finally();
+    }).bind(this);
+
+    callback(resolve, reject);
   }
 
   /* public */
-  MyPromise.prototype.then = (function(callback) {
-    _resolve = callback;
-  }).bind(this);
+  MyPromise.prototype.then = function(callback) {
+    this._chains.push(callback);
 
-  MyPromise.prototype.catch = (function(callback) {
-    _reject = callback;
-  }).bind(this);
+    return this;
+  };
+
+  MyPromise.prototype.catch = function(callback) {
+    this._reject = callback;
+
+    return this;
+  };
+
+  MyPromise.prototype.finally = function(callback) {
+    this._finally = callback;
+
+    return this;
+  };
 
   return MyPromise;
 })();
