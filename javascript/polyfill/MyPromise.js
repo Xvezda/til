@@ -2,12 +2,13 @@ module.exports = (function() {
   /* constructor */
   function MyPromise(callback) {
     /* private */
-    this._chains = [];
-    this._finally = new Function;
+    this._resolve_chains = [];
+    this._reject_chains = [];
+    this._finally_chains = [];
 
     var resolve = (function(data) {
-      var callback = this._chains.shift();
-      if (!callback) return this._finally();
+      var callback = this._resolve_chains.shift();
+      if (!callback) return finally_();
 
       try {
         var retval = callback(data);
@@ -20,10 +21,25 @@ module.exports = (function() {
       }
     }).bind(this);
 
-    this._reject = new Function;
     var reject = (function(err) {
-      this._reject(err);
-      this._finally();
+      var callback = this._reject_chains.shift();
+      if (!callback) return finally_();
+      try {
+        callback(err);
+        return finally_();
+      } catch (err) {
+        reject(err);
+      }
+    }).bind(this);
+
+    var finally_ = (function() {
+      var callback = this._finally_chains.shift();
+      if (!callback) return;
+      try {
+        callback();
+      } catch (err) {
+        reject(err);
+      }
     }).bind(this);
 
     callback(resolve, reject);
@@ -31,19 +47,19 @@ module.exports = (function() {
 
   /* public */
   MyPromise.prototype.then = function(callback) {
-    this._chains.push(callback);
+    this._resolve_chains.push(callback);
 
     return this;
   };
 
   MyPromise.prototype.catch = function(callback) {
-    this._reject = callback;
+    this._reject_chains.push(callback);
 
     return this;
   };
 
   MyPromise.prototype.finally = function(callback) {
-    this._finally = callback;
+    this._finally_chains.push(callback);
 
     return this;
   };

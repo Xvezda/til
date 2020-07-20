@@ -83,10 +83,11 @@ testPromiseCatch(4000)
 testPromiseCatch(5000)
   .then(function(data) {
     console.log(data);
+    throw new Error('error!');
   })
   .catch(function(err) {
-    throw new Error('error!');
     console.log(err.message);
+    throw new Error('error!');
   })
   .catch(function(err) {
     console.log(err.message);
