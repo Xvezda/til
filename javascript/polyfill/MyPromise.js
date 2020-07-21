@@ -66,7 +66,9 @@ module.exports = (function() {
       }
     }).bind(this);
 
-    callback(_resolve, _reject);
+    setTimeout(function() {
+      callback(_resolve, _reject);
+    }, 0);
   }
 
   /* public */
