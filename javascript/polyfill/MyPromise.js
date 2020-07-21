@@ -4,6 +4,7 @@ module.exports = (function() {
     /* private */
     this._chains = [];
 
+    /* TODO: Process thenable object */
     var _resolve = (function(value) {
       var chain, retval;
       do {
@@ -86,6 +87,19 @@ module.exports = (function() {
     this._chains.push({handler: onFinally, type: 'finally'});
 
     return this;
+  };
+
+  /* static */
+  MyPromise.resolve = function(value) {
+    return new MyPromise(function(resolve) {
+      resolve(value);
+    });
+  };
+
+  MyPromise.reject = function(reason) {
+    return new MyPromise(function(_, reject) {
+      reject(reason);
+    });
   };
 
   return MyPromise;
