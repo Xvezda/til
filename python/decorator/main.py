@@ -14,8 +14,7 @@ class MyClass(object):
         pass
 
     def listen(self, event):
-        def wrapper(*args, **kwargs):
-            callback = args[0]
+        def wrapper(callback):
             if not callable(callback):
                 raise TypeError('callback is not callable')
             if event in self._handlers:
