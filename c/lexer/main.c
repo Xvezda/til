@@ -3,11 +3,19 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#ifdef DEBUG
+    #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+#else
+    #define DEBUG_PRINTF(...) do {} while (0)
+#endif
+
+
 #define PS1 "> "
+#define FMTSTR "%lld"
+#define FACTOR long long int
 
 
 typedef enum types {
-    T_NOP,
     T_EOF,
     /* terminals */
     T_INT,
@@ -26,7 +34,7 @@ struct token {
 };
 
 
-typedef int factor_t;
+typedef FACTOR factor_t;
 typedef struct parser {
     const TOKEN *head;
     TOKEN *ptr;
@@ -101,7 +109,7 @@ int interpreter() {
 
         if (!input) break;
 
-        printf("input: %s\n", input);
+        DEBUG_PRINTF("input: %s\n", input);
 
         tokens = lexer(input);
         if (!tokens) goto error;
@@ -118,7 +126,7 @@ int interpreter() {
         if (!parser) goto error;
         expr2(parser);  // start symbol
 
-        printf("result: %d\n", parser->result);
+        printf(FMTSTR "\n", parser->result);
 
         del_parser(parser);
         del_token(tokens);
@@ -166,19 +174,17 @@ void expr2(parser_t *self) {
 
     while (self->ptr) {
         token_t type = self->ptr->type;
-        if (type != T_ADD && type != T_SUB) {
-            break;
-        }
+        if (type != T_ADD && type != T_SUB) break;
         next(self);
 
         expr1(self);
         right = self->result;
 
         if (type == T_ADD) {
-            puts("ADD");
+            DEBUG_PRINTF("ADD\n");
             left = left + right;
         } else if (type == T_SUB) {
-            puts("SUB");
+            DEBUG_PRINTF("SUB\n");
             left = left - right;
         }
     }
@@ -190,25 +196,23 @@ void expr1(parser_t *self) {
     factor_t left = factor(self);
     factor_t right = 0;
 
-    self->result = left;
 
     while (self->ptr) {
         token_t type = self->ptr->type;
-        if (type != T_MUL && type != T_DIV) {
-            return;
-        }
+        if (type != T_MUL && type != T_DIV) break;
         next(self);
 
         right = factor(self);
 
         if (type == T_MUL) {
-            puts("MUL");
-            self->result = left * right;
+            DEBUG_PRINTF("MUL\n");
+            left = left * right;
         } else if (type == T_DIV) {
-            puts("DIV");
-            self->result = (factor_t)(left / right);
+            DEBUG_PRINTF("DIV\n");
+            left = (factor_t)(left / right);
         }
     }
+    self->result = left;
 }
 
 
@@ -221,7 +225,7 @@ factor_t factor(parser_t *self) {
     factor_t ret = strtol(self->ptr->value, &tmp, 10);
     next(self);
 
-    printf("factor: %d\n", ret);
+    DEBUG_PRINTF("factor: " FMTSTR "\n", ret);
 
     return ret;
 }
@@ -298,7 +302,7 @@ TOKEN *new_token() {
     TOKEN *ret = malloc(sizeof(TOKEN));
     if (!ret) return NULL;
 
-    ret->type = T_NOP;
+    ret->type = T_EOF;
     ret->value = NULL;
     ret->next = NULL;
 
@@ -331,7 +335,7 @@ void print_token(const TOKEN *head) {
     if (!head) return;
     TOKEN *ptr = (TOKEN*) head;
     while (ptr->next) {
-        printf("value: %s\n", ptr->value);
+        DEBUG_PRINTF("value: %s\n", ptr->value);
         ptr = next_token(ptr);
     }
 }
