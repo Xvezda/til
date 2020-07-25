@@ -3,14 +3,20 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#define PS1 "> "
+
 
 typedef enum types {
-    T_INTEGER,
-    T_PLUS,
-    T_MINUS,
     T_NOP,
-    T_EOF
+    T_EOF,
+    /* terminals */
+    T_INT,
+    T_ADD,
+    T_SUB,
+    T_MUL,
+    T_DIV
 } token_t;
+
 
 typedef struct token TOKEN;
 struct token {
@@ -20,19 +26,35 @@ struct token {
 };
 
 
+typedef int factor_t;
+typedef struct parser {
+    const TOKEN *head;
+    TOKEN *ptr;
+    factor_t result;
+} parser_t;
+
+
 int interpreter(void);
 char *readline(void);
 TOKEN *lexer(char *string);
 
 TOKEN *new_token(void);
 int del_token(TOKEN *head);
-
 TOKEN *next_token(TOKEN *ptr);
+void print_token(const TOKEN *head);
+
+parser_t *new_parser(TOKEN *lexer);
+int del_parser(parser_t *parser);
+TOKEN *next(parser_t *self);
+
+/* rules */
+void expr2(parser_t *self);
+void expr1(parser_t *self);
+factor_t factor(parser_t *self);
 
 
 int main(void) {
     int code = interpreter();
-
     return code;
 }
 
@@ -72,64 +94,136 @@ char *readline() {
 int interpreter() {
     char *input = NULL;
     TOKEN *tokens = NULL;
-    TOKEN *cur = NULL;
 
     while (1) {
-        printf("> ");
+        printf(PS1);
         input = readline();
+
         if (!input) break;
 
         printf("input: %s\n", input);
+
         tokens = lexer(input);
+        if (!tokens) goto error;
+        print_token(tokens);
 
-        cur = tokens;
-        /* Evaluate */
-        int result = 0;
-        int tmp = 0;
-        char *ptr = NULL;
-        token_t prev = T_NOP;
-        while (cur) {
-            printf("%s\n", cur->value);
-            switch (cur->type) {
-            case T_INTEGER:
-                tmp = strtol(cur->value, &ptr, 10);
-                switch (prev) {
-                case T_PLUS:
-                    result += tmp;
-                    break;
-                case T_MINUS:
-                    result -= tmp;
-                    break;
-                case T_NOP:
-                    result = tmp;
-                    break;
-                case T_EOF:
-                case T_INTEGER:
-                    goto error;
-                }
-                break;
-            case T_PLUS:
-            case T_MINUS:
-                prev = cur->type;
-                break;
-            case T_NOP:
-            case T_EOF:
-                break;
-            default:
-                goto error;
-            }
-            cur = next_token(cur);
-        }
-        printf("result: %d\n", result);
+        /* for head(left-hand side) suffix ``N'',
+         * smaller has higher precendence level.
+         *
+         * expr2: expr1 ( ( ADD | SUB ) expr1 )*
+         * expr1: factor ( ( MUL | DIV ) factor )*
+         * factor: INT
+         */
+        parser_t *parser = new_parser(tokens);
+        if (!parser) goto error;
+        expr2(parser);  // start symbol
 
+        printf("result: %d\n", parser->result);
+
+        del_parser(parser);
         del_token(tokens);
         free(input);
     }
     return 0;
 
 error:
-    fprintf(stderr, "Syntax error occurred!");
     return 1;
+}
+
+
+parser_t *new_parser(TOKEN *lexer) {
+    parser_t *ret = malloc(sizeof *ret);
+    if (!ret || !lexer) return NULL;
+
+    ret->head = lexer;
+    ret->ptr = (TOKEN*) ret->head;
+    ret->result = 0;
+
+    return ret;
+}
+
+
+int del_parser(parser_t *parser) {
+    parser->ptr = NULL;
+    parser->result = 0;
+    free(parser);
+
+    return 0;
+}
+
+
+TOKEN *next(parser_t *self) {
+    if (!self) return NULL;
+    self->ptr = next_token(self->ptr);
+    return self->ptr;
+}
+
+
+void expr2(parser_t *self) {
+    expr1(self);
+    factor_t left = self->result;
+    factor_t right = 0;
+
+    while (self->ptr) {
+        token_t type = self->ptr->type;
+        if (type != T_ADD && type != T_SUB) {
+            break;
+        }
+        next(self);
+
+        expr1(self);
+        right = self->result;
+
+        if (type == T_ADD) {
+            puts("ADD");
+            left = left + right;
+        } else if (type == T_SUB) {
+            puts("SUB");
+            left = left - right;
+        }
+    }
+    self->result = left;
+}
+
+
+void expr1(parser_t *self) {
+    factor_t left = factor(self);
+    factor_t right = 0;
+
+    self->result = left;
+
+    while (self->ptr) {
+        token_t type = self->ptr->type;
+        if (type != T_MUL && type != T_DIV) {
+            return;
+        }
+        next(self);
+
+        right = factor(self);
+
+        if (type == T_MUL) {
+            puts("MUL");
+            self->result = left * right;
+        } else if (type == T_DIV) {
+            puts("DIV");
+            self->result = (factor_t)(left / right);
+        }
+    }
+}
+
+
+factor_t factor(parser_t *self) {
+    if (!self) return 0;
+
+    char *tmp;
+    if (self->ptr->type != T_INT) return 0;
+
+    factor_t ret = strtol(self->ptr->value, &tmp, 10);
+    next(self);
+
+    printf("factor: %d\n", ret);
+
+    return ret;
 }
 
 
@@ -146,7 +240,7 @@ TOKEN *lexer(char *string) {
         switch (string[i]) {
         case '1': case '2': case '3': case '4': case '5':
         case '6': case '7': case '8': case '9': case '0': {
-            cur->type = T_INTEGER;
+            cur->type = T_INT;
 
             int begin = i;
             do {
@@ -165,13 +259,23 @@ TOKEN *lexer(char *string) {
             break;
         }
         case '+':
-            cur->type = T_PLUS;
+            cur->type = T_ADD;
             cur->value = strdup("+");
             ++i;
             break;
         case '-':
-            cur->type = T_MINUS;
+            cur->type = T_SUB;
             cur->value = strdup("-");
+            ++i;
+            break;
+        case '/':
+            cur->type = T_DIV;
+            cur->value = strdup("/");
+            ++i;
+            break;
+        case '*':
+            cur->type = T_MUL;
+            cur->value = strdup("*");
             ++i;
             break;
         default:
@@ -220,4 +324,14 @@ int del_token(TOKEN *head) {
 inline TOKEN *next_token(TOKEN *ptr) {
     if (!ptr) return NULL;
     return ptr->next;
+}
+
+
+void print_token(const TOKEN *head) {
+    if (!head) return;
+    TOKEN *ptr = (TOKEN*) head;
+    while (ptr->next) {
+        printf("value: %s\n", ptr->value);
+        ptr = next_token(ptr);
+    }
 }
