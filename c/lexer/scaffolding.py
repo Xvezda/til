@@ -9,9 +9,9 @@ MAXNUM = 100
 MINNUM = 1
 MAXTOK = 10
 MINTOK = 1
-MAXSP = 5
+MAXSP = 2
 MINSP = 0
-INTVAL = 0.15
+INTVAL = 0.1
 
 
 def rand(start, end):
@@ -37,7 +37,7 @@ def main():
 
         expr = (' ' * rand(MINSP, MAXSP)).join(tokens)
         # Randomly remove all parentheses
-        if rand(0, 2) > 0:
+        if rand(0, 5) > 0:
             expr = expr.replace('(', '').replace(')', '')
 
         print(expr)
