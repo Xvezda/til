@@ -22,7 +22,9 @@ typedef enum types {
     T_ADD,
     T_SUB,
     T_MUL,
-    T_DIV
+    T_DIV,
+    T_LPAREN,
+    T_RPAREN
 } token_t;
 
 
@@ -35,10 +37,17 @@ struct token {
 
 
 typedef FACTOR factor_t;
+
+typedef enum parser_flag {
+    P_OK,
+    P_ERROR
+} pflag_t;
+
 typedef struct parser {
     const TOKEN *head;
     TOKEN *ptr;
     factor_t result;
+    pflag_t flag;
 } parser_t;
 
 
@@ -58,6 +67,7 @@ TOKEN *next(parser_t *self);
 /* rules */
 void expr2(parser_t *self);
 void expr1(parser_t *self);
+void parentheses(parser_t *self);
 factor_t factor(parser_t *self);
 
 
@@ -115,17 +125,18 @@ int interpreter() {
         if (!tokens) goto error;
         print_token(tokens);
 
-        /* for head(left-hand side) suffix ``N'',
+        /* for head(left-hand side) suffixed with digit,
          * smaller has higher precendence level.
          *
          * expr2: expr1 ( ( ADD | SUB ) expr1 )*
          * expr1: factor ( ( MUL | DIV ) factor )*
-         * factor: INT
+         * factor: INT | LPAREN expr2 RPAREN
          */
         parser_t *parser = new_parser(tokens);
         if (!parser) goto error;
         expr2(parser);  // start symbol
 
+        if (parser->flag == P_ERROR) goto error;
         printf(FMTSTR "\n", parser->result);
 
         del_parser(parser);
@@ -135,6 +146,9 @@ int interpreter() {
     return 0;
 
 error:
+    /* TODO: Print error and exit when parsing error (syntax error) */
+    fprintf(stderr, "syntax error occurred!\n");
+
     return 1;
 }
 
@@ -143,6 +157,7 @@ parser_t *new_parser(TOKEN *lexer) {
     parser_t *ret = malloc(sizeof *ret);
     if (!ret || !lexer) return NULL;
 
+    ret->flag = P_OK;
     ret->head = lexer;
     ret->ptr = (TOKEN*) ret->head;
     ret->result = 0;
@@ -172,7 +187,7 @@ void expr2(parser_t *self) {
     factor_t left = self->result;
     factor_t right = 0;
 
-    while (self->ptr) {
+    while (self->ptr && self->ptr->type != T_EOF) {
         token_t type = self->ptr->type;
         if (type != T_ADD && type != T_SUB) break;
         next(self);
@@ -197,7 +212,7 @@ void expr1(parser_t *self) {
     factor_t right = 0;
 
 
-    while (self->ptr) {
+    while (self->ptr && self->ptr->type != T_EOF) {
         token_t type = self->ptr->type;
         if (type != T_MUL && type != T_DIV) break;
         next(self);
@@ -220,7 +235,20 @@ factor_t factor(parser_t *self) {
     if (!self) return 0;
 
     char *tmp;
-    if (self->ptr->type != T_INT) return 0;
+    if (self->ptr->type != T_INT && self->ptr->type != T_LPAREN)
+        goto error;
+
+    if (self->ptr->type == T_LPAREN) {
+        next(self);
+
+        expr2(self);
+        factor_t result = self->result;
+
+        if (self->ptr->type != T_RPAREN) goto error;
+        next(self);
+
+        return result;
+    }
 
     factor_t ret = strtol(self->ptr->value, &tmp, 10);
     next(self);
@@ -228,6 +256,10 @@ factor_t factor(parser_t *self) {
     DEBUG_PRINTF("factor: " FMTSTR "\n", ret);
 
     return ret;
+
+error:
+    self->flag = P_ERROR;
+    return 0;
 }
 
 
@@ -282,6 +314,17 @@ TOKEN *lexer(char *string) {
             cur->value = strdup("*");
             ++i;
             break;
+        case '(':
+            cur->type = T_LPAREN;
+            cur->value = strdup("(");
+            ++i;
+            break;
+        case ')':
+            cur->type = T_RPAREN;
+            cur->value = strdup(")");
+            ++i;
+            break;
+        case ' ':
         default:
             ++i;
             continue;

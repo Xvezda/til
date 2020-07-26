@@ -2,7 +2,7 @@
 
 PY = python3
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic
+CFLAGS = -Wall -Wextra -pedantic -O2
 TARGET = main
 
 
