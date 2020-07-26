@@ -42,35 +42,43 @@ typedef FACTOR factor_t;
 
 typedef enum parser_flag {
     P_OK,
-    P_ERROR
+    P_ERROR,  // General syntax error
+    P_DIVIDE_BY_ZERO
 } pflag_t;
+
+#define DEF_ERROR(sym, msg) [sym] = msg
+typedef const char* table_t[];
+table_t parser_error_table = {
+    DEF_ERROR(P_ERROR, "syntax error occurred"),
+    DEF_ERROR(P_DIVIDE_BY_ZERO, "divide by zero error"),
+};
 
 typedef struct parser {
     const TOKEN *head;
     TOKEN *ptr;
     factor_t result;
     pflag_t flag;
+    table_t *error_table;
 } parser_t;
 
 
 int interpreter(void);
 char *readline(void);
-TOKEN *lexer(char *string);
+TOKEN *lexer(const char *string);
 
 TOKEN *new_token(void);
 int del_token(TOKEN *head);
 TOKEN *next_token(TOKEN *ptr);
 void print_token(const TOKEN *head);
 
-parser_t *new_parser(TOKEN *lexer);
+parser_t *new_parser(const TOKEN *lexer);
 int del_parser(parser_t *parser);
 TOKEN *next(parser_t *self);
 
 /* rules */
-void expr2(parser_t *self);
-void expr1(parser_t *self);
-void parentheses(parser_t *self);
-factor_t factor(parser_t *self);
+void parse_expr2(parser_t *self);
+void parse_expr1(parser_t *self);
+void parse_factor(parser_t *self);
 
 
 int main(void) {
@@ -117,6 +125,7 @@ char *readline() {
 int interpreter() {
     char *input = NULL;
     TOKEN *tokens = NULL;
+    parser_t *parser = NULL;
 
     for (;;) {
         printf(PS1);
@@ -137,11 +146,11 @@ int interpreter() {
          * expr1: factor ( ( MUL | DIV ) factor )*
          * factor: INT | LPAREN expr2 RPAREN
          */
-        parser_t *parser = new_parser(tokens);
+        parser = new_parser(tokens);
         if (!parser) goto error;
-        expr2(parser);  // start symbol
+        parse_expr2(parser);  // start symbol
 
-        if (parser->flag == P_ERROR) goto error;
+        if (parser->flag != P_OK) goto error;
         printf(FMTSTR "\n", parser->result);
 
         del_parser(parser);
@@ -151,21 +160,25 @@ int interpreter() {
     return 0;
 
 error:
-    /* TODO: Print error and exit when parsing error (syntax error) */
-    fprintf(stderr, "syntax error occurred!\n");
+    fprintf(stderr, "%s\n", (*parser->error_table)[parser->flag]);
+    del_parser(parser);
+    del_token(tokens);
+    free(input);
 
     return 1;
 }
 
 
-parser_t *new_parser(TOKEN *lexer) {
+parser_t *new_parser(const TOKEN *lexer) {
     parser_t *ret = malloc(sizeof *ret);
     if (!ret || !lexer) return NULL;
 
     ret->flag = P_OK;
     ret->head = lexer;
-    ret->ptr = (TOKEN*) ret->head;
+    ret->ptr = (TOKEN*)lexer;
     ret->result = 0;
+
+    ret->error_table = (table_t*)parser_error_table;
 
     return ret;
 }
@@ -187,8 +200,8 @@ TOKEN *next(parser_t *self) {
 }
 
 
-void expr2(parser_t *self) {
-    expr1(self);
+void parse_expr2(parser_t *self) {
+    parse_expr1(self);
     factor_t left = self->result;
     factor_t right = 0;
 
@@ -197,7 +210,7 @@ void expr2(parser_t *self) {
         if (type != T_ADD && type != T_SUB) break;
         next(self);
 
-        expr1(self);
+        parse_expr1(self);
         right = self->result;
 
         if (type == T_ADD) {
@@ -212,8 +225,9 @@ void expr2(parser_t *self) {
 }
 
 
-void expr1(parser_t *self) {
-    factor_t left = factor(self);
+void parse_expr1(parser_t *self) {
+    parse_factor(self);
+    factor_t left = self->result;
     factor_t right = 0;
 
 
@@ -222,16 +236,15 @@ void expr1(parser_t *self) {
         if (type != T_MUL && type != T_DIV) break;
         next(self);
 
-        right = factor(self);
+        parse_factor(self);
+        right = self->result;
 
         if (type == T_MUL) {
             DEBUG_PRINTF("MUL\n");
             left = left * right;
         } else if (type == T_DIV) {
             if (!right) {
-                /* TODO: Try to figure out way to represent errors */
-                // Division by zero
-                self->flag = P_ERROR;
+                self->flag = P_DIVIDE_BY_ZERO;
                 return;
             }
             DEBUG_PRINTF("DIV\n");
@@ -243,8 +256,8 @@ void expr1(parser_t *self) {
 }
 
 
-factor_t factor(parser_t *self) {
-    if (!self) return 0;
+void parse_factor(parser_t *self) {
+    if (!self) return;
 
     char *tmp;
     if (self->ptr->type != T_INT && self->ptr->type != T_LPAREN)
@@ -253,13 +266,12 @@ factor_t factor(parser_t *self) {
     if (self->ptr->type == T_LPAREN) {
         next(self);
 
-        expr2(self);
-        factor_t result = self->result;
+        parse_expr2(self);
 
         if (self->ptr->type != T_RPAREN) goto error;
         next(self);
 
-        return result;
+        return;
     }
 
     factor_t ret = strtol(self->ptr->value, &tmp, 10);
@@ -267,15 +279,15 @@ factor_t factor(parser_t *self) {
 
     DEBUG_PRINTF("factor: " FMTSTR "\n", ret);
 
-    return ret;
+    self->result = ret;
 
+    return;
 error:
     self->flag = P_ERROR;
-    return 0;
 }
 
 
-TOKEN *lexer(char *string) {
+TOKEN *lexer(const char *string) {
     if (!string) goto error;
 
     int i = 0;
@@ -396,7 +408,7 @@ inline TOKEN *next_token(TOKEN *ptr) {
 
 void print_token(const TOKEN *head) {
     if (!head) return;
-    TOKEN *ptr = (TOKEN*) head;
+    TOKEN *ptr = (TOKEN*)head;
     while (ptr->next) {
         DEBUG_PRINTF("value: %s\n", ptr->value);
         ptr = next_token(ptr);

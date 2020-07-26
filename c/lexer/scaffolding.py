@@ -49,9 +49,9 @@ def main():
                 # Expect to fail
                 pyout = str(eval(expr.replace('/', '//')))
             except ZeroDivisionError:
-                pass
+                print('divide by zero error')
             except SyntaxError:
-                pass
+                print('syntax error')
             else:
                 assert 0
         else:
