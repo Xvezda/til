@@ -87,7 +87,7 @@ int main(void) {
 }
 
 
-char *readline() {
+char *readline(void) {
     char *ret = NULL;
     char buffer[BUFSIZ] = { 0 };
     size_t size = 0;
@@ -122,7 +122,7 @@ char *readline() {
 }
 
 
-int interpreter() {
+int interpreter(void) {
     char *input = NULL;
     TOKEN *tokens = NULL;
     parser_t *parser = NULL;
@@ -175,7 +175,7 @@ parser_t *new_parser(const TOKEN *lexer) {
 
     ret->flag = P_OK;
     ret->head = lexer;
-    ret->ptr = (TOKEN*)lexer;
+    ret->ptr = (TOKEN*)ret->head;
     ret->result = 0;
 
     ret->error_table = (table_t*)parser_error_table;
@@ -373,7 +373,7 @@ error:
 }
 
 
-TOKEN *new_token() {
+TOKEN *new_token(void) {
     TOKEN *ret = malloc(sizeof(TOKEN));
     if (!ret) return NULL;
 
