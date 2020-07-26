@@ -14,6 +14,7 @@
 #define PS1 "> "
 #define FMTSTR "%lld"
 #define FACTOR long long int
+#define FLOOR_(num) floorl(num)
 
 
 typedef enum types {
@@ -228,13 +229,14 @@ void expr1(parser_t *self) {
             left = left * right;
         } else if (type == T_DIV) {
             if (!right) {
+                /* TODO: Try to figure out way to represent errors */
                 // Division by zero
                 self->flag = P_ERROR;
                 return;
             }
             DEBUG_PRINTF("DIV\n");
 
-            left = floor(floor(left) / right);
+            left = FLOOR_(FLOOR_(left) / right);
         }
     }
     self->result = left;
