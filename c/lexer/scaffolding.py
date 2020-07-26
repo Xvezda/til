@@ -11,11 +11,11 @@ MAXTOK = 10
 MINTOK = 1
 MAXSP = 5
 MINSP = 0
-INTVAL = .15
+INTVAL = 0.15
 
 
 def rand(start, end):
-    return int(random.random() * end) + start
+    return int(random.random() * (end + 1)) + start
 
 
 def main():
@@ -23,18 +23,44 @@ def main():
     while True:
         tokens = [str(rand(MINNUM, MAXNUM))]
         for _ in range(rand(MINTOK, MAXTOK)):
-            tokens.append(operators[rand(0, len(operators))])
+            tokens.append(operators[rand(0, len(operators)-1)])
+            p = rand(0, 0x10)
+            # Randomly insert open parentheses
+            if p % 3 == 1:
+                tokens.append('(')
+
             tokens.append(str(rand(MINNUM, MAXNUM)))
+
+            # Randomly insert closing parentheses
+            if p % 3 == 2:
+                tokens.append(')')
+
         expr = (' ' * rand(MINSP, MAXSP)).join(tokens)
+        # Randomly remove all parentheses
+        if rand(0, 2) > 0:
+            expr = expr.replace('(', '').replace(')', '')
+
         print(expr)
 
-        output = subprocess.check_output([TARGET], input=expr.encode())
-        outnum = re.search(r'([-]?\d+)', output.decode()).group(1)
+        try:
+            output = subprocess.check_output([TARGET], input=expr.encode())
+        except subprocess.CalledProcessError:
+            try:
+                # Expect to fail
+                pyout = str(eval(expr.replace('/', '//')))
+            except ZeroDivisionError:
+                pass
+            except SyntaxError:
+                pass
+            else:
+                assert 0
+        else:
+            outnum = re.search(r'([-]?\d+)', output.decode()).group(1)
 
-        pyout = str(eval(expr.replace('/', '//')))
-        print('expect: %s, result: %s' % (pyout, outnum))
+            pyout = str(eval(expr.replace('/', '//')))
+            print('expect: %s, result: %s' % (pyout, outnum))
 
-        assert outnum == pyout
+            assert outnum == pyout
         time.sleep(INTVAL)
 
 

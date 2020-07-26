@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include <ctype.h>
 
 #ifdef DEBUG
@@ -80,17 +81,20 @@ int main(void) {
 char *readline() {
     char *ret = NULL;
     char buffer[BUFSIZ] = { 0 };
-    size_t size = sizeof buffer;
+    size_t size = 0;
 
     while (fgets(buffer, sizeof buffer, stdin) != NULL) {
         if (!ret) {
             ret = malloc(sizeof buffer);
-            ret[0] = '\0';
+            size = sizeof buffer;
         } else {
             size += sizeof buffer;
             ret = realloc(ret, size);
         }
         if (!ret) return NULL;
+        else if (size == sizeof buffer) {
+            ret[0] = '\0';
+        }
 
         char *pos;
         if ((pos=strchr(buffer, '\r')) != NULL
@@ -113,7 +117,7 @@ int interpreter() {
     char *input = NULL;
     TOKEN *tokens = NULL;
 
-    while (1) {
+    for (;;) {
         printf(PS1);
         input = readline();
 
@@ -223,8 +227,14 @@ void expr1(parser_t *self) {
             DEBUG_PRINTF("MUL\n");
             left = left * right;
         } else if (type == T_DIV) {
+            if (!right) {
+                // Division by zero
+                self->flag = P_ERROR;
+                return;
+            }
             DEBUG_PRINTF("DIV\n");
-            left = (factor_t)(left / right);
+
+            left = floor(floor(left) / right);
         }
     }
     self->result = left;
@@ -264,13 +274,13 @@ error:
 
 
 TOKEN *lexer(char *string) {
-    if (!string) {
-        return NULL;
-    }
+    if (!string) goto error;
+
     int i = 0;
+    int paren_cnt = 0;
     TOKEN *ret = new_token();
     TOKEN *cur = ret;
-    if (!ret) return NULL;
+    if (!ret) goto error;
 
     while (string[i]) {
         switch (string[i]) {
@@ -286,7 +296,7 @@ TOKEN *lexer(char *string) {
             int len = end - begin;
 
             char *value = malloc(len + 1);
-            if (!value) return NULL;
+            if (!value) goto error;
 
             strncpy(value, &string[begin], len);
             value[len] = '\0';
@@ -317,11 +327,14 @@ TOKEN *lexer(char *string) {
         case '(':
             cur->type = T_LPAREN;
             cur->value = strdup("(");
+            ++paren_cnt;
             ++i;
             break;
         case ')':
             cur->type = T_RPAREN;
             cur->value = strdup(")");
+            --paren_cnt;
+            if (paren_cnt < 0) goto error;
             ++i;
             break;
         case ' ':
@@ -330,14 +343,19 @@ TOKEN *lexer(char *string) {
             continue;
         }
         cur->next = new_token();
-        if (!cur->next) return NULL;
+        if (!cur->next) goto error;
 
         cur = next_token(cur);
     }
+    if (paren_cnt) goto error;
+
     cur->type = T_EOF;
     cur->value = strdup("EOF");
 
     return ret;
+
+error:
+    return NULL;
 }
 
 
@@ -382,3 +400,4 @@ void print_token(const TOKEN *head) {
         ptr = next_token(ptr);
     }
 }
+
