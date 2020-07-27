@@ -1,6 +1,5 @@
 #ifndef XVZD_COMMON_H_
 #define XVZD_COMMON_H_
-
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
 
@@ -17,10 +16,10 @@
 
 #ifdef DEBUG
     #ifdef VERBOSE
-        #define DEBUG_PRINTF(...) \
-            do { \
+        #define DEBUG_PRINTF(...)                      \
+            do {                                       \
                 printf("%s:%d: ", __FILE__, __LINE__); \
-                printf(__VA_ARGS__); \
+                printf(__VA_ARGS__);                   \
             } while (0)
     #else
         #define DEBUG_PRINTF(...) printf(__VA_ARGS__)

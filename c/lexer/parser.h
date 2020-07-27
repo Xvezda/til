@@ -46,6 +46,7 @@ NODE *visit_integer(NODE *self, ...);
 NODE *visit_operator(NODE *self, ...);
 
 /* rules (production) */
+NODE *parse(parser_t *self);  // start symbol
 NODE *parse_expr2(parser_t *self);
 NODE *parse_expr1(parser_t *self);
 NODE *parse_factor(parser_t *self);

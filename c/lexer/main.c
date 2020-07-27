@@ -1,4 +1,7 @@
+#include "lexer.h"
+#include "parser.h"
 #include "interpreter.h"
+#include "translator.h"
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
 

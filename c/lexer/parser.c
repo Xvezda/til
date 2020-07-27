@@ -40,6 +40,13 @@ TOKEN *next(parser_t *self) {
 }
 
 
+NODE *parse(parser_t *self) {
+    if (!self) return NULL;
+
+    return parse_expr2(self);  // start symbol
+}
+
+
 NODE *parse_expr2(parser_t *self) {
     assert(self != NULL);
     NODE *ast = NULL;

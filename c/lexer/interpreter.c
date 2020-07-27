@@ -33,7 +33,7 @@ int interpreter(void) {
          */
         parser = new_parser(tokens);
         if (!parser) goto parser_error;
-        ast = parse_expr2(parser);  // start symbol
+        ast = parse(parser);  // start symbol
 
         if (!ast) goto parser_error;
         if (parser->flag != P_OK) goto parser_error;
