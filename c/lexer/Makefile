@@ -2,15 +2,14 @@
 
 PY = python3
 CC = gcc
-# CFLAGS = -Wall -Wextra -pedantic -O2
-CFLAGS = -Wall -Wextra -pedantic -DDEBUG -DVERBOSE -g -O0
+CFLAGS = -Wall -Wextra -pedantic -O2
 TARGET = main
 
 
 all: $(TARGET)
 
-# debug: CFLAGS = -Wall -Wextra -pedantic -DDEBUG -g -O0
-# debug: all
+debug: CFLAGS = -Wall -Wextra -pedantic -DDEBUG -DVERBOSE -g -O0
+debug: all
 
 $(TARGET): $(TARGET).o
 
