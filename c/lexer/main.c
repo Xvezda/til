@@ -1,11 +1,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <math.h>
 #include <ctype.h>
+#include <assert.h>
 
 #ifdef DEBUG
-    #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+    #ifdef VERBOSE
+        #define DEBUG_PRINTF(...) \
+            do { \
+                printf("%s:%d: ", __FILE__, __LINE__); \
+                printf(__VA_ARGS__); \
+            } while (0)
+    #else
+        #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+    #endif
 #else
     #define DEBUG_PRINTF(...) do {} while (0)
 #endif
@@ -39,6 +49,8 @@ struct token {
 
 
 typedef FACTOR factor_t;
+typedef struct node NODE;
+typedef NODE *(*visit_t)(NODE *self, ...);
 
 typedef enum parser_flag {
     P_OK,
@@ -46,20 +58,35 @@ typedef enum parser_flag {
     P_DIVIDE_BY_ZERO
 } pflag_t;
 
+
 #define DEF_ERROR(sym, msg) [sym] = msg
 typedef const char* table_t[];
 table_t parser_error_table = {
+    DEF_ERROR(P_OK, "unexpected error: exit while state ok"),
     DEF_ERROR(P_ERROR, "syntax error occurred"),
     DEF_ERROR(P_DIVIDE_BY_ZERO, "divide by zero error"),
 };
 
+
 typedef struct parser {
     const TOKEN *head;
     TOKEN *ptr;
-    factor_t result;
     pflag_t flag;
     table_t *error_table;
 } parser_t;
+
+
+typedef enum node_types {
+    N_INT,
+    N_BIN_OP,
+} node_t;
+struct node {
+    NODE *left;
+    NODE *right;
+    TOKEN *ptr;
+    visit_t visit;
+    node_t type;
+};
 
 
 int interpreter(void);
@@ -75,10 +102,19 @@ parser_t *new_parser(const TOKEN *lexer);
 int del_parser(parser_t *parser);
 TOKEN *next(parser_t *self);
 
+NODE *new_node(visit_t visit);
+int del_node(NODE *root);
+int free_node(NODE *node);
+
+NODE *visit_integer(NODE *self, ...);
+NODE *visit_operator(NODE *self, ...);
+
 /* rules */
-void parse_expr2(parser_t *self);
-void parse_expr1(parser_t *self);
-void parse_factor(parser_t *self);
+NODE *parse_expr2(parser_t *self);
+NODE *parse_expr1(parser_t *self);
+NODE *parse_factor(parser_t *self);
+
+void evaluate(NODE *ast);
 
 
 int main(void) {
@@ -136,7 +172,10 @@ int interpreter(void) {
         DEBUG_PRINTF("input: %s\n", input);
 
         tokens = lexer(input);
-        if (!tokens) goto error;
+        if (!tokens) {
+            fprintf(stderr, "lexer failed while tokenizing input\n");
+            goto lexer_error;
+        }
         print_token(tokens);
 
         /* for head(left-hand side) suffixed with digit,
@@ -147,11 +186,13 @@ int interpreter(void) {
          * factor: INT | LPAREN expr2 RPAREN
          */
         parser = new_parser(tokens);
-        if (!parser) goto error;
-        parse_expr2(parser);  // start symbol
+        if (!parser) goto parser_error;
+        NODE *ast = parse_expr2(parser);  // start symbol
 
-        if (parser->flag != P_OK) goto error;
-        printf(FMTSTR "\n", parser->result);
+        if (parser->flag != P_OK) goto parser_error;
+        evaluate(ast);
+        /* printf("%s\n", parser->result->value); */
+        /* printf(FMTSTR "\n", parser->result->value); */
 
         del_parser(parser);
         del_token(tokens);
@@ -159,9 +200,12 @@ int interpreter(void) {
     }
     return 0;
 
-error:
-    fprintf(stderr, "%s\n", (*parser->error_table)[parser->flag]);
+parser_error:
+    if (parser) {
+        fprintf(stderr, "%s\n", (*parser->error_table)[parser->flag]);
+    }
     del_parser(parser);
+lexer_error:
     del_token(tokens);
     free(input);
 
@@ -176,7 +220,6 @@ parser_t *new_parser(const TOKEN *lexer) {
     ret->flag = P_OK;
     ret->head = lexer;
     ret->ptr = (TOKEN*)ret->head;
-    ret->result = 0;
 
     ret->error_table = (table_t*)parser_error_table;
 
@@ -185,8 +228,9 @@ parser_t *new_parser(const TOKEN *lexer) {
 
 
 int del_parser(parser_t *parser) {
+    if (!parser) return 1;
+
     parser->ptr = NULL;
-    parser->result = 0;
     free(parser);
 
     return 0;
@@ -200,90 +244,134 @@ TOKEN *next(parser_t *self) {
 }
 
 
-void parse_expr2(parser_t *self) {
-    parse_expr1(self);
-    factor_t left = self->result;
-    factor_t right = 0;
+NODE *parse_expr2(parser_t *self) {
+    assert(self != NULL);
+    NODE *ast = NULL;
+    NODE *node = new_node(visit_operator);
 
-    while (self->ptr && self->ptr->type != T_EOF) {
-        token_t type = self->ptr->type;
-        if (type != T_ADD && type != T_SUB) break;
+    NODE *left = parse_expr1(self);
+    node->left = left;
+    if (!node->left) goto error;
+    DEBUG_PRINTF("expr2: left: %s\n", node->left->ptr->value);
+
+    NODE *right = NULL;
+
+    node->type = N_BIN_OP;
+    node->ptr = self->ptr;
+
+    while (self->ptr
+            && (self->ptr->type == T_ADD || self->ptr->type == T_SUB)) {
+        if (!node) {
+            node = new_node(visit_operator);
+        }
+        if (!node->ptr) {
+            node->ptr = self->ptr;
+        }
         next(self);
 
-        parse_expr1(self);
-        right = self->result;
-
-        if (type == T_ADD) {
-            DEBUG_PRINTF("ADD\n");
-            left = left + right;
-        } else if (type == T_SUB) {
-            DEBUG_PRINTF("SUB\n");
-            left = left - right;
+        right = parse_expr1(self);
+        node->right = right;
+        if (!node->right) goto error;
+        DEBUG_PRINTF("expr2: right: %s\n", node->right->ptr->value);
+        if (!ast) {
+            ast = node;
+        } else {
+            node->left = ast;
+            ast = node;
         }
+        node = NULL;
     }
-    self->result = left;
+    if (!ast) {
+        ast = node->left;
+    }
+    return ast;
+error:
+    self->flag = P_ERROR;
+    return NULL;
 }
 
 
-void parse_expr1(parser_t *self) {
-    parse_factor(self);
-    factor_t left = self->result;
-    factor_t right = 0;
+NODE *parse_expr1(parser_t *self) {
+    assert(self != NULL);
+    NODE *node = new_node(visit_operator);
 
+    NODE *left = parse_factor(self);
+    node->left = left;
+    if (!node->left) goto error;
+    DEBUG_PRINTF("expr1: left: %s\n", node->left->ptr->value);
 
-    while (self->ptr && self->ptr->type != T_EOF) {
-        token_t type = self->ptr->type;
-        if (type != T_MUL && type != T_DIV) break;
+    NODE *right = NULL;
+
+    node->type = N_BIN_OP;
+    node->ptr = self->ptr;
+
+    while (self->ptr
+            && (self->ptr->type == T_MUL || self->ptr->type == T_DIV)) {
+        if (!node) {
+            node = new_node(visit_operator);
+        }
+        if (!node->ptr) {
+            node->ptr = self->ptr;
+        }
         next(self);
 
-        parse_factor(self);
-        right = self->result;
+        right = parse_factor(self);
+        node->right = right;
 
-        if (type == T_MUL) {
-            DEBUG_PRINTF("MUL\n");
-            left = left * right;
-        } else if (type == T_DIV) {
-            if (!right) {
-                self->flag = P_DIVIDE_BY_ZERO;
-                return;
-            }
-            DEBUG_PRINTF("DIV\n");
-
-            left = FLOOR_(FLOOR_(left) / right);
-        }
+        if (!node->right) goto error;
+        DEBUG_PRINTF("expr1: left: %s\n", node->right->ptr->value);
     }
-    self->result = left;
+    if (!node->right) {
+        node = node->left;
+    }
+    return node;
+error:
+    self->flag = P_ERROR;
+    return NULL;
 }
 
 
-void parse_factor(parser_t *self) {
-    if (!self) return;
+NODE *parse_factor(parser_t *self) {
+    assert(self != NULL);
 
-    char *tmp;
     if (self->ptr->type != T_INT && self->ptr->type != T_LPAREN)
         goto error;
 
+    NODE *ret = NULL;
+
+    /* LPAREN expr2 RPAREN */
     if (self->ptr->type == T_LPAREN) {
+        DEBUG_PRINTF("context -> LPAREN\n");
         next(self);
 
-        parse_expr2(self);
+        ret = parse_expr2(self);
+        if (!ret) goto error;
+        assert(ret->ptr != NULL);
+        DEBUG_PRINTF("context -> PAREN: factor: %s\n", ret->ptr->value);
+        ret->type = N_BIN_OP;
 
         if (self->ptr->type != T_RPAREN) goto error;
         next(self);
+        DEBUG_PRINTF("context -> RPAREN\n");
 
-        return;
+        return ret;
     }
 
-    factor_t ret = strtol(self->ptr->value, &tmp, 10);
+    /* factor */
+    TOKEN *factor = self->ptr;
+    if (self->ptr->type != T_INT) goto error;
+
+    ret = new_node(visit_integer);
+    ret->ptr = factor;
+    ret->type = N_INT;
+
+    DEBUG_PRINTF("factor: %s\n", ret->ptr->value);
     next(self);
 
-    DEBUG_PRINTF("factor: " FMTSTR "\n", ret);
-
-    self->result = ret;
-
-    return;
+    return ret;
 error:
     self->flag = P_ERROR;
+    return NULL;
 }
 
 
@@ -413,5 +501,95 @@ void print_token(const TOKEN *head) {
         DEBUG_PRINTF("value: %s\n", ptr->value);
         ptr = next_token(ptr);
     }
+}
+
+
+NODE *new_node(visit_t visit) {
+    NODE *ret = malloc(sizeof *ret);
+    if (!ret || !visit) return NULL;
+
+    ret->left = NULL;
+    ret->right = NULL;
+    ret->ptr = NULL;
+
+    ret->visit = visit;
+
+    return ret;
+}
+
+
+int del_node(NODE *root) {
+    if (!root) return 1;
+
+    return 0;
+}
+
+
+int free_node(NODE *node) {
+    if (!node) return 1;
+    return 0;
+}
+
+
+NODE *visit_integer(NODE *self, ...) {
+    if (!self) return NULL;
+    assert(self->ptr->type == T_INT);
+    return self;
+}
+
+
+NODE *visit_operator(NODE *self, ...) {
+    if (!self) goto error;
+
+    /* TODO: Implement binary operators */
+    NODE *left = NULL;
+    NODE *right = NULL;
+
+    assert(self->left != NULL && self->right != NULL);
+
+    left = self->left->visit(self->left);
+    DEBUG_PRINTF("visit: left: %s\n", left->ptr->value);
+    right = self->right->visit(self->right);
+    DEBUG_PRINTF("visit: right: %s\n", right->ptr->value);
+
+    if (!left || !right) goto error;
+
+    switch (self->ptr->type) {
+    case T_ADD:
+        DEBUG_PRINTF("visit: T_ADD\n");
+        break;
+    case T_SUB:
+        DEBUG_PRINTF("visit: T_SUB\n");
+        break;
+    case T_MUL:
+        DEBUG_PRINTF("visit: T_MUL\n");
+        break;
+    case T_DIV:
+        DEBUG_PRINTF("visit: T_DIV\n");
+        break;
+    default:
+        goto error;
+    }
+    return self;
+
+error:
+    DEBUG_PRINTF("ERROR!\n");
+    return NULL;
+}
+
+
+void evaluate(NODE *ast) {
+    /* TODO: DFS */
+    if (!ast || !ast->ptr) return;
+
+    if (ast->left) {
+        evaluate(ast->left);
+    }
+    if (ast->right) {
+        evaluate(ast->right);
+    }
+
+    DEBUG_PRINTF("ast(%p): %s\n", (void*)ast, ast->ptr->value);
+    ast->visit(ast);
 }
 
