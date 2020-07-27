@@ -4,7 +4,7 @@ import random
 import subprocess
 
 
-TARGET = './main'
+TARGET = './interpreter'
 MAXNUM = 100
 MINNUM = 1
 MAXTOK = 10
