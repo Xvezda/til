@@ -26,13 +26,19 @@ def main():
             tokens.append(operators[rand(0, len(operators)-1)])
             p = rand(0, 0x10)
             # Randomly insert open parentheses
-            if p % 3 == 1:
+            if p % 4 == 1:
                 tokens.append('(')
 
             tokens.append(str(rand(MINNUM, MAXNUM)))
 
+            # Randomly insert unary operator
+            for _ in range(rand(1, 5)):
+                tokens.append(operators[rand(0, 1)])
+
+            tokens.append(str(rand(MINNUM, MAXNUM)))
+
             # Randomly insert closing parentheses
-            if p % 3 == 2:
+            if p % 4 == 3:
                 tokens.append(')')
 
         expr = (' ' * rand(MINSP, MAXSP)).join(tokens)
@@ -49,9 +55,11 @@ def main():
                 # Expect to fail
                 pyout = str(eval(expr.replace('/', '//')))
             except ZeroDivisionError:
-                print('divide by zero error')
+                # print('divide by zero error')
+                pass
             except SyntaxError:
-                print('syntax error')
+                # print('syntax error')
+                pass
             else:
                 assert 0
         else:
