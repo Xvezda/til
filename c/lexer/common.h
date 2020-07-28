@@ -14,6 +14,8 @@
 #include "util.h"
 
 
+#ifndef DEBUG_PRINTF
+
 #ifdef DEBUG
     #ifdef VERBOSE
         #define DEBUG_PRINTF(...)                      \
@@ -26,15 +28,9 @@
     #endif
 #else
     #define DEBUG_PRINTF(...) do {} while (0)
-#endif
+#endif  // #ifdef DEBUG
 
-
-#define PS1 "> "
-#define FMTSTR "%lld"
-#define FACTOR long long int
-#define FLOOR_(num) floorl(num)
-
-typedef FACTOR factor_t;
+#endif  // #ifndef DEBUG_PRINTF
 
 
 #endif  // XVZD_COMMON_H_

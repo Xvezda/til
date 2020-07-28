@@ -4,9 +4,9 @@
 
 struct stringbuilder {
     char *data;
-    int length;
-    int capacity;
-    int unit;
+    int  length;
+    int  capacity;
+    int  unit;
 };
 
 
@@ -54,7 +54,7 @@ sb_t *new_sb(const char *src) {
         if (srclen > capacity) {
             int newcap = unit;
             do {
-                newcap *= unit;
+                newcap += unit;
                 if (newcap < 0) goto error;
             } while (newcap < srclen);
             capacity = newcap;
@@ -118,7 +118,7 @@ sb_t *sb_append(sb_t *self, const char *src) {
         int newcap = sb_cap(self);
 
         do {
-            newcap *= self->unit;
+            newcap += self->unit;
             if (newcap < self->unit) goto error;
         } while (newcap < newlen);
 

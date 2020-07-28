@@ -1,6 +1,8 @@
 #include "interpreter.h"
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
+#define PS1 "> "
+
 
 int interpreter(void) {
     char *input = NULL;
@@ -36,12 +38,12 @@ int interpreter(void) {
         ast = parse(parser);  // start symbol
 
         if (!ast) goto parser_error;
-        if (parser->flag != P_OK) goto parser_error;
+        if (parser->flag != PARSER_OK) goto parser_error;
         result = evaluate(ast);
 
         if (!result) goto eval_error;
-        DEBUG_PRINTF("result: %s\n", result->ptr->value);
-        printf("%s\n", result->ptr->value);
+        DEBUG_PRINTF("result: %s\n", result->tokptr->value);
+        printf("%s\n", result->tokptr->value);
 
         del_node(result);
         del_node(ast);
@@ -56,12 +58,12 @@ parser_error:
         fprintf(stderr, "%s\n", (*parser->error_table)[parser->flag]);
     }
     del_parser(parser);
-
-lexer_error:
     del_token(tokens);
 
 eval_error:
     del_node(ast);
+
+lexer_error:
     free(input);
 
     return 1;
@@ -70,7 +72,7 @@ eval_error:
 
 NODE *evaluate(NODE *ast) {
     /* TODO: DFS */
-    if (!ast || !ast->ptr) return NULL;
+    if (!ast || !ast->tokptr) return NULL;
 
     if (ast->left) {
         ast->left = evaluate(ast->left);
@@ -78,9 +80,9 @@ NODE *evaluate(NODE *ast) {
     if (ast->right) {
         ast->right = evaluate(ast->right);
     }
-    assert(ast != NULL && ast->ptr != NULL);
+    assert(ast != NULL && ast->tokptr != NULL);
 
-    DEBUG_PRINTF("ast(%p): %s\n", (void*)ast, ast->ptr->value);
+    DEBUG_PRINTF("ast(%p): %s\n", (void*)ast, ast->tokptr->value);
 
     return ast->visit(ast);
 }

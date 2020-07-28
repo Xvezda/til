@@ -2,8 +2,6 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
 
-#define LISP_STYLE 1
-
 struct translator {
     sb_t *data;
 };
@@ -27,42 +25,28 @@ void del_translator(trans_t *self) {
 }
 
 
-#ifdef LISP_STYLE
 void translate(trans_t *self, const NODE *root) {
     if (!self || !root) return;
 
-    if (root->ptr->type != T_INT) {
+#if (USE_LISP_STYLE)
+    if (root->tokptr->type != TOKEN_INT) {
         sb_append(self->data, "( ");
     }
-    sb_append(self->data, root->ptr->value);
+    sb_append(self->data, root->tokptr->value);
     sb_append(self->data, " ");
-
+#endif
     translate(self, root->left);
     translate(self, root->right);
 
-    if (root->ptr->type != T_INT) {
+#if (USE_LISP_STYLE)
+    if (root->tokptr->type != TOKEN_INT) {
         sb_append(self->data, ") ");
     }
-}
-
 #else
-
-void translate(trans_t *self, const NODE *root) {
-    if (!self || !root) return;
-
-    if (root->left) {
-        translate(self, root->left);
-    }
-
-    if (root->right) {
-        translate(self, root->right);
-    }
-
-    /* Reverse Polish Notation (RPN) */
-    sb_append(self->data, root->ptr->value);
+    sb_append(self->data, root->tokptr->value);
     sb_append(self->data, " ");
+#endif
 }
-#endif  // ifdef LISP_STYLE
 
 
 void translator_print(trans_t *self) {
