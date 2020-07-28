@@ -9,6 +9,7 @@ SRCS = $(wildcard *.c)
 OBJS = $(patsubst %.c, %.o, $(SRCS))
 TARGET = interpreter
 LIBS = libs/libcommon.a
+TEST_FILE = scaffolding.py
 
 
 all: $(TARGET)
@@ -18,14 +19,14 @@ debug: all
 
 libs: $(LIBS)
 
-$(LIBS):
-	$(AR) rcs $@ $(filter-out main.o, $(OBJS))
+$(LIBS): $(filter-out main.o, $(OBJS))
+	$(AR) rcs $@ $+
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(CC) $(CFLAGS) $+ -o $@
 
 test:
-	$(PY) scaffolding.py
+	$(PY) $(TEST_FILE)
 
 clean:
 	$(RM) $(TARGET) $(LIBS) $(OBJS)

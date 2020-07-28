@@ -15,7 +15,7 @@ TOKEN *lexer(const char *string) {
         switch (string[i]) {
         case '1': case '2': case '3': case '4': case '5':
         case '6': case '7': case '8': case '9': case '0': {
-            cur->type = T_INT;
+            cur->type = TOKEN_INT;
 
             int begin = i;
             do {
@@ -34,33 +34,33 @@ TOKEN *lexer(const char *string) {
             break;
         }
         case '+':
-            cur->type = T_ADD;
+            cur->type = TOKEN_ADD;
             cur->value = strdup("+");
             ++i;
             break;
         case '-':
-            cur->type = T_SUB;
+            cur->type = TOKEN_SUB;
             cur->value = strdup("-");
             ++i;
             break;
         case '/':
-            cur->type = T_DIV;
+            cur->type = TOKEN_DIV;
             cur->value = strdup("/");
             ++i;
             break;
         case '*':
-            cur->type = T_MUL;
+            cur->type = TOKEN_MUL;
             cur->value = strdup("*");
             ++i;
             break;
         case '(':
-            cur->type = T_LPAREN;
+            cur->type = TOKEN_LPAREN;
             cur->value = strdup("(");
             ++paren_cnt;
             ++i;
             break;
         case ')':
-            cur->type = T_RPAREN;
+            cur->type = TOKEN_RPAREN;
             cur->value = strdup(")");
             --paren_cnt;
             if (paren_cnt < 0) goto error;
@@ -78,7 +78,7 @@ TOKEN *lexer(const char *string) {
     }
     if (paren_cnt) goto error;
 
-    cur->type = T_EOF;
+    cur->type = TOKEN_EOF;
     cur->value = strdup("EOF");
 
     return ret;
@@ -92,7 +92,7 @@ TOKEN *new_token(void) {
     TOKEN *ret = malloc(sizeof(TOKEN));
     if (!ret) return NULL;
 
-    ret->type = T_EOF;
+    ret->type = TOKEN_EOF;
     ret->value = NULL;
     ret->next = NULL;
 

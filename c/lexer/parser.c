@@ -1,21 +1,26 @@
 #include "parser.h"
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
+#define FMTSTR "%lld"
+#define FACTOR long long int
+typedef FACTOR factor_t;
 
-table_t parser_error_table = {
-    DEF_ERROR(P_OK, "unexpected error: exit while state ok"),
-    DEF_ERROR(P_ERROR, "syntax error occurred"),
-    DEF_ERROR(P_DIVIDE_BY_ZERO, "divide by zero error"),
+#define DEF_ERROR(sym, msg) [sym] = msg
+const table_t parser_error_table = {
+    DEF_ERROR(PARSER_OK, "unexpected error: exit while state ok"),
+    DEF_ERROR(PARSER_ERROR, "syntax error occurred"),
 };
+
+static TOKEN *next(parser_t *self);
 
 
 parser_t *new_parser(const TOKEN *lexer) {
     parser_t *ret = malloc(sizeof *ret);
     if (!ret || !lexer) return NULL;
 
-    ret->flag = P_OK;
+    ret->flag = PARSER_OK;
     ret->head = lexer;
-    ret->ptr = (TOKEN*)ret->head;
+    ret->tokptr = (TOKEN*)ret->head;
 
     ret->error_table = (table_t*)parser_error_table;
 
@@ -26,17 +31,17 @@ parser_t *new_parser(const TOKEN *lexer) {
 int del_parser(parser_t *parser) {
     if (!parser) return 1;
 
-    parser->ptr = NULL;
+    parser->tokptr = NULL;
     free(parser);
 
     return 0;
 }
 
 
-TOKEN *next(parser_t *self) {
+static TOKEN *next(parser_t *self) {
     if (!self) return NULL;
-    self->ptr = next_token(self->ptr);
-    return self->ptr;
+    self->tokptr = next_token(self->tokptr);
+    return self->tokptr;
 }
 
 
@@ -55,26 +60,26 @@ NODE *parse_expr2(parser_t *self) {
     NODE *left = parse_expr1(self);
     node->left = left;
     if (!node->left) goto error;
-    DEBUG_PRINTF("expr2: left: %s\n", node->left->ptr->value);
+    DEBUG_PRINTF("expr2: left: %s\n", node->left->tokptr->value);
 
     NODE *right = NULL;
 
-    node->ptr = self->ptr;
+    node->tokptr = self->tokptr;
 
-    while (self->ptr
-            && (self->ptr->type == T_ADD || self->ptr->type == T_SUB)) {
+    while (self->tokptr
+            && (self->tokptr->type == TOKEN_ADD || self->tokptr->type == TOKEN_SUB)) {
         if (!node) {
             node = new_node(visit_operator);
         }
-        if (!node->ptr) {
-            node->ptr = self->ptr;
+        if (!node->tokptr) {
+            node->tokptr = self->tokptr;
         }
         next(self);
 
         right = parse_expr1(self);
         node->right = right;
         if (!node->right) goto error;
-        DEBUG_PRINTF("expr2: right: %s\n", node->right->ptr->value);
+        DEBUG_PRINTF("expr2: right: %s\n", node->right->tokptr->value);
         if (!ast) {
             ast = node;
         } else {
@@ -88,7 +93,7 @@ NODE *parse_expr2(parser_t *self) {
     }
     return ast;
 error:
-    self->flag = P_ERROR;
+    self->flag = PARSER_ERROR;
     return NULL;
 }
 
@@ -101,27 +106,26 @@ NODE *parse_expr1(parser_t *self) {
     NODE *left = parse_factor(self);
     node->left = left;
     if (!node->left) goto error;
-    DEBUG_PRINTF("expr1: left: %s\n", node->left->ptr->value);
+    DEBUG_PRINTF("expr1: left: %s\n", node->left->tokptr->value);
 
     NODE *right = NULL;
 
-    node->ptr = self->ptr;
+    node->tokptr = self->tokptr;
 
-    while (self->ptr
-            && (self->ptr->type == T_MUL || self->ptr->type == T_DIV)) {
+    while (self->tokptr
+            && (self->tokptr->type == TOKEN_MUL || self->tokptr->type == TOKEN_DIV)) {
         if (!node) {
             node = new_node(visit_operator);
         }
-        if (!node->ptr) {
-            node->ptr = self->ptr;
+        if (!node->tokptr) {
+            node->tokptr = self->tokptr;
         }
         next(self);
 
         right = parse_factor(self);
         node->right = right;
 
-        /* if (!node->right) goto error; */
-        DEBUG_PRINTF("expr1: left: %s\n", node->right->ptr->value);
+        DEBUG_PRINTF("expr1: left: %s\n", node->right->tokptr->value);
         if (!ast) {
             ast = node;
         } else {
@@ -130,15 +134,12 @@ NODE *parse_expr1(parser_t *self) {
         }
         node = NULL;
     }
-    /* if (!node->right) { */
-    /*     node = node->left; */
-    /* } */
     if (!ast) {
         ast = node->left;
     }
     return ast;
 error:
-    self->flag = P_ERROR;
+    self->flag = PARSER_ERROR;
     return NULL;
 }
 
@@ -146,22 +147,22 @@ error:
 NODE *parse_factor(parser_t *self) {
     assert(self != NULL);
 
-    if (self->ptr->type != T_INT && self->ptr->type != T_LPAREN)
+    if (self->tokptr->type != TOKEN_INT && self->tokptr->type != TOKEN_LPAREN)
         goto error;
 
     NODE *ret = NULL;
 
     /* LPAREN expr2 RPAREN */
-    if (self->ptr->type == T_LPAREN) {
+    if (self->tokptr->type == TOKEN_LPAREN) {
         DEBUG_PRINTF("context -> LPAREN\n");
         next(self);
 
         ret = parse_expr2(self);
         if (!ret) goto error;
-        assert(ret->ptr != NULL);
-        DEBUG_PRINTF("context -> PAREN: factor: %s\n", ret->ptr->value);
+        assert(ret->tokptr != NULL);
+        DEBUG_PRINTF("context -> PAREN: factor: %s\n", ret->tokptr->value);
 
-        if (self->ptr->type != T_RPAREN) goto error;
+        if (self->tokptr->type != TOKEN_RPAREN) goto error;
         next(self);
         DEBUG_PRINTF("context -> RPAREN\n");
 
@@ -169,31 +170,31 @@ NODE *parse_factor(parser_t *self) {
     }
 
     /* factor */
-    TOKEN *factor = self->ptr;
-    if (self->ptr->type != T_INT) goto error;
+    TOKEN *factor = self->tokptr;
+    if (self->tokptr->type != TOKEN_INT) goto error;
 
     ret = new_node(visit_integer);
-    ret->ptr = factor;
+    ret->tokptr = factor;
 
-    DEBUG_PRINTF("factor: %s\n", ret->ptr->value);
+    DEBUG_PRINTF("factor: %s\n", ret->tokptr->value);
     next(self);
 
     return ret;
 error:
-    self->flag = P_ERROR;
+    self->flag = PARSER_ERROR;
     return NULL;
 }
 
 
-NODE *new_node(visit_t visit) {
+NODE *new_node(visit_func_t handler) {
     NODE *ret = malloc(sizeof *ret);
-    if (!ret || !visit) return NULL;
+    if (!ret || !handler) return NULL;
 
     ret->left = NULL;
     ret->right = NULL;
-    ret->ptr = NULL;
+    ret->tokptr = NULL;
 
-    ret->visit = visit;
+    ret->visit = handler;
 
     return ret;
 }
@@ -224,9 +225,9 @@ int free_node(NODE *node) {
 
 NODE *visit_integer(NODE *self, ...) {
     if (!self) return NULL;
-    assert(self->ptr->type == T_INT);
+    assert(self->tokptr->type == TOKEN_INT);
     NODE *ret = new_node(visit_integer);
-    ret->ptr = self->ptr;
+    ret->tokptr = self->tokptr;
     return ret;
 }
 
@@ -241,36 +242,36 @@ NODE *visit_operator(NODE *self, ...) {
     assert(self->left != NULL && self->right != NULL);
 
     left = self->left->visit(self->left);
-    DEBUG_PRINTF("visit: left: %s\n", left->ptr->value);
+    DEBUG_PRINTF("visit: left: %s\n", left->tokptr->value);
     right = self->right->visit(self->right);
-    DEBUG_PRINTF("visit: right: %s\n", right->ptr->value);
+    DEBUG_PRINTF("visit: right: %s\n", right->tokptr->value);
 
     if (!left || !right) goto error;
 
     int len;
     char *tmp;
-    factor_t lval = strtol(left->ptr->value, &tmp, 10);
-    factor_t rval = strtol(right->ptr->value, &tmp, 10);
+    factor_t lval = strtol(left->tokptr->value, &tmp, 10);
+    factor_t rval = strtol(right->tokptr->value, &tmp, 10);
     factor_t result = 0;
 
-    switch (self->ptr->type) {
-    case T_ADD: {
-        DEBUG_PRINTF("visit: T_ADD\n");
+    switch (self->tokptr->type) {
+    case TOKEN_ADD: {
+        DEBUG_PRINTF("visit: TOKEN_ADD\n");
         result = lval + rval;
         break;
     }
-    case T_SUB:
-        DEBUG_PRINTF("visit: T_SUB\n");
+    case TOKEN_SUB:
+        DEBUG_PRINTF("visit: TOKEN_SUB\n");
         result = lval - rval;
         break;
-    case T_MUL:
-        DEBUG_PRINTF("visit: T_MUL\n");
+    case TOKEN_MUL:
+        DEBUG_PRINTF("visit: TOKEN_MUL\n");
         result = lval * rval;
         break;
-    case T_DIV:
-        DEBUG_PRINTF("visit: T_DIV\n");
+    case TOKEN_DIV:
+        DEBUG_PRINTF("visit: TOKEN_DIV\n");
         if (rval == 0) goto error;
-        result = FLOOR_(FLOOR_(lval) / rval);
+        result = floor(floor(lval) / rval);
         break;
     default:
         goto error;
@@ -280,7 +281,7 @@ NODE *visit_operator(NODE *self, ...) {
 
     char *value = malloc(BUFSIZ);
     if (!value) {
-        // TODO
+        // FIXME
         goto error;
     }
 
@@ -294,10 +295,10 @@ NODE *visit_operator(NODE *self, ...) {
     DEBUG_PRINTF("visit: result: %s\n", value);
 
     token->value = value;
-    token->type = T_INT;
+    token->type = TOKEN_INT;
 
     NODE *ret = new_node(visit_integer);
-    ret->ptr = token;
+    ret->tokptr = token;
 
     return ret;
 

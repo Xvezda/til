@@ -6,24 +6,24 @@
 #include "common.h"
 
 
-typedef enum types {
-    T_EOF,
+typedef enum TOKEN_TYPE {
+    TOKEN_EOF,
     /* terminals */
-    T_INT,
-    T_ADD,
-    T_SUB,
-    T_MUL,
-    T_DIV,
-    T_LPAREN,
-    T_RPAREN
+    TOKEN_INT,
+    TOKEN_ADD,
+    TOKEN_SUB,
+    TOKEN_MUL,
+    TOKEN_DIV,
+    TOKEN_LPAREN,
+    TOKEN_RPAREN
 } token_t;
 
 
 typedef struct token TOKEN;
 struct token {
     token_t type;
-    char *value;
-    TOKEN *next;
+    char    *value;
+    TOKEN   *next;
 };
 
 

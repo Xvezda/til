@@ -6,39 +6,33 @@
 #include "lexer.h"
 
 typedef struct node NODE;
-typedef NODE *(*visit_t)(NODE *self, ...);
+typedef NODE *(*visit_func_t)(NODE *self, ...);
+typedef char* table_t[];
 
-typedef enum parser_flag {
-    P_OK,
-    P_ERROR,  // General syntax error
-    P_DIVIDE_BY_ZERO
+typedef enum PARSER_FLAG {
+    PARSER_OK,
+    PARSER_ERROR,  // General syntax error
 } pflag_t;
 
-
-#define DEF_ERROR(sym, msg) [sym] = msg
-typedef const char* table_t[];
-
 typedef struct parser {
-    const TOKEN *head;
-    TOKEN *ptr;
+    const   TOKEN *head;
+    TOKEN   *tokptr;
     pflag_t flag;
     table_t *error_table;
 } parser_t;
 
-
 struct node {
-    NODE *left;
-    NODE *right;
-    TOKEN *ptr;
-    visit_t visit;
+    NODE    *left;
+    NODE    *right;
+    TOKEN   *tokptr;
+    visit_func_t visit;
 };
 
 
 parser_t *new_parser(const TOKEN *lexer);
 int del_parser(parser_t *parser);
-TOKEN *next(parser_t *self);
 
-NODE *new_node(visit_t visit);
+NODE *new_node(visit_func_t handler);
 int del_node(NODE *node);
 int free_node(NODE *node);
 
