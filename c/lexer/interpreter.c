@@ -26,13 +26,6 @@ int interpreter(void) {
         }
         print_token(tokens);
 
-        /* for head(left-hand side) suffixed with digit,
-         * smaller has higher precendence level.
-         *
-         * expr2: expr1 ( ( ADD | SUB ) expr1 )*
-         * expr1: factor ( ( MUL | DIV ) factor )*
-         * factor: INT | LPAREN expr2 RPAREN
-         */
         parser = new_parser(tokens);
         if (!parser) goto parser_error;
         ast = parse(parser);  // start symbol

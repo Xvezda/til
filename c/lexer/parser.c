@@ -1,6 +1,15 @@
 #include "parser.h"
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
+
+/* for head(left-hand side) suffixed with digit,
+ * smaller has higher precendence level.
+ *
+ * expr2: expr1 ( ( ADD | SUB ) expr1 )*
+ * expr1: factor ( ( MUL | DIV ) factor )*
+ * factor: ( ADD | SUB ) factor | LPAREN expr2 RPAREN | INT
+ */
+
 #define FMTSTR "%lld"
 #define FACTOR long long int
 typedef FACTOR factor_t;
@@ -55,7 +64,7 @@ NODE *parse(parser_t *self) {
 NODE *parse_expr2(parser_t *self) {
     assert(self != NULL);
     NODE *ast = NULL;
-    NODE *node = new_node(visit_operator);
+    NODE *node = new_node(visit_binary_operator);
 
     NODE *left = parse_expr1(self);
     node->left = left;
@@ -69,7 +78,7 @@ NODE *parse_expr2(parser_t *self) {
     while (self->tokptr
             && (self->tokptr->type == TOKEN_ADD || self->tokptr->type == TOKEN_SUB)) {
         if (!node) {
-            node = new_node(visit_operator);
+            node = new_node(visit_binary_operator);
         }
         if (!node->tokptr) {
             node->tokptr = self->tokptr;
@@ -101,7 +110,7 @@ error:
 NODE *parse_expr1(parser_t *self) {
     assert(self != NULL);
     NODE *ast = NULL;
-    NODE *node = new_node(visit_operator);
+    NODE *node = new_node(visit_binary_operator);
 
     NODE *left = parse_factor(self);
     node->left = left;
@@ -115,7 +124,7 @@ NODE *parse_expr1(parser_t *self) {
     while (self->tokptr
             && (self->tokptr->type == TOKEN_MUL || self->tokptr->type == TOKEN_DIV)) {
         if (!node) {
-            node = new_node(visit_operator);
+            node = new_node(visit_binary_operator);
         }
         if (!node->tokptr) {
             node->tokptr = self->tokptr;
@@ -147,10 +156,40 @@ error:
 NODE *parse_factor(parser_t *self) {
     assert(self != NULL);
 
-    if (self->tokptr->type != TOKEN_INT && self->tokptr->type != TOKEN_LPAREN)
+    switch (self->tokptr->type) {
+    /* unary operator */
+    case TOKEN_SUB:
+    case TOKEN_ADD:
+    /* parentheses operator */
+    case TOKEN_LPAREN:
+    /* INT */
+    case TOKEN_INT:
+        break;
+    default:
         goto error;
+    }
 
     NODE *ret = NULL;
+    TOKEN *factor = NULL;
+
+    /* (ADD|SUB) factor */
+    if (self->tokptr->type == TOKEN_ADD || self->tokptr->type == TOKEN_SUB) {
+        NODE *ast = NULL;
+
+        ret = new_node(visit_unary_operator);
+        factor = self->tokptr;
+        ret->tokptr = factor;
+
+        DEBUG_PRINTF("unary: factor: %s\n", ret->tokptr->value);
+        next(self);
+
+        ast = parse_factor(self);
+        if (!ast) goto error;
+
+        ret->right = ast;
+
+        return ret;
+    }
 
     /* LPAREN expr2 RPAREN */
     if (self->tokptr->type == TOKEN_LPAREN) {
@@ -170,7 +209,7 @@ NODE *parse_factor(parser_t *self) {
     }
 
     /* factor */
-    TOKEN *factor = self->tokptr;
+    factor = self->tokptr;
     if (self->tokptr->type != TOKEN_INT) goto error;
 
     ret = new_node(visit_integer);
@@ -226,13 +265,77 @@ int free_node(NODE *node) {
 NODE *visit_integer(NODE *self, ...) {
     if (!self) return NULL;
     assert(self->tokptr->type == TOKEN_INT);
+
     NODE *ret = new_node(visit_integer);
-    ret->tokptr = self->tokptr;
+    if (!ret) goto node_error;
+
+    TOKEN *token = new_token();
+    if (!token) goto token_error;
+
+    token->value = strdup(self->tokptr->value);
+    token->type = TOKEN_INT;
+
+    ret->tokptr = token;
     return ret;
+
+token_error:
+    del_node(ret);
+
+node_error:
+    return NULL;
 }
 
 
-NODE *visit_operator(NODE *self, ...) {
+NODE *visit_unary_operator(NODE *self, ...) {
+    if (!self) return NULL;
+    assert(self->tokptr != NULL && self->tokptr->value != NULL);
+    DEBUG_PRINTF("visit: unary: %s\n", self->tokptr->value);
+    DEBUG_PRINTF("visit: left->%p, right-> %p\n",
+            (void*)self->left, (void*)self->right);
+    assert(self->tokptr->type == TOKEN_ADD
+            || self->tokptr->type == TOKEN_SUB);
+    NODE *ret = new_node(visit_integer);
+    NODE *right = NULL;
+
+    assert(self->right != NULL);
+    right = self->right->visit(self->right);
+
+    if (!ret || !right) goto error;
+
+    char *tmp;
+    factor_t rval = strtol(right->tokptr->value, &tmp, 10);
+    switch (self->tokptr->type) {
+    case TOKEN_SUB:
+        rval *= -1;
+        break;
+    case TOKEN_ADD:
+        break;
+    default:
+        goto error;
+    }
+    int len = snprintf(NULL, 0, FMTSTR, rval);
+    char *value = malloc(BUFSIZ);
+    if (!value) {
+        goto error;
+    }
+    snprintf(value, BUFSIZ, FMTSTR, rval);
+    value[len] = '\0';
+
+    TOKEN *token = new_token();
+    token->value = value;
+    token->type = TOKEN_INT;
+    DEBUG_PRINTF("visit: unary: return -> %s\n", value);
+
+    ret->tokptr = token;
+    return ret;
+
+error:
+    del_node(ret);
+    return NULL;
+}
+
+
+NODE *visit_binary_operator(NODE *self, ...) {
     if (!self) goto error;
 
     /* TODO: Implement binary operators */

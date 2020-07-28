@@ -37,7 +37,8 @@ int del_node(NODE *node);
 int free_node(NODE *node);
 
 NODE *visit_integer(NODE *self, ...);
-NODE *visit_operator(NODE *self, ...);
+NODE *visit_unary_operator(NODE *self, ...);
+NODE *visit_binary_operator(NODE *self, ...);
 
 /* rules (production) */
 NODE *parse(parser_t *self);  // start symbol
