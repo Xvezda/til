@@ -3,3 +3,4 @@
 *.s
 *_test
 test_*
+!*.c
