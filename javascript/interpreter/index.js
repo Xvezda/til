@@ -37,7 +37,7 @@ rl.on('line', input => {
     }
 
     let result = interpreter.feedline(input)
-    if (result) {
+    if (result !== undefined) {
       console.log(result)
     }
 
