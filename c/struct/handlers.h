@@ -8,21 +8,21 @@
 #include "xobject.h"
 
 
-obj_t *type_str_init_handler(obj_t *self, ...);
-void type_str_del_handler(obj_t *self);
-char *type_str_cstr_handler(obj_t *self);
+obj_t *str_init_handler(obj_t *self, ...);
+void str_del_handler(obj_t *self);
+char *str_cstr_handler(obj_t *self);
 
-obj_t *type_int_init_handler(obj_t *self, ...);
-void type_int_del_handler(obj_t *self);
-char *type_int_cstr_handler(obj_t *self);
+obj_t *int_init_handler(obj_t *self, ...);
+void int_del_handler(obj_t *self);
+char *int_cstr_handler(obj_t *self);
 
-obj_t *type_int_ptr_init_handler(obj_t *self, ...);
-void type_int_ptr_del_handler(obj_t *self);
-char *type_int_ptr_cstr_handler(obj_t *self);
+obj_t *int_ptr_init_handler(obj_t *self, ...);
+void int_ptr_del_handler(obj_t *self);
+char *int_ptr_cstr_handler(obj_t *self);
 
-obj_t *type_double_init_handler(obj_t *self, ...);
-void type_double_del_handler(obj_t *self);
-char *type_double_cstr_handler(obj_t *self);
+obj_t *double_init_handler(obj_t *self, ...);
+void double_del_handler(obj_t *self);
+char *double_cstr_handler(obj_t *self);
 
 
 #endif  // HANDLERS_H_

@@ -12,7 +12,6 @@
  */
 #define OBJECT(type, data) \
     type ## _init_handler(&(obj_t) { \
-        .type_ = type, \
         .size_ = sizeof(data), \
         .init_handler_ = type ## _init_handler, \
         .del_handler_ = type ## _del_handler, \
@@ -20,8 +19,6 @@
     }, data)
 
 typedef int type_t;
-
-#define type_etc 0
 
 #define CALL_OBJECT_METHOD(obj, method, ...) \
     (obj)-> ## method((obj), __VA_ARGS__)
@@ -34,7 +31,6 @@ typedef struct obj_s *(*init_handler_t)(struct obj_s *self, ...);
 typedef void (*del_handler_t)(struct obj_s *self);
 typedef char *(*cstr_handler_t)(struct obj_s *self);
 typedef struct obj_s {
-    type_t type_;
     size_t size_;
     void *ptr_;
     init_handler_t init_handler_;
