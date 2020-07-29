@@ -49,6 +49,12 @@ class Interpreter extends AstVisitor {
     return Number(node.value)
   }
 
+  visitUnaryOperator(node) {
+    console.debug(`visitUnaryOperator -> ${node.operator}`)
+    return (node.operator === '+' ? 1 : -1)
+      * Number(this.visit(node.value))
+  }
+
   visitBinaryOperator(node) {
     let result
     console.debug(`visitBinaryOperator -> ${node.operator}`)

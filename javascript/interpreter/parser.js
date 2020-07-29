@@ -28,9 +28,14 @@ class BinaryOperator extends Ast {
     this.operator = operator
     this.right = right
   }
+}
 
-  get value() {
-    return this.operator
+
+class UnaryOperator extends Ast {
+  constructor(operator, value) {
+    super()
+    this.operator = operator
+    this.value = value
   }
 }
 
@@ -65,7 +70,7 @@ class Parser extends Base {
     /*
      * expr2: expr1 (( ADD | SUB) expr1)*
      * expr1: factor (( MUL | DIV ) factor)*
-     * factor: LPAREN expr2 RPAREN | INT
+     * factor: ( ADD | SUB ) factor | LPAREN expr2 RPAREN | INT
      */
     return this.expr2()
   }
@@ -110,6 +115,14 @@ class Parser extends Base {
 
   factor() {
     let node
+    if (this.token.type === UniqueTokens.ADD.type
+        || this.token.type === UniqueTokens.SUB.type) {
+
+      const token = this.token
+      this.eat(this.token.name)
+      return new UnaryOperator(token.value, this.factor())
+    }
+
     if (this.token.type === UniqueTokens.LPAREN.type) {
       this.eat('LPAREN')
 
