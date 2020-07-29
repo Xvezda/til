@@ -1,0 +1,12 @@
+{
+  "name": "xvzd-interpreter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Xvezda <xvezda@naver.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "NODE_ENV=production node $npm_package_main",
+    "dev": "NODE_ENV=development node $npm_package_main"
+  }
+}
