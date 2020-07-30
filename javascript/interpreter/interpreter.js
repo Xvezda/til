@@ -42,6 +42,34 @@ class AstVisitor extends TreeVisitor {
 class Interpreter extends AstVisitor {
   constructor() {
     super()
+    this.globals = {}
+  }
+
+  visitCompound(node) {
+    console.debug(`visitCompound -> `
+      + `${node.childrens.map(s => s.getClassName()).join(', ')}`)
+    for (const children of node.childrens) {
+      this.visit(children)
+    }
+  }
+
+  visitAssign(node) {
+    console.debug(`visitAssign -> `
+      + `${node.left.value} := ${node.right.getClassName()}`)
+    this.globals[node.left.value] = this.visit(node.right)
+  }
+
+  visitVariable(node) {
+    console.debug(`visitVariable -> ${node.value}`)
+    if (node.token.value in this.globals) {
+      return this.globals[node.token.value]
+    }
+    throw new ReferenceError(`variable name ${node.token.value} `
+      + `is not defined`)
+  }
+
+  visitNop(node) {
+    console.debug(`visitNop`)
   }
 
   visitInteger(node) {
@@ -79,11 +107,6 @@ class Interpreter extends AstVisitor {
         throw new Error(`${node.operator} is not a valid operator`)
     }
     return result
-  }
-
-  // Process input line by line
-  feedline(input) {
-    return this.execute(input)
   }
 
   execute(text) {

@@ -4,15 +4,13 @@ const { Base, isAlpha, isDigit, isSpace } = require('./common.js')
 
 
 class Token extends Base {
-  #name = ""
-  #value = ""
   #type = ""
 
   constructor(name, value) {
     super()
-    this.#name = name
+    this.name = name
     if (value) {
-      this.#value = value
+      this.value = value
     }
   }
 
@@ -22,23 +20,17 @@ class Token extends Base {
     }
     return this.#type
   }
-
-  get name() {
-    return this.#name
-  }
-
-  get value() {
-    if (this.#value) {
-      return this.#value
-    }
-    throw new ReferenceError(`Tried to reference undefined value ` +
-      `of token ${this.name}`)
-  }
 }
 
 
 const EOF = new Token('EOF', 'EOF')
 
+const BEGIN = new Token('BEGIN', 'BEGIN')
+const END = new Token('END', 'END')
+const DOT = new Token('DOT', '.')
+const ID = new Token('ID')
+const ASSIGN = new Token('ASSIGN', ':=')
+const SEMI = new Token('SEMI', ';')
 const LPAREN = new Token('LPAREN', '(')
 const RPAREN = new Token('RPAREN', ')')
 
@@ -52,6 +44,12 @@ const INT = new Token('INT')
 /* Pseudo-enum */
 const UniqueTokens = {
   EOF,
+  BEGIN,
+  END,
+  DOT,
+  ID,
+  ASSIGN,
+  SEMI,
   LPAREN,
   RPAREN,
   ADD,
@@ -119,6 +117,11 @@ class Lexer extends Base {
     let c
     let result = ''
 
+    const reserved = [
+      UniqueTokens.BEGIN,
+      UniqueTokens.END
+    ]
+
     while ((c=this.readchar()) !== undefined) {
       if (isAlpha(c)) {
         result += c
@@ -126,6 +129,11 @@ class Lexer extends Base {
         continue
       }
       break
+    }
+    for (const token of reserved) {
+      if (token.name === result) {
+        return token
+      }
     }
     return new Token('ID', result)
   }
@@ -162,6 +170,22 @@ class Lexer extends Base {
         case '/':
           this.forward()
           return UniqueTokens.DIV
+        case ':':
+          switch (this.peek()) {
+            case '=':
+              this.forward()
+              this.forward()
+              return UniqueTokens.ASSIGN
+            default:
+              break
+          }
+          break
+        case ';':
+          this.forward()
+          return UniqueTokens.SEMI
+        case '.':
+          this.forward()
+          return UniqueTokens.DOT
         default:
           break
       }

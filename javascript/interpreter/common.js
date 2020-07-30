@@ -45,6 +45,7 @@ const Color = {
   // Add color here
 }
 
+
 function isWrapper(pattern) {
   return text => {
     return !!(text || '').match(pattern)
