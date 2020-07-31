@@ -45,6 +45,25 @@ class Interpreter extends AstVisitor {
     this.globals = {}
   }
 
+  visitProgram(node) {
+    this.visit(node.block)
+  }
+
+  visitBlock(node) {
+    for (const declaration of node.declarations) {
+      this.visit(declaration)
+    }
+    this.visit(node.compoundStatement)
+  }
+
+  visitVarDecl(node) {
+    // TODO
+  }
+
+  visitType(node) {
+    // TODO
+  }
+
   visitCompound(node) {
     console.debug(`visitCompound -> `
       + `${node.childrens.map(s => s.getClassName()).join(', ')}`)
@@ -72,8 +91,8 @@ class Interpreter extends AstVisitor {
     console.debug(`visitNop`)
   }
 
-  visitInteger(node) {
-    console.debug(`visitInteger -> ${node.value}`)
+  visitNum(node) {
+    console.debug(`visitNum -> ${node.value}`)
     return Number(node.value)
   }
 
@@ -93,7 +112,13 @@ class Interpreter extends AstVisitor {
       case '-':
         result = this.visit(node.left) - this.visit(node.right)
         break
-      // case '/':
+      case '/': {
+        let rval = this.visit(node.right)
+        if (rval === 0) throw new Error('Divide by zero')
+
+        result = this.visit(node.left) / rval
+        break
+      }
       case 'DIV': {
         let rval = this.visit(node.right)
         if (rval === 0) throw new Error('Divide by zero')
@@ -115,6 +140,7 @@ class Interpreter extends AstVisitor {
       var lexer = new Lexer(text)
     } catch (e) {
       console.error(`Tokenizing failure: ${e.message}`)
+      console.debug(e)
       return
     }
 
@@ -123,6 +149,7 @@ class Interpreter extends AstVisitor {
       var ast = parser.parse()
     } catch (e) {
       console.error(`Parsing failure: ${e.message}`)
+      console.debug(e)
       return
     }
     return this.visit(ast)

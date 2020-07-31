@@ -1,6 +1,6 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
-const { Base, isAlpha, isDigit, isSpace } = require('./common.js')
+const { Base, isAlpha, isDigit, isAlnum, isSpace } = require('./common.js')
 
 
 class Token extends Base {
@@ -11,6 +11,8 @@ class Token extends Base {
     this.name = name
     if (value) {
       this.value = value
+    } else {
+      this.value = this.name
     }
   }
 
@@ -25,39 +27,57 @@ class Token extends Base {
 
 const EOF = new Token('EOF', 'EOF')
 
+const PROGRAM = new Token('PROGRAM', 'PROGRAM')
 const BEGIN = new Token('BEGIN', 'BEGIN')
 const END = new Token('END', 'END')
+
+const VAR = new Token('VAR', 'VAR')
+const INTEGER = new Token('INTEGER', 'INTEGER')
+const REAL = new Token('REAL', 'REAL')
+
 const DOT = new Token('DOT', '.')
-const ID = new Token('ID')
-const ASSIGN = new Token('ASSIGN', ':=')
+const COLON = new Token('COLON', ':')
+const COMMA = new Token('COMMA', ',')
 const SEMI = new Token('SEMI', ';')
 const LPAREN = new Token('LPAREN', '(')
 const RPAREN = new Token('RPAREN', ')')
 
+const ASSIGN = new Token('ASSIGN', ':=')
 const ADD = new Token('ADD', '+')
 const SUB = new Token('SUB', '-')
 const MUL = new Token('MUL', '*')
-// const DIV = new Token('DIV', '/')
+const FLOAT_DIV = new Token('FLOAT_DIV', '/')
 const DIV = new Token('DIV', 'DIV')
 
-const INT = new Token('INT')
+const ID = new Token('ID')
+const REAL_CONST = new Token('REAL_CONST')
+const INT_CONST = new Token('INT_CONST')
+
 
 /* Pseudo-enum */
 const UniqueTokens = {
   EOF,
+  PROGRAM,
   BEGIN,
   END,
+  VAR,
+  INTEGER,
+  REAL,
   DOT,
-  ID,
-  ASSIGN,
+  COLON,
+  COMMA,
   SEMI,
   LPAREN,
   RPAREN,
+  ASSIGN,
   ADD,
   SUB,
   MUL,
+  FLOAT_DIV,
   DIV,
-  INT,
+  ID,
+  REAL_CONST,
+  INT_CONST,
 }
 
 
@@ -88,6 +108,17 @@ class Lexer extends Base {
     return this.text[this.cursor+1]
   }
 
+  skipComment() {
+    let c
+    while ((c=this.readchar()) !== undefined) {
+      if (c === '}') {
+        break
+      }
+      this.forward()
+    }
+    this.forward()
+  }
+
   skipWhiteSpace() {
     let c
     while ((c=this.readchar()) !== undefined) {
@@ -99,7 +130,7 @@ class Lexer extends Base {
     }
   }
 
-  integer() {
+  number() {
     let c
     let result = ''
 
@@ -111,21 +142,40 @@ class Lexer extends Base {
       }
       break
     }
-    return new Token('INT', result)
+    if (c === '.') {
+      result += c
+      this.forward()
+
+      while ((c=this.readchar()) !== undefined) {
+        if (isDigit(c)) {
+          result += c
+          this.forward()
+          continue
+        }
+        break
+      }
+      return new Token('REAL_CONST', result)
+    }
+    return new Token('INT_CONST', result)
   }
 
   identifier() {
-    let c
-    let result = ''
+    let c = this.readchar()
+    let result = c
+    this.forward()
 
     const reserved = [
+      UniqueTokens.PROGRAM,
       UniqueTokens.BEGIN,
       UniqueTokens.END,
-      UniqueTokens.DIV
+      UniqueTokens.VAR,
+      UniqueTokens.DIV,
+      UniqueTokens.INTEGER,
+      UniqueTokens.REAL,
     ]
 
     while ((c=this.readchar()) !== undefined) {
-      if (isAlpha(c) || (!result && c === '_')) {
+      if (isAlnum(c)) {
         result += c
         this.forward()
         continue
@@ -146,23 +196,27 @@ class Lexer extends Base {
   nextToken() {
     let c
     while ((c=this.readchar()) !== undefined) {
+      if (c === '{') {
+        this.forward()
+        this.skipComment()
+        continue
+      }
+
       if (isSpace(c)) {
         this.skipWhiteSpace()
         continue
       }
 
       if (isAlpha(c) || c === '_') return this.identifier()
-      if (isDigit(c)) return this.integer()
+      if (isDigit(c)) return this.number()
 
       switch (c) {
         case '(':
           this.forward()
           return UniqueTokens.LPAREN
-          break
         case ')':
           this.forward()
           return UniqueTokens.RPAREN
-          break
         case '+':
           this.forward()
           return UniqueTokens.ADD
@@ -172,11 +226,9 @@ class Lexer extends Base {
         case '*':
           this.forward()
           return UniqueTokens.MUL
-        /*
         case '/':
           this.forward()
-          return UniqueTokens.DIV
-        */
+          return UniqueTokens.FLOAT_DIV
         case ':':
           switch (this.peek()) {
             case '=':
@@ -184,12 +236,16 @@ class Lexer extends Base {
               this.forward()
               return UniqueTokens.ASSIGN
             default:
-              break
+              this.forward()
+              return UniqueTokens.COLON
           }
           break
         case ';':
           this.forward()
           return UniqueTokens.SEMI
+        case ',':
+          this.forward()
+          return UniqueTokens.COMMA
         case '.':
           this.forward()
           return UniqueTokens.DOT

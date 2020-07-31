@@ -20,6 +20,40 @@ class Ast extends Tree {
 }
 
 
+class Program extends Ast {
+  constructor(name, block) {
+    super()
+    this.name = name
+    this.block = block
+  }
+}
+
+
+class Block extends Ast {
+  constructor(declarations, compoundStatement) {
+    super()
+    this.declarations = declarations
+    this.compoundStatement = compoundStatement
+  }
+}
+
+
+class VarDecl extends Ast {
+  constructor(varNode, typeNode) {
+    super()
+    this.varNode = varNode
+    this.typeNode = typeNode
+  }
+}
+
+
+class Type extends Ast {
+  constructor(token) {
+    super()
+    this.token = token
+  }
+}
+
 class Compound extends Ast {
   constructor() {
     super()
@@ -74,7 +108,7 @@ class UnaryOperator extends Ast {
 }
 
 
-class Integer extends Ast {
+class Num extends Ast {
   constructor(value) {
     super()
     this.value = value
@@ -108,14 +142,24 @@ class Parser extends Base {
       }
     } catch (e) {
       console.error(e)
+      throw e
     }
     throw new Error(`Current token ${this.token.value} is not type ${type}`)
   }
 
   parse() {
-    // https://ruslanspivak.com/lsbasi-part9/
+    // https://ruslanspivak.com/lsbasi-part10/
     /*
-    program : compound_statement DOT
+    program : PROGRAM variable SEMI block DOT
+
+    block : declarations compound_statement
+
+    declarations : VAR (variable_declaration SEMI)+
+                 | empty
+
+    variable_declaration : ID (COMMA ID)* COLON type_spec
+
+    type_spec : INTEGER | REAL
 
     compound_statement : BEGIN statement_list END
 
@@ -130,13 +174,14 @@ class Parser extends Base {
 
     empty :
 
-    expr: term ((PLUS | MINUS) term)*
+    expr: term ((ADD | SUB) term)*
 
-    term: factor ((MUL | DIV) factor)*
+    term: factor ((MUL | INT_DIV | FLOAT_DIV) factor)*
 
-    factor : PLUS factor
-           | MINUS factor
-           | INTEGER
+    factor : ADD factor
+           | SUB factor
+           | INT_CONST
+           | REAL_CONST
            | LPAREN expr RPAREN
            | variable
 
@@ -150,11 +195,70 @@ class Parser extends Base {
     return node
   }
 
-  /* program : compound_statement DOT */
+  /* program : PROGRAM variable SEMI block DOT */
   program() {
-    let node = this.compoundStatement()
+    this.eat('PROGRAM')
+    const varNode = this.variable()
+    const progName = varNode.value
+    this.eat('SEMI')
+    const blockNode = this.block()
+    const progNode = new Program(progName, blockNode)
     this.eat('DOT')
-    return node
+    return progNode
+  }
+
+  /* block : declarations compound_statement */
+  block() {
+    const declarationsNode = this.declarations()
+    const compoundNode = this.compoundStatement()
+    return new Block(declarationsNode, compoundNode)
+  }
+
+  /*
+   * declarations : VAR (variable_declaration SEMI)+
+   *              | empty
+   */
+  declarations() {
+    let declarations = []
+    if (this.token.type === UniqueTokens.VAR.type) {
+      this.eat('VAR')
+      while (this.token.type === UniqueTokens.ID.type) {
+        declarations = declarations.concat(this.variableDeclarations())
+        this.eat('SEMI')
+      }
+    }
+    return declarations
+  }
+
+  /* variable_declaration : ID (COMMA ID)* COLON type_spec */
+  variableDeclarations() {
+    let varNodes = [new Variable(this.token)]
+    this.eat('ID')
+
+    while (this.token.type === UniqueTokens.COMMA.type) {
+      this.eat('COMMA')
+      varNodes.push(new Variable(this.token))
+      this.eat('ID')
+    }
+    this.eat('COLON')
+
+    let typeNode = this.typeSpec()
+    let varDecls = []
+    for (const varNode of varNodes) {
+      varDecls.push(new VarDecl(varNode, typeNode))
+    }
+    return varDecls
+  }
+
+  /* type_spec : INTEGER | REAL */
+  typeSpec() {
+    const token = this.token
+    if (token.type === UniqueTokens.INTEGER.type) {
+      this.eat('INTEGER')
+    } else {
+      this.eat('REAL')
+    }
+    return new Type(token)
   }
 
   /* compound_statement: BEGIN statement_list END */
@@ -235,10 +339,15 @@ class Parser extends Base {
     return node
   }
 
+  /* term: factor ((MUL | INT_DIV | FLOAT_DIV) factor)*  */
   term() {
     let node = this.factor()
 
-    while ([UniqueTokens.MUL, UniqueTokens.DIV].some(op => (
+    while ([
+      UniqueTokens.MUL,
+      UniqueTokens.DIV,
+      UniqueTokens.FLOAT_DIV
+    ].some(op => (
       op.type === this.token.type
     ))) {
       const token = this.token
@@ -250,7 +359,8 @@ class Parser extends Base {
 
   /* factor: ADD factor
    *       | SUB factor
-   *       | INT
+   *       | INT_CONST
+   *       | REAL_CONST
    *       | LPAREN expr RPAREN
    *       | variable
    */
@@ -264,9 +374,13 @@ class Parser extends Base {
       const token = this.token
       this.eat('SUB')
       return new UnaryOperator(token.value, this.factor())
-    } else if (this.token.type === UniqueTokens.INT.type) {
-      node = new Integer(this.token.value)
-      this.eat('INT')
+    } else if (this.token.type === UniqueTokens.INT_CONST.type) {
+      node = new Num(this.token.value)
+      this.eat('INT_CONST')
+      return node
+    } else if (this.token.type === UniqueTokens.REAL_CONST.type) {
+      node = new Num(this.token.value)
+      this.eat('REAL_CONST')
       return node
     } else if (this.token.type === UniqueTokens.LPAREN.type) {
       this.eat('LPAREN')
