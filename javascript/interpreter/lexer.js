@@ -37,7 +37,8 @@ const RPAREN = new Token('RPAREN', ')')
 const ADD = new Token('ADD', '+')
 const SUB = new Token('SUB', '-')
 const MUL = new Token('MUL', '*')
-const DIV = new Token('DIV', '/')
+// const DIV = new Token('DIV', '/')
+const DIV = new Token('DIV', 'DIV')
 
 const INT = new Token('INT')
 
@@ -119,17 +120,21 @@ class Lexer extends Base {
 
     const reserved = [
       UniqueTokens.BEGIN,
-      UniqueTokens.END
+      UniqueTokens.END,
+      UniqueTokens.DIV
     ]
 
     while ((c=this.readchar()) !== undefined) {
-      if (isAlpha(c)) {
+      if (isAlpha(c) || (!result && c === '_')) {
         result += c
         this.forward()
         continue
       }
       break
     }
+    // case insensitive
+    result = result.toUpperCase()
+
     for (const token of reserved) {
       if (token.name === result) {
         return token
@@ -146,7 +151,7 @@ class Lexer extends Base {
         continue
       }
 
-      if (isAlpha(c)) return this.identifier()
+      if (isAlpha(c) || c === '_') return this.identifier()
       if (isDigit(c)) return this.integer()
 
       switch (c) {
@@ -167,9 +172,11 @@ class Lexer extends Base {
         case '*':
           this.forward()
           return UniqueTokens.MUL
+        /*
         case '/':
           this.forward()
           return UniqueTokens.DIV
+        */
         case ':':
           switch (this.peek()) {
             case '=':

@@ -93,7 +93,8 @@ class Interpreter extends AstVisitor {
       case '-':
         result = this.visit(node.left) - this.visit(node.right)
         break
-      case '/': {
+      // case '/':
+      case 'DIV': {
         let rval = this.visit(node.right)
         if (rval === 0) throw new Error('Divide by zero')
 

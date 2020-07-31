@@ -145,7 +145,7 @@ class Parser extends Base {
 
     const node = this.program()  // Start symbol
     if (this.token.type !== UniqueTokens.EOF.type) {
-      throw new SyntaxError()
+      throw new SyntaxError(`expect EOF, but ${this.token.value} found.`)
     }
     return node
   }
@@ -183,7 +183,7 @@ class Parser extends Base {
     }
 
     if (this.token.type === UniqueTokens.ID.type)
-      throw new SyntaxError()
+      throw new SyntaxError(`invalid token ${this.token.value}`)
 
     return results
   }
