@@ -1,6 +1,7 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
 
+const fs = require('fs')
 const readline = require('readline')
 const { Color } = require('./common.js')
 const Interpreter = require('./interpreter.js')
@@ -19,33 +20,48 @@ if (typeof console === 'object' && 'debug' in console) {
 }
 
 
-
-rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  prompt: PS1
-})
-
-rl.prompt()
-rl.on('line', input => {
-  if (input) {
-    if (isDev) {
-      var timeout = setTimeout(() => {
-        console.log('timeout!')
-        process.exit(1)
-      }, 1000)
-    }
-
-    let result = interpreter.feedline(input)
-    if (result !== undefined) {
-      console.log(result)
-    }
-
-    if (isDev) {
-      clearTimeout(timeout)
-    }
+function processInput(input) {
+  if (isDev) {
+    var timeout = setTimeout(() => {
+      console.log('timeout!')
+      process.exit(1)
+    }, 1000)
   }
+
+  let result = interpreter.execute(input)
+  if (result !== undefined) {
+    console.log(result)
+  }
+  console.log(interpreter.globals)
+
+  if (isDev) {
+    clearTimeout(timeout)
+  }
+}
+
+
+if (process.argv[2]) {
+  const filePath = process.argv[2]
+
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) throw err
+    processInput(data)
+  })
+
+} else {
+  let rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: PS1
+  })
+
   rl.prompt()
-}).on('close', () => {
-  process.exit(0)
-})
+  rl.on('line', input => {
+    processInput(input)
+    rl.prompt()
+  }).on('close', () => {
+    process.exit(0)
+  })
+}
+
+
