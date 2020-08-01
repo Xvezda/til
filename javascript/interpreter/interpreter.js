@@ -5,6 +5,53 @@ const { Lexer } = require('./lexer.js')
 const { Parser } = require('./parser.js')
 
 
+class BaseSymbol extends Base {
+  constructor(name, type) {
+    super()
+    this.name = name
+    this.type = type
+  }
+}
+
+
+class BuiltinTypeSymbol extends BaseSymbol {
+  constructor(name) {
+    super(name)
+  }
+}
+
+
+class VarSymbol extends BaseSymbol {
+  constructor(name, type) {
+    super(name, type)
+  }
+}
+
+
+class SymbolTable extends Base {
+  #symbols = null
+
+  constructor() {
+    super()
+    this.#symbols = {}
+
+    this.define(new BuiltinTypeSymbol('INTEGER'))
+    this.define(new BuiltinTypeSymbol('REAL'))
+  }
+
+  define(symbol) {
+    console.debug('define:', symbol)
+    this.#symbols[symbol.name] = symbol
+  }
+
+  lookup(name) {
+    console.debug('lookup:', name)
+    return this.#symbols[name]
+  }
+}
+
+
+
 class Visitor extends Base {
   constructor() {
     super()
@@ -19,7 +66,7 @@ class TreeVisitor extends Visitor {
 }
 
 
-class AstVisitor extends TreeVisitor {
+class NodeVisitor extends TreeVisitor {
   constructor() {
     super()
   }
@@ -39,7 +86,14 @@ class AstVisitor extends TreeVisitor {
 }
 
 
-class Interpreter extends AstVisitor {
+class SymbolTableBuilder extends NodeVisitor {
+  constructor() {
+    super()
+  }
+}
+
+
+class Interpreter extends NodeVisitor {
   constructor() {
     super()
     this.globals = {}

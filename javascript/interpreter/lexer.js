@@ -51,7 +51,7 @@ const DIV = new Token('DIV', 'DIV')
 
 const ID = new Token('ID')
 const REAL_CONST = new Token('REAL_CONST')
-const INT_CONST = new Token('INT_CONST')
+const INTEGER_CONST = new Token('INTEGER_CONST')
 
 
 /* Pseudo-enum */
@@ -77,7 +77,7 @@ const UniqueTokens = {
   DIV,
   ID,
   REAL_CONST,
-  INT_CONST,
+  INTEGER_CONST,
 }
 
 
@@ -156,7 +156,7 @@ class Lexer extends Base {
       }
       return new Token('REAL_CONST', result)
     }
-    return new Token('INT_CONST', result)
+    return new Token('INTEGER_CONST', result)
   }
 
   identifier() {
