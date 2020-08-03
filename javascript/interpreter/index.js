@@ -4,9 +4,10 @@
 const fs = require('fs')
 const readline = require('readline')
 const { Color } = require('./common.js')
+const { Lexer } = require('./lexer.js')
+const { Parser } = require('./parser.js')
 const { Interpreter } = require('./interpreter.js')
 
-const interpreter = new Interpreter()
 const PS1 = '> '
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -28,7 +29,13 @@ function processInput(input) {
     }, 1000)
   }
 
-  let result = interpreter.execute(input)
+  const tokens = new Lexer(input)
+  const parser = new Parser(tokens)
+  const ast = parser.parse()
+
+  const interpreter = new Interpreter(ast)
+
+  const result = interpreter.interpret()
   if (result !== undefined) {
     console.log(result)
   }

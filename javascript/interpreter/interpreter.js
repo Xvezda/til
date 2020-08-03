@@ -126,6 +126,10 @@ class SymbolTableBuilder extends AstVisitor {
     this.symbolTable.define(varSymbol)
   }
 
+  visitProcDecl(node) {
+    // FIXME
+  }
+
   visitAssign(node) {
     const varName = node.left.value
     const varType = this.symbolTable.lookup(varName)
@@ -168,13 +172,18 @@ class SymbolTableBuilder extends AstVisitor {
 
 
 class Interpreter extends AstVisitor {
-  constructor() {
+  constructor(tree) {
     super()
+    this.tree = tree
     this.globals = {}
   }
 
   visitVarDecl(node) {
     // TODO
+  }
+
+  visitProcDecl(node) {
+    // FIXME
   }
 
   visitType(node) {
@@ -252,24 +261,9 @@ class Interpreter extends AstVisitor {
     return result
   }
 
-  execute(text) {
-    try {
-      var lexer = new Lexer(text)
-    } catch (e) {
-      console.error(`Tokenizing failure: ${e.message}`)
-      console.debug(e)
-      return
-    }
-
-    try {
-      var parser = new Parser(lexer)
-      var ast = parser.parse()
-    } catch (e) {
-      console.error(`Parsing failure: ${e.message}`)
-      console.debug(e)
-      return
-    }
-    return this.visit(ast)
+  interpret() {
+    if (!this.tree) return
+    return this.visit(this.tree)
   }
 }
 
