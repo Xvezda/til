@@ -1,5 +1,7 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
+const util = require('util')
+
 const { Base } = require('./common.js')
 const { Lexer } = require('./lexer.js')
 const { Parser } = require('./parser.js')
@@ -18,6 +20,10 @@ class BuiltinTypeSymbol extends BaseSymbol {
   constructor(name) {
     super(name)
   }
+
+  [util.inspect.custom]() {
+    return `[${this.getClassName()}(${this.name})]`
+  }
 }
 
 
@@ -29,11 +35,9 @@ class VarSymbol extends BaseSymbol {
 
 
 class SymbolTable extends Base {
-  #symbols = null
-
   constructor() {
     super()
-    this.#symbols = {}
+    this.symbols = {}
 
     this.define(new BuiltinTypeSymbol('INTEGER'))
     this.define(new BuiltinTypeSymbol('REAL'))
@@ -41,12 +45,12 @@ class SymbolTable extends Base {
 
   define(symbol) {
     console.debug('define:', symbol)
-    this.#symbols[symbol.name] = symbol
+    this.symbols[symbol.name] = symbol
   }
 
   lookup(name) {
     console.debug('lookup:', name)
-    return this.#symbols[name]
+    return this.symbols[name]
   }
 }
 
@@ -86,17 +90,9 @@ class NodeVisitor extends TreeVisitor {
 }
 
 
-class SymbolTableBuilder extends NodeVisitor {
+class AstVisitor extends NodeVisitor {
   constructor() {
     super()
-  }
-}
-
-
-class Interpreter extends NodeVisitor {
-  constructor() {
-    super()
-    this.globals = {}
   }
 
   visitProgram(node) {
@@ -108,6 +104,73 @@ class Interpreter extends NodeVisitor {
       this.visit(declaration)
     }
     this.visit(node.compoundStatement)
+  }
+}
+
+
+class SymbolTableBuilder extends AstVisitor {
+  constructor() {
+    super()
+    this.symbolTable = new SymbolTable()
+  }
+
+  visitVarDecl(node) {
+    console.debug('symbol table: visitVarDecl')
+    console.debug(node)
+
+    const typeName = node.typeNode.value
+    const typeSymbol = this.symbolTable.lookup(typeName)
+    const varName = node.varNode.value
+    const varSymbol = new VarSymbol(varName, typeSymbol)
+
+    this.symbolTable.define(varSymbol)
+  }
+
+  visitAssign(node) {
+    const varName = node.left.value
+    const varType = this.symbolTable.lookup(varName)
+    if (varType === undefined)
+      throw new ReferenceError(`Variable name ${varName} not exists`)
+
+    this.visit(node.right)
+  }
+
+  visitVariable(node) {
+    const varName = node.value
+    const varSymbol = this.symbolTable.lookup(varName)
+    if (varSymbol === undefined)
+      throw new ReferenceError(`Variable name ${varName} not exists`)
+  }
+
+  visitNop(node) {
+    // TODO
+  }
+
+  visitNum(node) {
+    // TODO
+  }
+
+  visitCompound(node) {
+    for (const children of node.childrens) {
+      this.visit(children)
+    }
+  }
+
+  visitUnaryOperator(node) {
+    this.visit(node.value)
+  }
+
+  visitBinaryOperator(node) {
+    this.visit(node.left)
+    this.visit(node.right)
+  }
+}
+
+
+class Interpreter extends AstVisitor {
+  constructor() {
+    super()
+    this.globals = {}
   }
 
   visitVarDecl(node) {
@@ -211,4 +274,7 @@ class Interpreter extends NodeVisitor {
 }
 
 
-module.exports = Interpreter
+module.exports = {
+  SymbolTableBuilder,
+  Interpreter,
+}

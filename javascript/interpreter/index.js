@@ -4,7 +4,7 @@
 const fs = require('fs')
 const readline = require('readline')
 const { Color } = require('./common.js')
-const Interpreter = require('./interpreter.js')
+const { Interpreter } = require('./interpreter.js')
 
 const interpreter = new Interpreter()
 const PS1 = '> '
