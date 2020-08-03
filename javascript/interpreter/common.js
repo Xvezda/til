@@ -15,13 +15,16 @@ function ansiEscapeControlSequence(...args) {
   return `${ESC}[${args.join('')}`
 }
 
+const hasColors = process.stdout.hasColors()
+
 function controlSequenceColor(...args) {
   // return ansiEscapeControlSequence(args.join(';'), 'm')
   return ansiEscapeControlSequence(args[0], 'm')
 }
 
-const RESET = controlSequenceColor('0')
+const RESET = hasColors ? controlSequenceColor('0') : ''
 function colorTemplate(modifier) {
+  if (!hasColors) modifier = ''
   return (strings, ...args) => {
     let result = modifier + strings[0]
     args.forEach((v, i) => {
@@ -34,6 +37,7 @@ function colorTemplate(modifier) {
     return result
   }
 }
+
 
 const Color = {
   ...Object.fromEntries(

@@ -51,6 +51,7 @@ class Type extends Ast {
   constructor(token) {
     super()
     this.token = token
+    this.value = token.value
   }
 }
 
@@ -176,11 +177,11 @@ class Parser extends Base {
 
     expr: term ((ADD | SUB) term)*
 
-    term: factor ((MUL | INT_DIV | FLOAT_DIV) factor)*
+    term: factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*
 
     factor : ADD factor
            | SUB factor
-           | INT_CONST
+           | INTEGER_CONST
            | REAL_CONST
            | LPAREN expr RPAREN
            | variable
@@ -339,7 +340,7 @@ class Parser extends Base {
     return node
   }
 
-  /* term: factor ((MUL | INT_DIV | FLOAT_DIV) factor)*  */
+  /* term: factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*  */
   term() {
     let node = this.factor()
 
@@ -359,7 +360,7 @@ class Parser extends Base {
 
   /* factor: ADD factor
    *       | SUB factor
-   *       | INT_CONST
+   *       | INTEGER_CONST
    *       | REAL_CONST
    *       | LPAREN expr RPAREN
    *       | variable
@@ -374,9 +375,9 @@ class Parser extends Base {
       const token = this.token
       this.eat('SUB')
       return new UnaryOperator(token.value, this.factor())
-    } else if (this.token.type === UniqueTokens.INT_CONST.type) {
+    } else if (this.token.type === UniqueTokens.INTEGER_CONST.type) {
       node = new Num(this.token.value)
-      this.eat('INT_CONST')
+      this.eat('INTEGER_CONST')
       return node
     } else if (this.token.type === UniqueTokens.REAL_CONST.type) {
       node = new Num(this.token.value)
