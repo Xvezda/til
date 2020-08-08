@@ -48,10 +48,20 @@ class VarDecl extends Ast {
 
 
 class ProcDecl extends Ast {
-  constructor(procName, blockNode) {
+  constructor(procName, params, blockNode) {
     super()
     this.procName = procName
+    this.params = params
     this.blockNode = blockNode
+  }
+}
+
+
+class Param extends Ast {
+  constructor(varNode, typeNode) {
+    super()
+    this.varNode = varNode
+    this.typeNode = typeNode
   }
 }
 
@@ -165,10 +175,15 @@ class Parser extends Base {
     block : declarations compound_statement
 
     declarations : VAR (variable_declaration SEMI)+
-                 | (PROCEDURE ID SEMI block SEMI)*
+                 | (PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI)*
                  | empty
 
     variable_declaration : ID (COMMA ID)* COLON type_spec
+
+    formal_parameter_list : formal_parameters
+                          | formal_parameters SEMI formal_parameter_list
+
+    formal_parameters: ID (COMMA ID)* COLON type_spec
 
     type_spec : INTEGER | REAL
 
@@ -227,28 +242,39 @@ class Parser extends Base {
 
   /*
    * declarations : VAR (variable_declaration SEMI)+
-   *              | (PROCEDURE ID SEMI block SEMI)*
+   *              | (PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI)*
    *              | empty
    */
   declarations() {
     let declarations = []
-    if (this.token.type === UniqueTokens.VAR.type) {
+    do {
+      if (this.token.type !== UniqueTokens.VAR.type) break
+
       this.eat('VAR')
       while (this.token.type === UniqueTokens.ID.type) {
         declarations = declarations.concat(this.variableDeclarations())
         this.eat('SEMI')
       }
-    }
+    } while (this.token.type === UniqueTokens.VAR.type)
+
     while (this.token.type === UniqueTokens.PROCEDURE.type) {
       this.eat('PROCEDURE')
       let procName = this.token.value
       this.eat('ID')
+
+      let paramList = []
+      if (this.token.type === UniqueTokens.LPAREN.type) {
+        this.eat('LPAREN')
+        paramList = this.formalParameterList()
+        this.eat('RPAREN')
+      }
+
       this.eat('SEMI')
 
       let blockNode = this.block()
       this.eat('SEMI')
 
-      declarations.push(new ProcDecl(procName, blockNode))
+      declarations.push(new ProcDecl(procName, paramList, blockNode))
     }
     return declarations
   }
@@ -271,6 +297,27 @@ class Parser extends Base {
       varDecls.push(new VarDecl(varNode, typeNode))
     }
     return varDecls
+  }
+
+  // formal_parameter_list : formal_parameters
+  //                       | formal_parameters SEMI formal_parameter_list
+  formalParameterList() {
+    let params = this.formalParameters()
+    if (this.token.type === UniqueTokens.SEMI.type) {
+      this.eat('SEMI')
+      params = params.concat(this.formalParameterList())
+    }
+    return params
+  }
+
+  // formal_parameters: ID (COMMA ID)* COLON type_spec
+  formalParameters() {
+    const paramNodes = []
+    const varDecls = this.variableDeclarations()
+    for (const varDecl of varDecls) {
+      paramNodes.push(new Param(varDecl.varNode, varDecl.typeNode))
+    }
+    return paramNodes
   }
 
   /* type_spec : INTEGER | REAL */

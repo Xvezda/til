@@ -18,7 +18,7 @@ class Token extends Base {
 
   get type() {
     if (!this.#type) {
-      this.#type = Symbol.for(this.name)
+      this.#type = Symbol.for(this.name.toUpperCase())
     }
     return this.#type
   }
@@ -186,11 +186,9 @@ class Lexer extends Base {
       }
       break
     }
-    // case insensitive
-    result = result.toUpperCase()
 
     for (const token of reserved) {
-      if (token.name === result) {
+      if (token.name.toUpperCase() === result.toUpperCase()) {
         return token
       }
     }
