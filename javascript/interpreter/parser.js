@@ -241,7 +241,7 @@ class Parser extends Base {
     }
     while (this.token.type === UniqueTokens.PROCEDURE.type) {
       this.eat('PROCEDURE')
-      let procName = this.token
+      let procName = this.token.value
       this.eat('ID')
       this.eat('SEMI')
 

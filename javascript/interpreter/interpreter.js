@@ -183,6 +183,7 @@ class Interpreter extends AstVisitor {
   }
 
   visitProcDecl(node) {
+    console.debug(`visitProcDecl -> ${node.procName}`)
     // FIXME
   }
 
