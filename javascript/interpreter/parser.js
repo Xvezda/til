@@ -47,6 +47,15 @@ class VarDecl extends Ast {
 }
 
 
+class ProcDecl extends Ast {
+  constructor(procName, blockNode) {
+    super()
+    this.procName = procName
+    this.blockNode = blockNode
+  }
+}
+
+
 class Type extends Ast {
   constructor(token) {
     super()
@@ -156,6 +165,7 @@ class Parser extends Base {
     block : declarations compound_statement
 
     declarations : VAR (variable_declaration SEMI)+
+                 | (PROCEDURE ID SEMI block SEMI)*
                  | empty
 
     variable_declaration : ID (COMMA ID)* COLON type_spec
@@ -217,6 +227,7 @@ class Parser extends Base {
 
   /*
    * declarations : VAR (variable_declaration SEMI)+
+   *              | (PROCEDURE ID SEMI block SEMI)*
    *              | empty
    */
   declarations() {
@@ -227,6 +238,17 @@ class Parser extends Base {
         declarations = declarations.concat(this.variableDeclarations())
         this.eat('SEMI')
       }
+    }
+    while (this.token.type === UniqueTokens.PROCEDURE.type) {
+      this.eat('PROCEDURE')
+      let procName = this.token.value
+      this.eat('ID')
+      this.eat('SEMI')
+
+      let blockNode = this.block()
+      this.eat('SEMI')
+
+      declarations.push(new ProcDecl(procName, blockNode))
     }
     return declarations
   }

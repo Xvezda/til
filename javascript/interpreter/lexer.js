@@ -27,11 +27,13 @@ class Token extends Base {
 
 const EOF = new Token('EOF', 'EOF')
 
-const PROGRAM = new Token('PROGRAM', 'PROGRAM')
 const BEGIN = new Token('BEGIN', 'BEGIN')
 const END = new Token('END', 'END')
 
+const PROGRAM = new Token('PROGRAM', 'PROGRAM')
+const PROCEDURE = new Token('PROCEDURE', 'PROCEDURE')
 const VAR = new Token('VAR', 'VAR')
+
 const INTEGER = new Token('INTEGER', 'INTEGER')
 const REAL = new Token('REAL', 'REAL')
 
@@ -57,9 +59,10 @@ const INTEGER_CONST = new Token('INTEGER_CONST')
 /* Pseudo-enum */
 const UniqueTokens = {
   EOF,
-  PROGRAM,
   BEGIN,
   END,
+  PROGRAM,
+  PROCEDURE,
   VAR,
   INTEGER,
   REAL,
@@ -165,9 +168,10 @@ class Lexer extends Base {
     this.forward()
 
     const reserved = [
-      UniqueTokens.PROGRAM,
       UniqueTokens.BEGIN,
       UniqueTokens.END,
+      UniqueTokens.PROGRAM,
+      UniqueTokens.PROCEDURE,
       UniqueTokens.VAR,
       UniqueTokens.DIV,
       UniqueTokens.INTEGER,
