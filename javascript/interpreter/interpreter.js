@@ -54,6 +54,18 @@ class ProcSymbol extends BaseSymbol {
   }
 }
 
+
+class ProgSymbol extends BaseSymbol {
+  constructor(name) {
+    super(name)
+  }
+
+  toString() {
+    return `[${this.getClassName()}(name=${this.name})]`
+  }
+}
+
+
 const initBuiltins = Symbol('initBuiltins')
 
 class ScopedSymbolTable extends Base {
@@ -168,21 +180,28 @@ class AstVisitor extends NodeVisitor {
 class SemanticAnalyzer extends AstVisitor {
   constructor() {
     super()
-    this.currentScope = null
+    const globalScope = new ScopedSymbolTable('Global', 0)
+    globalScope[initBuiltins]()
+    this.currentScope = globalScope
   }
 
   visitProgram(node) {
-    console.debug(`visitProgram -> Entering scope GLOBAL`)
+    const progSymbol = new ProgSymbol(node.name)
+    this.currentScope.define(progSymbol)
 
-    const globalScope = new ScopedSymbolTable('GLOBAL', 1)
-    globalScope[initBuiltins]()
-    this.currentScope = globalScope
+    console.debug(`visitProgram -> Entering scope ${node.name}`)
+
+    const programScope =
+      new ScopedSymbolTable(node.name,
+        this.currentScope.scopeLevel + 1,
+        this.currentScope)
+    this.currentScope = programScope
 
     this.visit(node.block)
 
-    console.debug(globalScope)
+    console.debug(programScope)
     this.currentScope = this.currentScope.enclosingScope
-    console.debug(`visitProgram -> Leaving scope GLOBAL`)
+    console.debug(`visitProgram -> Leaving scope ${node.name}`)
   }
 
   visitProcDecl(node) {
@@ -391,9 +410,7 @@ class Translator extends SemanticAnalyzer {
   }
 
   visitProgram(node) {
-    this.append(`program ${
-      node.name + (!!this.currentScope ? this.currentScope.scopeLevel : 0)
-    };\n`, true)
+    this.append(`program ${node.name + this.currentScope.scopeLevel};\n`, true)
 
     super.visitProgram(node)
 
