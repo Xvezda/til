@@ -13,6 +13,10 @@ class BaseSymbol extends Base {
     this.name = name
     this.type = type
   }
+
+  [util.inspect.custom]() {
+    return this.toString()
+  }
 }
 
 
@@ -21,7 +25,7 @@ class BuiltinTypeSymbol extends BaseSymbol {
     super(name)
   }
 
-  [util.inspect.custom]() {
+  toString() {
     return `[${this.getClassName()}(${this.name})]`
   }
 }
@@ -31,29 +35,79 @@ class VarSymbol extends BaseSymbol {
   constructor(name, type) {
     super(name, type)
   }
+
+  toString() {
+    return `[${this.getClassName()}(name=${this.name}, type=${this.type})]`
+  }
 }
 
 
-class SymbolTable extends Base {
-  constructor() {
+class ProcSymbol extends BaseSymbol {
+  constructor(name, params) {
+    super(name)
+    this.params = params || []
+  }
+
+  toString() {
+    return `[${this.getClassName()}(name=${this.name},
+      params=${this.params.length > 0 ? this.params : '[]'})]`
+  }
+}
+
+const initBuiltins = Symbol('initBuiltins')
+
+class ScopedSymbolTable extends Base {
+  constructor(scopeName, scopeLevel, enclosingScope) {
     super()
     this.symbols = {}
+    this.scopeName = scopeName
+    this.scopeLevel = scopeLevel
+    this.enclosingScope = enclosingScope
 
+    // this[initBuiltins]()
+  }
+
+  [initBuiltins]() {
     this.define(new BuiltinTypeSymbol('INTEGER'))
     this.define(new BuiltinTypeSymbol('REAL'))
   }
 
   define(symbol) {
-    console.debug('define:', symbol)
+    console.debug('define:', symbol.name)
+    // if (symbol.name in this.symbols)
+    //   throw new SyntaxError(`Redefining symbol ${symbol.name}`)
     this.symbols[symbol.name] = symbol
   }
 
-  lookup(name) {
-    console.debug('lookup:', name)
-    return this.symbols[name]
+  lookup(name, currentScopeOnly) {
+    console.debug(`lookup: ${name} (scope: ${this.scopeName})`)
+    const symbol = this.symbols[name]
+    if (symbol !== undefined) return symbol
+
+    if (!!currentScopeOnly) return
+
+    if (this.enclosingScope !== undefined) {
+      return this.enclosingScope.lookup(name)
+    }
+  }
+
+  [util.inspect.custom]() {
+    let lines = [
+      `Scope name: ${this.scopeName}`,
+      `Scope level: ${this.scopeLevel}`,
+      `Enclosing scope: ${
+        this.enclosingScope !== undefined
+          ? this.enclosingScope.scopeName
+          : 'None'
+      }`
+    ]
+    Object.entries(this.symbols).forEach(([k, v]) => {
+      lines.push(`${k}: ${v}`)
+    })
+    lines = lines.map(v => ' '.repeat(2) + v)
+    return `{\n${lines.join('\n')}\n}`
   }
 }
-
 
 
 class Visitor extends Base {
@@ -82,6 +136,8 @@ class NodeVisitor extends TreeVisitor {
       throw new ReferenceError(`${this.getClassName()} has no method ` +
         `name ${visitorName}`)
 
+    // console.debug(`visit -> ${visitorName}`)
+
     // We need to bind `this` to visitor function
     // If not, visitor function containing `this` will cause error.
     visitorFunc = visitorFunc.bind(this)
@@ -101,6 +157,7 @@ class AstVisitor extends NodeVisitor {
 
   visitBlock(node) {
     for (const declaration of node.declarations) {
+      console.debug(`visitBlock -> ${declaration.getClassName()}`)
       this.visit(declaration)
     }
     this.visit(node.compoundStatement)
@@ -108,10 +165,54 @@ class AstVisitor extends NodeVisitor {
 }
 
 
-class SymbolTableBuilder extends AstVisitor {
+class SemanticAnalyzer extends AstVisitor {
   constructor() {
     super()
-    this.symbolTable = new SymbolTable()
+    this.currentScope = null
+  }
+
+  visitProgram(node) {
+    console.debug(`visitProgram -> Entering scope GLOBAL`)
+
+    const globalScope = new ScopedSymbolTable('GLOBAL', 1)
+    globalScope[initBuiltins]()
+    this.currentScope = globalScope
+
+    this.visit(node.block)
+
+    console.debug(globalScope)
+    this.currentScope = this.currentScope.enclosingScope
+    console.debug(`visitProgram -> Leaving scope GLOBAL`)
+  }
+
+  visitProcDecl(node) {
+    const procSymbol = new ProcSymbol(node.procName)
+    this.currentScope.define(procSymbol)
+
+    console.debug(`visitProcDecl -> Entering scope ${node.procName}`)
+
+    const procedureScope =
+      new ScopedSymbolTable(node.procName,
+        this.currentScope.scopeLevel + 1,
+        this.currentScope)
+    this.currentScope = procedureScope
+
+    // Passing variables to parameter
+    for (const param of node.params) {
+      console.debug(`param:`, param)
+      const paramName = param.varNode.value
+      const paramType = this.currentScope.lookup(param.typeNode.value)
+      const varSymbol = new VarSymbol(paramName, paramType)
+
+      this.currentScope.define(varSymbol)
+      procSymbol.params.push(varSymbol)
+    }
+
+    this.visit(node.blockNode)
+
+    console.debug(procedureScope)
+    this.currentScope = this.currentScope.enclosingScope
+    console.debug(`visitProcDecl -> Leaving scope ${node.procName}`)
   }
 
   visitVarDecl(node) {
@@ -119,29 +220,32 @@ class SymbolTableBuilder extends AstVisitor {
     console.debug(node)
 
     const typeName = node.typeNode.value
-    const typeSymbol = this.symbolTable.lookup(typeName)
+    const typeSymbol = this.currentScope.lookup(typeName)
     const varName = node.varNode.value
     const varSymbol = new VarSymbol(varName, typeSymbol)
 
-    this.symbolTable.define(varSymbol)
-  }
+    if (this.currentScope.lookup(varName, true) !== undefined)
+      throw new SyntaxError(`Symbol name ${varName} already exists`)
 
-  visitProcDecl(node) {
-    // FIXME
+    this.currentScope.define(varSymbol)
   }
 
   visitAssign(node) {
+    console.debug(`symbol table: visitAssign(${node.left.value} := ?)`)
+    /*
     const varName = node.left.value
-    const varType = this.symbolTable.lookup(varName)
+    const varType = this.currentScope.lookup(varName)
     if (varType === undefined)
       throw new ReferenceError(`Variable name ${varName} not exists`)
-
+      */
     this.visit(node.right)
+    this.visit(node.left)
   }
 
   visitVariable(node) {
+    console.debug(`symbol table: visitVariable -> ${node.value}`)
     const varName = node.value
-    const varSymbol = this.symbolTable.lookup(varName)
+    const varSymbol = this.currentScope.lookup(varName)
     if (varSymbol === undefined)
       throw new ReferenceError(`Variable name ${varName} not exists`)
   }
@@ -269,7 +373,106 @@ class Interpreter extends AstVisitor {
 }
 
 
+class Translator extends SemanticAnalyzer {
+  constructor(indent) {
+    super()
+    this.result = ''
+    this.indent = indent || 4
+  }
+
+  append(text, prepend, adjust) {
+    prepend = prepend || false
+    adjust = adjust || 0
+    if (prepend && !!this.currentScope) {
+      this.result += ' '.repeat((this.currentScope.scopeLevel+adjust)
+        * this.indent)
+    }
+    this.result += text
+  }
+
+  visitProgram(node) {
+    this.append(`program ${
+      node.name + (!!this.currentScope ? this.currentScope.scopeLevel : 0)
+    };\n`, true)
+
+    super.visitProgram(node)
+
+    this.append(`. {END OF ${node.name}}\n`)
+  }
+
+  visitCompound(node) {
+    this.append('\n')
+    this.append(`begin\n`, true, -1)
+
+    super.visitCompound(node)
+
+    this.append(`end`, true, -1)
+  }
+
+  visitVarDecl(node) {
+    const varName = node.varNode.value + this.currentScope.scopeLevel
+    this.append(`var ${varName} : ${node.typeNode.value};\n`, true)
+
+    super.visitVarDecl(node)
+  }
+
+  visitProcDecl(node) {
+    const procName = node.procName + this.currentScope.scopeLevel
+    this.append(`procedure ${procName}`, true)
+
+    if (node.params.length > 0) {
+      this.append('(')
+      const params = {}
+      node.params.forEach(({varNode, typeNode}) => {
+        const varName = varNode.value + (this.currentScope.scopeLevel+1)
+        if (params[typeNode.value] !== undefined) {
+          params[typeNode.value].push(varName)
+        } else {
+          params[typeNode.value] = [varName]
+        }
+      })
+      const groups = []
+      Object.entries(params).forEach(([k, v]) => {
+        groups.push(v.join(', ') + ' : ' + k)
+      })
+      this.append(groups.join('; '))
+      this.append(')')
+    }
+    this.append(';\n')
+
+    super.visitProcDecl(node)
+
+    this.append(`; {END OF ${node.procName}}\n`)
+  }
+
+  visitAssign(node) {
+    this.append(`${this.visit(node.left)} := ${this.visit(node.right)};\n`, true)
+    super.visitAssign(node)
+  }
+
+  visitVariable(node) {
+    const varNode = this.currentScope.lookup(node.value)
+    let scope = this.currentScope
+    while (scope && !(node.value in scope.symbols)) {
+      scope = scope.enclosingScope
+    }
+    super.visitVariable(node)
+
+    const varName = varNode.name + scope.scopeLevel
+    const typeName = varNode.type.name
+
+    return `<${varName}:${typeName}>`
+  }
+
+  visitBinaryOperator(node) {
+    super.visitBinaryOperator(node)
+    return `${this.visit(node.left)} ${node.operator} ${this.visit(node.right)}`
+  }
+}
+
+
 module.exports = {
-  SymbolTableBuilder,
+  SemanticAnalyzer,
   Interpreter,
+  Translator,
 }

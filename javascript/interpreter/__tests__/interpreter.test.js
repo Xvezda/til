@@ -1,9 +1,13 @@
 const { Lexer } = require('../lexer.js')
 const { Parser } = require('../parser.js')
-const { SymbolTableBuilder, Interpreter } = require('../interpreter.js')
+const {
+  SemanticAnalyzer,
+  Interpreter,
+  Translator
+} = require('../interpreter.js')
 
 
-describe('SymbolTableBuilder', () => {
+describe('SemanticAnalyzer', () => {
   test('build symbol table', () => {
     const text = `
     PROGRAM Part11;
@@ -18,11 +22,11 @@ describe('SymbolTableBuilder', () => {
     const lexer = new Lexer(text)
     const parser = new Parser(lexer)
     const ast = parser.parse()
-    const symtabBuilder = new SymbolTableBuilder()
-    console.log('before visit:', symtabBuilder.symbolTable)
+    const semanticAnalyzer = new SemanticAnalyzer()
+    console.log('before visit:', semanticAnalyzer.symbolTable)
 
-    symtabBuilder.visit(ast)
-    console.log('after visit:', symtabBuilder.symbolTable)
+    semanticAnalyzer.visit(ast)
+    console.log('after visit:', semanticAnalyzer.symbolTable)
   })
 
   test('verify symbol', () => {
@@ -37,10 +41,10 @@ describe('SymbolTableBuilder', () => {
     `
     let parser = new Parser(new Lexer(text))
     let ast = parser.parse()
-    let symtabBuilder = new SymbolTableBuilder()
+    let semanticAnalyzer = new SemanticAnalyzer()
 
     expect(() => {
-      symtabBuilder.visit(ast)
+      semanticAnalyzer.visit(ast)
     }).toThrow(ReferenceError)
 
     text = `
@@ -55,10 +59,10 @@ describe('SymbolTableBuilder', () => {
     `
     parser = new Parser(new Lexer(text))
     ast = parser.parse()
-    symtabBuilder = new SymbolTableBuilder()
+    semanticAnalyzer = new SemanticAnalyzer()
 
     expect(() => {
-      symtabBuilder.visit(ast)
+      semanticAnalyzer.visit(ast)
     }).toThrow(ReferenceError)
   })
 
@@ -90,13 +94,252 @@ describe('SymbolTableBuilder', () => {
     `
     let parser = new Parser(new Lexer(text))
     let ast = parser.parse()
-    let symtabBuilder = new SymbolTableBuilder()
+    let semanticAnalyzer = new SemanticAnalyzer()
 
-    symtabBuilder.visit(ast)
-    console.log(symtabBuilder)
+    semanticAnalyzer.visit(ast)
+    console.log(semanticAnalyzer)
 
     let interpreter = new Interpreter(ast)
     interpreter.interpret()
     console.log(interpreter)
+  })
+
+  test('check duplicated identifier', () => {
+    let text = `
+    program SymTab6;
+       var x, y : integer;
+       var y : real;
+    begin
+       x := x + y;
+    end.
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    let semanticAnalyzer = new SemanticAnalyzer()
+
+    expect(() => {
+      semanticAnalyzer.visit(ast)
+    }).toThrow(SyntaxError)
+  })
+
+  test('procedure formal parameter declarations', () => {
+    let text = `
+    program Main;
+       var x, y: real;
+
+       procedure Alpha(a : integer);
+          var y : integer;
+       begin
+          x := a + x + y;
+       end;
+
+    begin { Main }
+
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+
+    console.log(ast)
+  })
+
+  test('procedure scope', () => {
+    let text = `
+    program Main;
+       var x, y: real;
+
+       procedure Alpha(a : integer);
+          var y : integer;
+       begin
+
+       end;
+
+    begin { Main }
+
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    console.log(ast)
+    let semanticAnalyzer = new SemanticAnalyzer()
+
+    semanticAnalyzer.visit(ast)
+    console.log(semanticAnalyzer)
+  })
+
+  test('nested procedures', () => {
+    let text = `
+    program Main;
+       var x, y : real;
+
+       procedure AlphaA(a : integer);
+          var y : integer;
+       begin { AlphaA }
+
+       end;  { AlphaA }
+
+       procedure AlphaB(a : integer);
+          var b : integer;
+       begin { AlphaB }
+
+       end;  { AlphaB }
+
+    begin { Main }
+
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    console.log(ast)
+    let semanticAnalyzer = new SemanticAnalyzer()
+
+    semanticAnalyzer.visit(ast)
+    console.log(semanticAnalyzer)
+  })
+
+  test(`nested procedure's name resolution`, () => {
+    let text = `
+    program Main;
+       var x, y: real;
+
+       procedure Alpha(a : integer);
+          var y : integer;
+       begin
+          x := a + x + y;
+       end;
+
+    begin { Main }
+
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    console.log(ast)
+    let semanticAnalyzer = new SemanticAnalyzer()
+
+    semanticAnalyzer.visit(ast)
+    console.log(semanticAnalyzer)
+  })
+
+  test('name resolution error', () => {
+    let text = `
+    program Main;
+       var x, y: real;
+
+       procedure Alpha(a : integer);
+          var y : integer;
+       begin
+          x := b + x + y; { ERROR here! }
+       end;
+
+    begin { Main }
+
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    console.log(ast)
+    let semanticAnalyzer = new SemanticAnalyzer()
+
+    expect(() => {
+      semanticAnalyzer.visit(ast)
+    }).toThrow(ReferenceError)
+  })
+
+
+  test('source to source translator', () => {
+    let text = `
+    program Main;
+       var x, y : real;
+       var z : integer;
+
+       procedure AlphaA(a : integer);
+          var y : integer;
+       begin { AlphaA }
+          x := a + x + y;
+       end;  { AlphaA }
+
+       procedure AlphaB(a : integer);
+          var b : integer;
+       begin { AlphaB }
+       end;  { AlphaB }
+
+    begin { Main }
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    let translator = new Translator()
+
+    translator.visit(ast)
+    console.log(translator.result)
+  })
+
+  test('translate nested procedure', () => {
+    let text = `
+    program Main;
+       var b, x, y : real;
+       var z : integer;
+
+       procedure AlphaA(a : integer);
+          var b : integer;
+
+          procedure Beta(c : integer);
+             var y : integer;
+
+             procedure Gamma(c : integer);
+                var x : integer;
+             begin { Gamma }
+                x := a + b + c + x + y + z;
+             end;  { Gamma }
+
+          begin { Beta }
+
+          end;  { Beta }
+
+       begin { AlphaA }
+
+       end;  { AlphaA }
+
+       procedure AlphaB(a : integer);
+          var c : real;
+       begin { AlphaB }
+          c := a + b;
+       end;  { AlphaB }
+
+    begin { Main }
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    let translator = new Translator()
+
+    translator.visit(ast)
+    console.log(translator.result)
+  })
+
+  test('parameter duplicated identifier', () => {
+    let text = `
+    program Main;
+       var x, y: real;
+
+       procedure Alpha(a : integer);
+          var y : integer;
+          var a : real;  { ERROR here! }
+       begin
+          x := a + x + y;
+       end;
+
+    begin { Main }
+
+    end.  { Main }
+    `
+    let parser = new Parser(new Lexer(text))
+    let ast = parser.parse()
+    let semanticAnalyzer = new SemanticAnalyzer()
+
+    expect(() => {
+      semanticAnalyzer.visit(ast)
+    }).toThrow(SyntaxError)
   })
 })
