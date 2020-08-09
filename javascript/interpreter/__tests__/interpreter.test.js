@@ -1,3 +1,7 @@
+/* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
+
+require('../globals.js')
+
 const { Lexer } = require('../lexer.js')
 const { Parser } = require('../parser.js')
 const {
@@ -447,5 +451,19 @@ describe('SemanticAnalyzer', () => {
     expect(() => {
       console.info(semanticAnalysis(buildAst(text)))
     }).toThrow(SemanticError)
+  })
+
+  test('interpreter callstack', () => {
+    let text = `
+    program Main;
+    var x, y : integer;
+    begin { Main }
+       y := 7;
+       x := (y + 3) * 3;
+    end.  { Main }
+    `
+    const interpreter = new Interpreter(buildAst(text))
+    interpreter.interpret()
+    console.info(interpreter)
   })
 })
