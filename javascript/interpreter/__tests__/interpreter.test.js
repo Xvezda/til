@@ -35,7 +35,8 @@ describe('SemanticAnalyzer', () => {
   }
 
   beforeAll(() => {
-    jest.spyOn(console, 'debug').mockImplementation(jest.fn())
+    // jest.spyOn(console, 'debug').mockImplementation(jest.fn())
+    // jest.spyOn(console, 'info').mockImplementation(jest.fn())
   })
 
   test('build symbol table', () => {
@@ -383,5 +384,24 @@ describe('SemanticAnalyzer', () => {
     expect(() => {
       console.info(translate(buildAst(text)))
     }).not.toThrow()
+  })
+
+  test('procedure call', () => {
+    let text = `
+    program Main;
+
+    procedure Alpha(a : integer; b : integer);
+    var x : integer;
+    begin
+       x := (a + b ) * 2;
+    end;
+
+    begin { Main }
+
+       Alpha(3 + 5, 7);  { procedure call }
+
+    end.  { Main }
+    `
+    console.info(semanticAnalysis(buildAst(text)))
   })
 })
