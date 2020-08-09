@@ -1,9 +1,61 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
-const { Base } = require('./common.js')
+const { Base, Stack } = require('./common.js')
 const { Lexer } = require('./lexer.js')
 const { Parser } = require('./parser.js')
 const { ErrorCode, SemanticError } = require('./errors.js')
+
+
+const PROGRAM = 'PROGRAM'
+const ARType = {
+  PROGRAM,
+}
+
+class ActivationRecord extends Base {
+  constructor(name, type, nestingLevel) {
+    super()
+    this.name = name
+    this.type = type
+    this.nestingLevel = nestingLevel
+    this.members = {}
+  }
+
+  set(key, value) {
+    this.members[key] = value
+  }
+
+  get(key) {
+    return this.members[key]
+  }
+
+  toString() {
+    const lines = [`${this.nestingLevel}: ${this.type} ${this.name}`]
+    for (const [k, v] of Object.entries(this.members)) {
+      lines.push(`   ${k}: ${v}`)
+    }
+    return lines.join('\n') + '\n'
+  }
+}
+
+class CallStack extends Stack {
+  constructor() {
+    super()
+  }
+
+  toString() {
+    function banner(heading, char, count) {
+      char = char || '='
+      count = count || 3
+      return char.repeat(count) + heading + char.repeat(count)
+    }
+
+    let output = banner(' CALLSTACK ') + '\n'
+    output += this.items.reverse().join('\n') + '\n'
+    output += banner(' END OF CALLSTACK ')
+
+    return output
+  }
+}
 
 
 class BaseSymbol extends Base {
@@ -74,20 +126,26 @@ class ScopedSymbolTable extends Base {
     // this[initBuiltins]()
   }
 
+  log(msg) {
+    if (global.argv.scope) {
+      console.info(msg)
+    }
+  }
+
   [initBuiltins]() {
     this.define(new BuiltinTypeSymbol('INTEGER'))
     this.define(new BuiltinTypeSymbol('REAL'))
   }
 
   define(symbol) {
-    console.info('define:', symbol.name)
+    this.log('define:', symbol.name)
     // if (symbol.name in this.symbols)
     //   throw new SyntaxError(`Redefining symbol ${symbol.name}`)
     this.symbols[symbol.name] = symbol
   }
 
   lookup(name, currentScopeOnly) {
-    console.info(`lookup: ${name} (scope: ${this.scopeName})`)
+    this.log(`lookup: ${name} (scope: ${this.scopeName})`)
     const symbol = this.symbols[name]
     if (symbol !== undefined) return symbol
 
@@ -312,7 +370,29 @@ class Interpreter extends AstVisitor {
   constructor(tree) {
     super()
     this.tree = tree
-    this.globals = {}
+    this.callStack = new CallStack()
+  }
+
+  log(msg) {
+    if (global.argv.stack) {
+      console.info(msg)
+    }
+  }
+
+  visitProgram(node) {
+    const progName = node.name
+    this.log(`ENTER: PROGRAM ${progName}`)
+    const ar = new ActivationRecord(progName, ARType.PROGRAM, 1)
+    this.callStack.push(ar)
+
+    this.log(`${this.callStack}`)
+
+    super.visitProgram(node)
+
+    this.log(`LEAVE: PROGRAM ${progName}`)
+    this.log(`${this.callStack}`)
+
+    this.callStack.pop()
   }
 
   visitVarDecl(node) {
@@ -339,16 +419,28 @@ class Interpreter extends AstVisitor {
   visitAssign(node) {
     console.debug(`visitAssign -> `
       + `${node.left.value} := ${node.right.getClassName()}`)
-    this.globals[node.left.value] = this.visit(node.right)
+    // this.globals[node.left.value] = this.visit(node.right)
+    const varName = node.left.value
+    const varValue = this.visit(node.right)
+
+    const ar = this.callStack.peek()
+    ar.set(varName, varValue)
   }
 
   visitVariable(node) {
     console.debug(`visitVariable -> ${node.value}`)
-    if (node.token.value in this.globals) {
-      return this.globals[node.token.value]
-    }
-    throw new SemanticError(`variable name ${node.token.value} `
-      + `is not defined`)
+    // if (node.token.value in this.globals) {
+    //   return this.globals[node.token.value]
+    // }
+    const varName = node.value
+    const ar = this.callStack.peek()
+    const varValue = ar.get(varName)
+
+    if (varValue !== undefined)
+      return varValue
+
+    // FIXME: Add error method
+    return this.error(ErrorCode.ID_NOT_FOUND, node.token)
   }
 
   visitNop(node) {
@@ -507,6 +599,9 @@ class Translator extends SemanticAnalyzer {
 
 
 module.exports = {
+  CallStack,
+  ARType,
+  ActivationRecord,
   SemanticAnalyzer,
   Interpreter,
   Translator,

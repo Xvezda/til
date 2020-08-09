@@ -18,6 +18,32 @@ class Base {
 }
 
 
+class Stack extends Base {
+  #items = null
+
+  constructor() {
+    super()
+    this.#items = []
+  }
+
+  push(item) {
+    this.#items.push(item)
+  }
+
+  pop() {
+    return this.#items.pop()
+  }
+
+  peek() {
+    return this.#items.slice(-1)[0]
+  }
+
+  get items() {
+    return this.#items.slice()
+  }
+}
+
+
 const ESC = '\x1b'
 function ansiEscapeControlSequence(...args) {
   return `${ESC}[${args.join('')}`
@@ -90,6 +116,7 @@ function isAlnum(text) {
 
 module.exports = {
   Base,
+  Stack,
   Color,
   isAlpha,
   isDigit,
