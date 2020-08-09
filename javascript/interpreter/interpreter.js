@@ -205,6 +205,12 @@ class SemanticAnalyzer extends AstVisitor {
 
   visitProcCall(node) {
     console.debug(`visitProcCall -> ${node.procName}`)
+    const procSymbol = this.currentScope.lookup(node.procName)
+    const argsCount = procSymbol.params.length
+
+    if (argsCount !== node.actualParams.length)
+      throw new SemanticError()  // FIXME: Add error code
+
     for (const paramNode of node.actualParams) {
       this.visit(paramNode)
     }
