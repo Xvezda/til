@@ -11,5 +11,8 @@
   },
   "devDependencies": {
     "jest": "^26.2.2"
+  },
+  "dependencies": {
+    "yargs": "^15.4.1"
   }
 }

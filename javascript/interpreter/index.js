@@ -6,17 +6,43 @@ const readline = require('readline')
 const { Color } = require('./common.js')
 const { Lexer } = require('./lexer.js')
 const { Parser } = require('./parser.js')
-const { Interpreter } = require('./interpreter.js')
+const { SemanticAnalyzer, Interpreter } = require('./interpreter.js')
+
+const yargs = require('yargs')
+
 
 const PS1 = '> '
 
 const isDev = process.env.NODE_ENV === 'development'
 
-if (typeof console === 'object' && 'debug' in console) {
+const argv = yargs
+  .usage('Usage: $0 [options...] [file]')
+  .option('scope', {
+    alias: 's',
+    description: 'Print information about scopes',
+    type: 'boolean'
+  })
+  .option('file', {
+    alias: 'f',
+    description: 'Pascal source code file to execute',
+    type: 'string'
+  })
+  .help()
+  .alias('help', 'h')
+  .argv
+
+// Overwrite console loggers
+if (typeof console !== 'undefined') {
   if (!isDev) {
     global.console.debug = new Function
   } else {
     global.console.debug = console.debug.bind(null, Color.red`DEBUG:`)
+  }
+
+  if (!!argv.scope) {
+    global.console.info = console.info.bind(null, Color.blue`INFO:`)
+  } else {
+    global.console.info = new Function
   }
 }
 
@@ -33,13 +59,20 @@ function processInput(input) {
   const parser = new Parser(tokens)
   const ast = parser.parse()
 
-  const interpreter = new Interpreter(ast)
+  try {
+    const analyzer = new SemanticAnalyzer()
+    analyzer.visit(ast)
 
-  const result = interpreter.interpret()
-  if (result !== undefined) {
-    console.log(result)
+    const interpreter = new Interpreter(ast)
+    const result = interpreter.interpret()
+
+    if (result !== undefined) {
+      console.log(result)
+    }
+    console.log(interpreter.globals)
+  } catch (e) {
+    console.error(e)
   }
-  console.log(interpreter.globals)
 
   if (isDev) {
     clearTimeout(timeout)
@@ -47,9 +80,9 @@ function processInput(input) {
 }
 
 
-if (process.argv[2]) {
-  const filePath = process.argv[2]
+const filePath = argv.file || argv._[0]
 
+if (!!filePath) {
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) throw err
     processInput(data)

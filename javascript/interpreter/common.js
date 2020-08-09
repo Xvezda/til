@@ -7,6 +7,14 @@ class Base {
   getClassName() {
     return this.constructor.name
   }
+
+  [util.inspect.custom]() {
+    return this.toString()
+  }
+
+  toString() {
+    return util.inspect(this, {customInspect: false})
+  }
 }
 
 

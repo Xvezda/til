@@ -5,9 +5,39 @@ const {
   Interpreter,
   Translator
 } = require('../interpreter.js')
+const {
+  ErrorCode,
+  LexerError,
+  ParserError,
+  SemanticError
+} = require('../errors.js')
 
 
 describe('SemanticAnalyzer', () => {
+  function buildAst(source) {
+    const lexer = new Lexer(source)
+    const parser = new Parser(lexer)
+    return parser.parse()
+  }
+
+  function semanticAnalysis(ast) {
+    const semanticAnalyzer = new SemanticAnalyzer()
+    semanticAnalyzer.visit(ast)
+
+    return semanticAnalyzer
+  }
+
+  function translate(ast) {
+    const translator = new Translator()
+    translator.visit(ast)
+
+    return translator.result
+  }
+
+  beforeAll(() => {
+    jest.spyOn(console, 'debug').mockImplementation(jest.fn())
+  })
+
   test('build symbol table', () => {
     const text = `
     PROGRAM Part11;
@@ -19,14 +49,11 @@ describe('SemanticAnalyzer', () => {
 
     END.
     `
-    const lexer = new Lexer(text)
-    const parser = new Parser(lexer)
-    const ast = parser.parse()
-    const semanticAnalyzer = new SemanticAnalyzer()
-    console.log('before visit:', semanticAnalyzer.symbolTable)
+    const ast = buildAst(text)
 
-    semanticAnalyzer.visit(ast)
-    console.log('after visit:', semanticAnalyzer.symbolTable)
+    expect(() => {
+      semanticAnalysis(ast)
+    }).not.toThrow()
   })
 
   test('verify symbol', () => {
@@ -39,13 +66,11 @@ describe('SemanticAnalyzer', () => {
        a := 2 + b;
     END.
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let semanticAnalyzer = new SemanticAnalyzer()
+    const ast = buildAst(text)
 
     expect(() => {
-      semanticAnalyzer.visit(ast)
-    }).toThrow(ReferenceError)
+      semanticAnalysis(ast)
+    }).toThrow(ErrorCode.ID_NOT_FOUND)
 
     text = `
     PROGRAM NameError2;
@@ -57,13 +82,9 @@ describe('SemanticAnalyzer', () => {
        a := b + 2;
     END.
     `
-    parser = new Parser(new Lexer(text))
-    ast = parser.parse()
-    semanticAnalyzer = new SemanticAnalyzer()
-
     expect(() => {
-      semanticAnalyzer.visit(ast)
-    }).toThrow(ReferenceError)
+      semanticAnalysis(buildAst(text))
+    }).toThrow(ErrorCode.ID_NOT_FOUND)
   })
 
   test('procedure declaration', () => {
@@ -92,16 +113,16 @@ describe('SemanticAnalyzer', () => {
        a := 10;
     END.  {Part12}
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let semanticAnalyzer = new SemanticAnalyzer()
-
-    semanticAnalyzer.visit(ast)
-    console.log(semanticAnalyzer)
+    let ast = buildAst(text)
+    expect(() => {
+      semanticAnalysis(ast)
+    }).not.toThrow()
 
     let interpreter = new Interpreter(ast)
-    interpreter.interpret()
-    console.log(interpreter)
+    expect(() => {
+      interpreter.interpret()
+    }).not.toThrow()
+    console.info(interpreter)
   })
 
   test('check duplicated identifier', () => {
@@ -113,13 +134,11 @@ describe('SemanticAnalyzer', () => {
        x := x + y;
     end.
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let semanticAnalyzer = new SemanticAnalyzer()
+    let ast = buildAst(text)
 
     expect(() => {
-      semanticAnalyzer.visit(ast)
-    }).toThrow(SyntaxError)
+      semanticAnalysis(ast)
+    }).toThrow(ErrorCode.DUPLICATE_ID)
   })
 
   test('procedure formal parameter declarations', () => {
@@ -137,10 +156,9 @@ describe('SemanticAnalyzer', () => {
 
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-
-    console.log(ast)
+    expect(() => {
+      console.info(buildAst(text))
+    }).not.toThrow()
   })
 
   test('procedure scope', () => {
@@ -158,13 +176,12 @@ describe('SemanticAnalyzer', () => {
 
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    console.log(ast)
-    let semanticAnalyzer = new SemanticAnalyzer()
+    let ast = buildAst(text)
+    console.info(ast)
 
-    semanticAnalyzer.visit(ast)
-    console.log(semanticAnalyzer)
+    expect(() => {
+      semanticAnalysis(ast)
+    }).not.toThrow()
   })
 
   test('nested procedures', () => {
@@ -188,13 +205,11 @@ describe('SemanticAnalyzer', () => {
 
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    console.log(ast)
-    let semanticAnalyzer = new SemanticAnalyzer()
+    let ast = buildAst(text)
 
-    semanticAnalyzer.visit(ast)
-    console.log(semanticAnalyzer)
+    expect(() => {
+      semanticAnalysis(ast)
+    }).not.toThrow()
   })
 
   test(`nested procedure's name resolution`, () => {
@@ -212,13 +227,13 @@ describe('SemanticAnalyzer', () => {
 
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    console.log(ast)
-    let semanticAnalyzer = new SemanticAnalyzer()
+    let ast = buildAst(text)
+    console.info(ast)
 
-    semanticAnalyzer.visit(ast)
-    console.log(semanticAnalyzer)
+    let result
+    expect(() => {
+      console.info(semanticAnalysis(ast))
+    }).not.toThrow()
   })
 
   test('name resolution error', () => {
@@ -236,14 +251,11 @@ describe('SemanticAnalyzer', () => {
 
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    console.log(ast)
-    let semanticAnalyzer = new SemanticAnalyzer()
+    let ast = buildAst(text)
 
     expect(() => {
-      semanticAnalyzer.visit(ast)
-    }).toThrow(ReferenceError)
+      semanticAnalysis(ast)
+    }).toThrow(ErrorCode.ID_NOT_FOUND)
   })
 
 
@@ -267,12 +279,9 @@ describe('SemanticAnalyzer', () => {
     begin { Main }
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let translator = new Translator()
-
-    translator.visit(ast)
-    console.log(translator.result)
+    expect(() => {
+      console.info(translate(buildAst(text)))
+    }).not.toThrow()
   })
 
   test('translate nested procedure', () => {
@@ -310,12 +319,9 @@ describe('SemanticAnalyzer', () => {
     begin { Main }
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let translator = new Translator()
-
-    translator.visit(ast)
-    console.log(translator.result)
+    expect(() => {
+      console.info(translate(buildAst(text)))
+    }).not.toThrow()
   })
 
   test('parameter duplicated identifier', () => {
@@ -334,13 +340,9 @@ describe('SemanticAnalyzer', () => {
 
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let semanticAnalyzer = new SemanticAnalyzer()
-
     expect(() => {
-      semanticAnalyzer.visit(ast)
-    }).toThrow(SyntaxError)
+      semanticAnalysis(buildAst(text))
+    }).toThrow(ErrorCode.DUPLICATE_ID)
   })
 
   test('assignment nestedscopes04', () => {
@@ -378,11 +380,8 @@ describe('SemanticAnalyzer', () => {
     begin { Main }
     end.  { Main }
     `
-    let parser = new Parser(new Lexer(text))
-    let ast = parser.parse()
-    let translator = new Translator()
-    translator.visit(ast)
-
-    console.log(translator.result)
+    expect(() => {
+      console.info(translate(buildAst(text)))
+    }).not.toThrow()
   })
 })
