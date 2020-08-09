@@ -203,6 +203,19 @@ class SemanticAnalyzer extends AstVisitor {
     console.debug(`visitProgram -> Leaving scope ${node.name}`)
   }
 
+  visitProcCall(node) {
+    console.debug(`visitProcCall -> ${node.procName}`)
+    const procSymbol = this.currentScope.lookup(node.procName)
+    const argsCount = procSymbol.params.length
+
+    if (argsCount !== node.actualParams.length)
+      throw new SemanticError()  // FIXME: Add error code
+
+    for (const paramNode of node.actualParams) {
+      this.visit(paramNode)
+    }
+  }
+
   visitProcDecl(node) {
     const procSymbol = new ProcSymbol(node.procName)
     this.currentScope.define(procSymbol)
@@ -273,6 +286,7 @@ class SemanticAnalyzer extends AstVisitor {
   }
 
   visitNum(node) {
+    console.debug(`visitNum -> ${node.value}`)
     // TODO
   }
 
@@ -287,6 +301,7 @@ class SemanticAnalyzer extends AstVisitor {
   }
 
   visitBinaryOperator(node) {
+    console.debug(`visitBinaryOperator -> ${node.operator}`)
     this.visit(node.left)
     this.visit(node.right)
   }
@@ -414,6 +429,10 @@ class Translator extends SemanticAnalyzer {
     super.visitProgram(node)
 
     this.append(`. {END OF ${node.name}}\n`)
+  }
+
+  visitProcCall(node) {
+    // TODO
   }
 
   visitCompound(node) {

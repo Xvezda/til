@@ -21,6 +21,16 @@ class Ast extends Tree {
 }
 
 
+class ProcCall extends Ast {
+  constructor(procName, actualParams, token) {
+    super()
+    this.procName = procName
+    this.actualParams = actualParams
+    this.token = token
+  }
+}
+
+
 class Program extends Ast {
   constructor(name, block) {
     super()
@@ -197,10 +207,13 @@ class Parser extends Base {
                    | statement SEMI statement_list
 
     statement : compound_statement
+              | proccall_statement
               | assignment_statement
               | empty
 
     assignment_statement : variable ASSIGN expr
+
+    proccall_statement : ID LPAREN (expr (COMMA expr)*)? RPAREN
 
     empty :
 
@@ -367,6 +380,7 @@ class Parser extends Base {
 
   /*
    * statement : compound_statement
+   *           | proccall_statement
    *           | assignment_statement
    *           | empty
    */
@@ -375,7 +389,11 @@ class Parser extends Base {
     if (this.token.type === UniqueTokens.BEGIN.type) {
       node = this.compoundStatement()
     } else if (this.token.type === UniqueTokens.ID.type) {
-      node = this.assignmentStatement()
+      if (this.lexer.readchar() === '(') {
+        node = this.proccallStatement()
+      } else {
+        node = this.assignmentStatement()
+      }
     } else {
       node = this.empty()
     }
@@ -392,6 +410,29 @@ class Parser extends Base {
     const right = this.expr()
     const node = new Assign(left, token, right)
     return node
+  }
+
+  // proccall_statement : ID LPAREN (expr (COMMA expr)*)? RPAREN
+  proccallStatement() {
+    const token = this.token
+    const procName = this.token.value
+    this.eat('ID')
+    this.eat('LPAREN')
+    const actualParams = []
+    if (this.token.type !== UniqueTokens.RPAREN.type) {
+      const node = this.expr()
+      actualParams.push(node)
+    }
+
+    while (this.token.type === UniqueTokens.COMMA.type) {
+      this.eat('COMMA')
+      const node = this.expr()
+      actualParams.push(node)
+    }
+
+    this.eat('RPAREN')
+
+    return new ProcCall(procName, actualParams, token)
   }
 
   /* empty: */

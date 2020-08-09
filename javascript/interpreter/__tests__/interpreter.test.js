@@ -35,7 +35,8 @@ describe('SemanticAnalyzer', () => {
   }
 
   beforeAll(() => {
-    jest.spyOn(console, 'debug').mockImplementation(jest.fn())
+    // jest.spyOn(console, 'debug').mockImplementation(jest.fn())
+    // jest.spyOn(console, 'info').mockImplementation(jest.fn())
   })
 
   test('build symbol table', () => {
@@ -383,5 +384,68 @@ describe('SemanticAnalyzer', () => {
     expect(() => {
       console.info(translate(buildAst(text)))
     }).not.toThrow()
+  })
+
+  test('procedure call semantic analysis', () => {
+    let text = `
+    program Main;
+
+    procedure Alpha(a : integer; b : integer);
+    var x : integer;
+    begin
+       x := (a + b ) * 2;
+    end;
+
+    begin { Main }
+
+       Alpha(3 + 5, 7);  { procedure call }
+
+    end.  { Main }
+    `
+    expect(() => {
+      console.info(semanticAnalysis(buildAst(text)))
+    }).not.toThrow()
+  })
+
+  test('procedure call semantic error - 1', () => {
+    let text = `
+    program Main;
+
+    procedure Alpha(a : integer; b : integer);
+    var x : integer;
+    begin
+       x := (a + b ) * 2;
+    end;
+
+    begin { Main }
+
+       Alpha(3 + 5, 7, 1);  { wrong arguments number }
+
+    end.  { Main }
+    `
+    expect(() => {
+      console.info(semanticAnalysis(buildAst(text)))
+    }).toThrow(SemanticError)
+  })
+
+  test('procedure call semantic error - 2', () => {
+    let text = `
+    program Main;
+
+    procedure Alpha(a : integer; b : integer);
+    var x : integer;
+    begin
+       x := (a + b ) * 2;
+    end;
+
+    begin { Main }
+
+       Alpha();  { wrong arguments number }
+
+    end.  { Main }
+    `
+    expect(() => {
+      console.info(semanticAnalysis(buildAst(text)))
+    }).toThrow(SemanticError)
   })
 })
