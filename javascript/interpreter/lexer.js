@@ -1,12 +1,13 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
 const { Base, isAlpha, isDigit, isAlnum, isSpace } = require('./common.js')
+const { LexerError } = require('./errors.js')
 
 
 class Token extends Base {
   #type = ""
 
-  constructor(name, value) {
+  constructor(name, value, lineno, column) {
     super()
     this.name = name
     if (value) {
@@ -14,6 +15,8 @@ class Token extends Base {
     } else {
       this.value = this.name
     }
+    this.lineno = lineno
+    this.column = column
   }
 
   get type() {
@@ -21,6 +24,13 @@ class Token extends Base {
       this.#type = Symbol.for(this.name.toUpperCase())
     }
     return this.#type
+  }
+
+  toString() {
+    const attrs = [this.name]
+    if (this.value) attrs.push(this.value)
+    attrs.push(`position=${[this.lineno, this.column].join(':')}`)
+    return `Token(${attrs.join(', ')})`
   }
 }
 
@@ -59,6 +69,7 @@ const INTEGER_CONST = new Token('INTEGER_CONST')
 /* Pseudo-enum */
 const UniqueTokens = {
   EOF,
+  /* Start Reserved */
   BEGIN,
   END,
   PROGRAM,
@@ -66,6 +77,8 @@ const UniqueTokens = {
   VAR,
   INTEGER,
   REAL,
+  DIV,
+  /* End of Reserved */
   DOT,
   COLON,
   COMMA,
@@ -77,10 +90,34 @@ const UniqueTokens = {
   SUB,
   MUL,
   FLOAT_DIV,
-  DIV,
   ID,
   REAL_CONST,
   INTEGER_CONST,
+}
+
+const RESERVED_KEYWORDS = buildReservedKeywords()
+
+function buildReservedKeywords() {
+  const reserved = {}
+
+  const keys = Object.keys(UniqueTokens)
+  const startIdx = keys.indexOf('BEGIN')
+  const endIdx = keys.indexOf('DIV')
+
+  Object.entries(UniqueTokens).forEach(([k, v], i) => {
+    if (startIdx <= i && i <= endIdx) {
+      reserved[k] = v
+    }
+  })
+
+  return reserved
+}
+
+
+function getTokenNameByValue(value) {
+  for (const v of Object.values(UniqueTokens)) {
+    if (v.value === value) return v.name
+  }
 }
 
 
@@ -90,6 +127,9 @@ class Lexer extends Base {
 
     this.cursor = 0
     this.text = text
+
+    this.lineno = 1
+    this.column = 1
   }
 
   /* FIXME: this is test function
@@ -104,7 +144,14 @@ class Lexer extends Base {
   }
 
   forward() {
-    return this.text[++this.cursor]
+    if (this.readchar() === '\n') {
+      ++this.lineno
+      this.column = 0
+    }
+    const ret = this.text[++this.cursor]
+    if (ret !== undefined) {
+      ++this.column
+    }
   }
 
   peek() {
@@ -167,16 +214,7 @@ class Lexer extends Base {
     let result = c
     this.forward()
 
-    const reserved = [
-      UniqueTokens.BEGIN,
-      UniqueTokens.END,
-      UniqueTokens.PROGRAM,
-      UniqueTokens.PROCEDURE,
-      UniqueTokens.VAR,
-      UniqueTokens.DIV,
-      UniqueTokens.INTEGER,
-      UniqueTokens.REAL,
-    ]
+    const reserved = Object.values(RESERVED_KEYWORDS)
 
     while ((c=this.readchar()) !== undefined) {
       if (isAlnum(c)) {
@@ -213,24 +251,6 @@ class Lexer extends Base {
       if (isDigit(c)) return this.number()
 
       switch (c) {
-        case '(':
-          this.forward()
-          return UniqueTokens.LPAREN
-        case ')':
-          this.forward()
-          return UniqueTokens.RPAREN
-        case '+':
-          this.forward()
-          return UniqueTokens.ADD
-        case '-':
-          this.forward()
-          return UniqueTokens.SUB
-        case '*':
-          this.forward()
-          return UniqueTokens.MUL
-        case '/':
-          this.forward()
-          return UniqueTokens.FLOAT_DIV
         case ':':
           switch (this.peek()) {
             case '=':
@@ -238,25 +258,36 @@ class Lexer extends Base {
               this.forward()
               return UniqueTokens.ASSIGN
             default:
-              this.forward()
-              return UniqueTokens.COLON
+              break
           }
-          break
+        case '(':
+        case ')':
+        case '+':
+        case '-':
+        case '*':
+        case '/':
         case ';':
-          this.forward()
-          return UniqueTokens.SEMI
         case ',':
-          this.forward()
-          return UniqueTokens.COMMA
         case '.':
-          this.forward()
-          return UniqueTokens.DOT
+        {
+          const name = getTokenNameByValue(c)
+          if (name !== undefined) {
+            this.forward()
+            return new Token(name, c,
+              this.lineno, this.column)
+          }
+        }
         default:
           break
       }
-      throw new SyntaxError(`Invalid character: ${c}`)
+      this.error()
     }
     return EOF
+  }
+
+  error() {
+    throw new LexerError(`Lexer error on '${this.readchar()}'` +
+      ` line: ${this.lineno} column: ${this.column}`)
   }
 
   tokenize() {

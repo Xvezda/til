@@ -4,6 +4,7 @@ const assert = require('assert')
 
 const { Base } = require('./common.js')
 const { Token, UniqueTokens } = require('./lexer.js')
+const { ErrorCode, ParserError } = require('./errors.js')
 
 
 class Tree extends Base {
@@ -154,6 +155,10 @@ class Parser extends Base {
     return this.#token
   }
 
+  error(errorCode, token) {
+    throw new ParserError(`${errorCode}: ${token}`)
+  }
+
   eat(type) {
     try {
       if (this.token.type === UniqueTokens[type].type) {
@@ -162,9 +167,8 @@ class Parser extends Base {
       }
     } catch (e) {
       console.error(e)
-      throw e
     }
-    throw new Error(`Current token ${this.token.value} is not type ${type}`)
+    this.error(ErrorCode.UNEXPECTED_TOKEN, this.token)
   }
 
   parse() {
@@ -174,9 +178,9 @@ class Parser extends Base {
 
     block : declarations compound_statement
 
-    declarations : VAR (variable_declaration SEMI)+
-                 | (PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI)*
-                 | empty
+    declarations : (VAR (variable_declaration SEMI)+)* procedure_declaration*
+
+    procedure_declaration: PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI
 
     variable_declaration : ID (COMMA ID)* COLON type_spec
 
@@ -240,43 +244,42 @@ class Parser extends Base {
     return new Block(declarationsNode, compoundNode)
   }
 
-  /*
-   * declarations : VAR (variable_declaration SEMI)+
-   *              | (PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI)*
-   *              | empty
-   */
+  // declarations : (VAR (variable_declaration SEMI)+)* procedure_declaration*
   declarations() {
     let declarations = []
-    do {
-      if (this.token.type !== UniqueTokens.VAR.type) break
-
+    while (this.token.type === UniqueTokens.VAR.type) {
       this.eat('VAR')
-      while (this.token.type === UniqueTokens.ID.type) {
+      do {
         declarations = declarations.concat(this.variableDeclarations())
         this.eat('SEMI')
-      }
-    } while (this.token.type === UniqueTokens.VAR.type)
+      } while (this.token.type === UniqueTokens.ID.type)
+    }
 
     while (this.token.type === UniqueTokens.PROCEDURE.type) {
-      this.eat('PROCEDURE')
-      let procName = this.token.value
-      this.eat('ID')
-
-      let paramList = []
-      if (this.token.type === UniqueTokens.LPAREN.type) {
-        this.eat('LPAREN')
-        paramList = this.formalParameterList()
-        this.eat('RPAREN')
-      }
-
-      this.eat('SEMI')
-
-      let blockNode = this.block()
-      this.eat('SEMI')
-
-      declarations.push(new ProcDecl(procName, paramList, blockNode))
+      declarations.push(this.procedureDeclaration())
     }
     return declarations
+  }
+
+  // procedure_declaration: PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI
+  procedureDeclaration() {
+    this.eat('PROCEDURE')
+    let procName = this.token.value
+    this.eat('ID')
+
+    let paramList = []
+    if (this.token.type === UniqueTokens.LPAREN.type) {
+      this.eat('LPAREN')
+      paramList = this.formalParameterList()
+      this.eat('RPAREN')
+    }
+
+    this.eat('SEMI')
+
+    let blockNode = this.block()
+    this.eat('SEMI')
+
+    return new ProcDecl(procName, paramList, blockNode)
   }
 
   /* variable_declaration : ID (COMMA ID)* COLON type_spec */

@@ -1,10 +1,9 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
-const util = require('util')
-
 const { Base } = require('./common.js')
 const { Lexer } = require('./lexer.js')
 const { Parser } = require('./parser.js')
+const { ErrorCode, SemanticError } = require('./errors.js')
 
 
 class BaseSymbol extends Base {
@@ -12,10 +11,6 @@ class BaseSymbol extends Base {
     super()
     this.name = name
     this.type = type
-  }
-
-  [util.inspect.custom]() {
-    return this.toString()
   }
 }
 
@@ -85,14 +80,14 @@ class ScopedSymbolTable extends Base {
   }
 
   define(symbol) {
-    console.debug('define:', symbol.name)
+    console.info('define:', symbol.name)
     // if (symbol.name in this.symbols)
     //   throw new SyntaxError(`Redefining symbol ${symbol.name}`)
     this.symbols[symbol.name] = symbol
   }
 
   lookup(name, currentScopeOnly) {
-    console.debug(`lookup: ${name} (scope: ${this.scopeName})`)
+    console.info(`lookup: ${name} (scope: ${this.scopeName})`)
     const symbol = this.symbols[name]
     if (symbol !== undefined) return symbol
 
@@ -103,7 +98,7 @@ class ScopedSymbolTable extends Base {
     }
   }
 
-  [util.inspect.custom]() {
+  toString() {
     let lines = [
       `Scope name: ${this.scopeName}`,
       `Scope level: ${this.scopeLevel}`,
@@ -145,7 +140,7 @@ class NodeVisitor extends TreeVisitor {
     const visitorName = `visit${node.getClassName()}`
     let visitorFunc = this[visitorName]
     if (!visitorFunc)
-      throw new ReferenceError(`${this.getClassName()} has no method ` +
+      throw new SemanticError(`${this.getClassName()} has no method ` +
         `name ${visitorName}`)
 
     // console.debug(`visit -> ${visitorName}`)
@@ -183,6 +178,10 @@ class SemanticAnalyzer extends AstVisitor {
     const globalScope = new ScopedSymbolTable('Global', 0)
     globalScope[initBuiltins]()
     this.currentScope = globalScope
+  }
+
+  error(errorCode, token) {
+    throw new SemanticError(`${errorCode}: ${token}`)
   }
 
   visitProgram(node) {
@@ -244,7 +243,7 @@ class SemanticAnalyzer extends AstVisitor {
     const varSymbol = new VarSymbol(varName, typeSymbol)
 
     if (this.currentScope.lookup(varName, true) !== undefined)
-      throw new SyntaxError(`Symbol name ${varName} already exists`)
+      this.error(ErrorCode.DUPLICATE_ID, node.varNode.token)
 
     this.currentScope.define(varSymbol)
   }
@@ -266,7 +265,7 @@ class SemanticAnalyzer extends AstVisitor {
     const varName = node.value
     const varSymbol = this.currentScope.lookup(varName)
     if (varSymbol === undefined)
-      throw new ReferenceError(`Variable name ${varName} not exists`)
+      this.error(ErrorCode.ID_NOT_FOUND, node.token)
   }
 
   visitNop(node) {
@@ -333,7 +332,7 @@ class Interpreter extends AstVisitor {
     if (node.token.value in this.globals) {
       return this.globals[node.token.value]
     }
-    throw new ReferenceError(`variable name ${node.token.value} `
+    throw new SemanticError(`variable name ${node.token.value} `
       + `is not defined`)
   }
 
