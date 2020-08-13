@@ -1,51 +1,73 @@
 /* Copyright (C) 2020 Xvezda <xvezda@naver.com> */
 
 
+require('./globals.js')
+
+const fs = require('fs')
 const readline = require('readline')
 const { Color } = require('./common.js')
-const Interpreter = require('./interpreter.js')
+const { Lexer } = require('./lexer.js')
+const { Parser } = require('./parser.js')
+const { SemanticAnalyzer, Interpreter } = require('./interpreter.js')
 
-const interpreter = new Interpreter()
+
 const PS1 = '> '
 
-const isDev = process.env.NODE_ENV === 'development'
 
-if (typeof console === 'object' && 'debug' in console) {
-  if (!isDev) {
-    global.console.debug = new Function
-  } else {
-    global.console.debug = console.debug.bind(null, Color.red`DEBUG:`)
+function processInput(input) {
+  if (isDev) {
+    var timeout = setTimeout(() => {
+      console.log('timeout!')
+      process.exit(1)
+    }, 1000)
+  }
+
+  const tokens = new Lexer(input)
+  const parser = new Parser(tokens)
+  const ast = parser.parse()
+
+  try {
+    const analyzer = new SemanticAnalyzer()
+    analyzer.visit(ast)
+
+    const interpreter = new Interpreter(ast)
+    const result = interpreter.interpret()
+
+    if (result !== undefined) {
+      console.log(result)
+    }
+  } catch (e) {
+    console.error(e)
+  }
+
+  if (isDev) {
+    clearTimeout(timeout)
   }
 }
 
 
+const filePath = argv.file || argv._[0]
 
-rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  prompt: PS1
-})
+if (!!filePath) {
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) throw err
+    processInput(data)
+  })
 
-rl.prompt()
-rl.on('line', input => {
-  if (input) {
-    if (isDev) {
-      var timeout = setTimeout(() => {
-        console.log('timeout!')
-        process.exit(1)
-      }, 1000)
-    }
+} else {
+  let rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: PS1
+  })
 
-    let result = interpreter.feedline(input)
-    if (result) {
-      console.log(result)
-    }
-
-    if (isDev) {
-      clearTimeout(timeout)
-    }
-  }
   rl.prompt()
-}).on('close', () => {
-  process.exit(0)
-})
+  rl.on('line', input => {
+    processInput(input)
+    rl.prompt()
+  }).on('close', () => {
+    process.exit(0)
+  })
+}
+
+

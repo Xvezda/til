@@ -7,6 +7,40 @@ class Base {
   getClassName() {
     return this.constructor.name
   }
+
+  [util.inspect.custom]() {
+    return this.toString()
+  }
+
+  toString() {
+    return util.inspect(this, {customInspect: false})
+  }
+}
+
+
+class Stack extends Base {
+  #items = null
+
+  constructor() {
+    super()
+    this.#items = []
+  }
+
+  push(item) {
+    this.#items.push(item)
+  }
+
+  pop() {
+    return this.#items.pop()
+  }
+
+  peek() {
+    return this.#items.slice(-1)[0]
+  }
+
+  get items() {
+    return this.#items.slice()
+  }
 }
 
 
@@ -15,13 +49,16 @@ function ansiEscapeControlSequence(...args) {
   return `${ESC}[${args.join('')}`
 }
 
+const hasColors = process.stdout.hasColors()
+
 function controlSequenceColor(...args) {
   // return ansiEscapeControlSequence(args.join(';'), 'm')
   return ansiEscapeControlSequence(args[0], 'm')
 }
 
-const RESET = controlSequenceColor('0')
+const RESET = hasColors ? controlSequenceColor('0') : ''
 function colorTemplate(modifier) {
+  if (!hasColors) modifier = ''
   return (strings, ...args) => {
     let result = modifier + strings[0]
     args.forEach((v, i) => {
@@ -35,6 +72,7 @@ function colorTemplate(modifier) {
   }
 }
 
+
 const Color = {
   ...Object.fromEntries(
     Object.entries(util.inspect.colors).map(([k, v]) => {
@@ -44,6 +82,7 @@ const Color = {
   ),
   // Add color here
 }
+
 
 function isWrapper(pattern) {
   return text => {
@@ -77,6 +116,7 @@ function isAlnum(text) {
 
 module.exports = {
   Base,
+  Stack,
   Color,
   isAlpha,
   isDigit,

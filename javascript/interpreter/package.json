@@ -8,5 +8,11 @@
   "scripts": {
     "start": "NODE_ENV=production node $npm_package_main",
     "dev": "NODE_ENV=development node $npm_package_main"
+  },
+  "devDependencies": {
+    "jest": "^26.2.2"
+  },
+  "dependencies": {
+    "yargs": "^15.4.1"
   }
 }
