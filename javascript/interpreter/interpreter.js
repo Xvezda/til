@@ -7,8 +7,10 @@ const { ErrorCode, SemanticError } = require('./errors.js')
 
 
 const PROGRAM = 'PROGRAM'
+const PROCEDURE = 'PROCEDURE'
 const ARType = {
   PROGRAM,
+  PROCEDURE,
 }
 
 class ActivationRecord extends Base {
@@ -93,6 +95,7 @@ class ProcSymbol extends BaseSymbol {
   constructor(name, params) {
     super(name)
     this.params = params || []
+    this.blockAst = null
   }
 
   toString() {
@@ -272,6 +275,7 @@ class SemanticAnalyzer extends AstVisitor {
     for (const paramNode of node.actualParams) {
       this.visit(paramNode)
     }
+    node.procSymbol = procSymbol
   }
 
   visitProcDecl(node) {
@@ -302,6 +306,8 @@ class SemanticAnalyzer extends AstVisitor {
     console.debug(procedureScope)
     this.currentScope = this.currentScope.enclosingScope
     console.debug(`visitProcDecl -> Leaving scope ${node.procName}`)
+
+    procSymbol.blockAst = node.blockNode
   }
 
   visitVarDecl(node) {
@@ -390,6 +396,31 @@ class Interpreter extends AstVisitor {
     super.visitProgram(node)
 
     this.log(`LEAVE: PROGRAM ${progName}`)
+    this.log(`${this.callStack}`)
+
+    this.callStack.pop()
+  }
+
+  visitProcCall(node) {
+    const procName = node.procName
+    const ar = new ActivationRecord(procName, ARType.PROCEDURE, 2)
+
+    const procSymbol = node.procSymbol
+    const formalParams = procSymbol.params
+    const actualParams = node.actualParams
+
+    for (let i = 0; i < formalParams.length; ++i) {
+      // Evaluate and assign
+      ar.set(formalParams[i].name, this.visit(actualParams[i]))
+    }
+    this.callStack.push(ar)
+
+    this.log(`ENTER: PROCEDURE ${procName}`)
+    this.log(`${this.callStack}`)
+
+    this.visit(procSymbol.blockAst)
+
+    this.log(`LEAVE: PROCEDURE ${procName}`)
     this.log(`${this.callStack}`)
 
     this.callStack.pop()
