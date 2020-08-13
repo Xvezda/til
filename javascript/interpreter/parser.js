@@ -27,6 +27,7 @@ class ProcCall extends Ast {
     this.procName = procName
     this.actualParams = actualParams
     this.token = token
+    this.procSymbol = null
   }
 }
 
