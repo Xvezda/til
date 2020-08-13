@@ -65,6 +65,7 @@ class BaseSymbol extends Base {
     super()
     this.name = name
     this.type = type
+    this.scopeLevel = 0
   }
 }
 
@@ -144,6 +145,7 @@ class ScopedSymbolTable extends Base {
     this.log('define:', symbol.name)
     // if (symbol.name in this.symbols)
     //   throw new SyntaxError(`Redefining symbol ${symbol.name}`)
+    symbol.scopeLevel = this.scopeLevel
     this.symbols[symbol.name] = symbol
   }
 
@@ -403,9 +405,11 @@ class Interpreter extends AstVisitor {
 
   visitProcCall(node) {
     const procName = node.procName
-    const ar = new ActivationRecord(procName, ARType.PROCEDURE, 2)
-
     const procSymbol = node.procSymbol
+    const ar = new ActivationRecord(procName,
+      ARType.PROCEDURE,
+      procSymbol.scopeLevel + 1)
+
     const formalParams = procSymbol.params
     const actualParams = node.actualParams
 
