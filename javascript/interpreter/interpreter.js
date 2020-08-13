@@ -290,7 +290,7 @@ class SemanticAnalyzer extends AstVisitor {
         this.currentScope)
     this.currentScope = procedureScope
 
-    // Passing variables to parameter
+    // Define parameter variable symbols as procedure scope
     for (const param of node.params) {
       console.debug(`param:`, param)
       const paramName = param.varNode.value
@@ -411,18 +411,23 @@ class Interpreter extends AstVisitor {
 
     for (let i = 0; i < formalParams.length; ++i) {
       // Evaluate and assign
-      ar.set(formalParams[i].name, this.visit(actualParams[i]))
+      const paramSymbol = formalParams[i]
+      const argumentNode = actualParams[i]
+      ar.set(paramSymbol.name, this.visit(argumentNode))
     }
+    // Put procedure activation record at the top of callstack
     this.callStack.push(ar)
 
     this.log(`ENTER: PROCEDURE ${procName}`)
     this.log(`${this.callStack}`)
 
+    // Evaluate procedure body
     this.visit(procSymbol.blockAst)
 
     this.log(`LEAVE: PROCEDURE ${procName}`)
     this.log(`${this.callStack}`)
 
+    // Restore callstack
     this.callStack.pop()
   }
 
