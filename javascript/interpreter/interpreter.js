@@ -154,7 +154,7 @@ class ScopedSymbolTable extends Base {
     const symbol = this.symbols[name]
     if (symbol !== undefined) return symbol
 
-    if (!!currentScopeOnly) return
+    if (!!currentScopeOnly) return undefined
 
     if (this.enclosingScope !== undefined) {
       return this.enclosingScope.lookup(name)
@@ -532,7 +532,7 @@ class Interpreter extends AstVisitor {
   }
 
   interpret() {
-    if (!this.tree) return
+    if (!this.tree) return undefined
     return this.visit(this.tree)
   }
 }
