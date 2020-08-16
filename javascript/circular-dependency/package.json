@@ -1,0 +1,12 @@
+{
+  "name": "circular-dependency",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node foo.js",
+    "start:module": "node --experimental-modules foo.mjs",
+    "test": "npm run start && npm run start:module"
+  },
+  "license": "MIT",
+  "private": true
+}
