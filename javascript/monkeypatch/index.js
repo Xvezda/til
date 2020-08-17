@@ -16,3 +16,8 @@ fooExports.bar = function() {
 console.log('=== after monkeypatch ===');
 foo.bar();
 egg.ham();
+
+// Proof:
+var exposedFoo = egg.expose();
+console.assert(foo === exposedFoo);
+console.assert(foo.bar === exposedFoo.bar);
