@@ -8,4 +8,12 @@ Order a package
 
 Package arrived
 
+## 2020-08-17
+
+Order free volt adapters
+
+## 2020-08-19
+
+Received adapters
+
 ## WIP
