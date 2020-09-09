@@ -7,6 +7,10 @@
   "scripts": {
     "prebuild": "./hooks/prebuild",
     "build": "echo fake build",
-    "postbuild": "./hooks/postbuild"
+    "postbuild": "./hooks/postbuild",
+    "success": "echo pseudo success && true",
+    "postsuccess": "echo 'will it echo?'",
+    "fail": "echo pseudo fail && false",
+    "postfail": "echo 'will it echo?'"
   }
 }
