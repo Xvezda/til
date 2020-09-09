@@ -1,0 +1,12 @@
+{
+  "name": "hooks-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "prebuild": "./hooks/prebuild",
+    "build": "echo fake build",
+    "postbuild": "./hooks/postbuild"
+  }
+}
