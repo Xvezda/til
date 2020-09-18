@@ -1,0 +1,13 @@
+{
+  "name": "config-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "config": {
+    "foobar": "hello world"
+  },
+  "scripts": {
+    "print": "echo $npm_package_config_foobar"
+  }
+}
