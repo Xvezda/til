@@ -56,6 +56,7 @@ class App {
     box.style.width = '100px'
     box.style.height = '100px'
     box.style.border = '1px solid gray'
+    box.style.backgroundColor = 'white'
     box.style.boxSizing = 'border-box'
     box.style.padding = '28px'
     box.style.margin = '5px'
@@ -80,7 +81,7 @@ class App {
 
   onDragStart(event) {
     console.log('dragstart:', event)
-    event.dataTransfer.setData('text/plain', this.counter)
+    event.dataTransfer.setData('text/plain', event.target.dataset.num)
     event.dataTransfer.effectAllowed = 'move'
 
     this.dragged = event.target
