@@ -31,8 +31,17 @@ const { series, parallel } = require('gulp');
 
 `src()`와 `dest()` 매서드는 `gulp`가 컴퓨터의 파일들을 다룰 때 주로 사용된다.
 `src()`는 glob 패턴을 받아 [Node stream](https://nodejs.org/api/stream.html)으로 변환한다.
+`dest()`는 파이프라인의 중간에 사용되어 현 상태의 파일을 파일 시스템에 기록할 수 있다.
+
+`src()`는 `streaming`, `buffered`, `empty`의 세가지 모드로 작동한다. 설정은 `read`와 `buffer` 옵션을 통해 결정된다.
+- `buffered`: 기본모드로서 파일의 내용물을 메모리에 로드한다. 대부분의 플러그인은 이 모드에서 동작하며 `streaming`은 지원하지 않는경우가 많다.
+- `streaming`: 메모리에 올릴 수 없는 큰 파일을 다룰 때 주로 사용된다.
+- `empty`: 파일의 내용물 없이 메타데이터만 필요할 때 유용한 모드이다.
 
 
 ## Epilogue
 
-감상: 다른 프레임워크에 비해 굉장히 직관적인것 같다. `Node.js`의 철학이 녹아있는듯한 툴킷.
+### Comment
+- 다른 프레임워크에 비해 굉장히 직관적인것 같다.
+- = 추상화 정도가 낮기 때문에 정교한 작업에 강점일듯.
+- `Node.js`의 철학이 녹아있는듯한 툴킷.
