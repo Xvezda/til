@@ -1,0 +1,9 @@
+# We can emulate "include" with option
+# Include requirements.txt
+-r requirements.txt
+
+# And we need pytest
+pytest
+
+# vim:ft=requirements
+
