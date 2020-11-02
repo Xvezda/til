@@ -4,10 +4,13 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+#define  _POSIX_C_SOURCE 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <arpa/inet.h>
 
 
 #ifdef DEBUG
@@ -93,17 +96,18 @@ int analyze_image(const char *path) {
     IMAGE_TYPE image_type = imgcmp(image_buffer);
     switch (image_type) {
         case PNG:
-            puts("this is png :)");
+            puts("png file detected");
+            analyze_png(image_buffer);
             break;
         case JPG:
-            puts("this is jpg :)");
+            puts("jpg file detected");
             break;
         case GIF:
-            puts("this is gif :)");
+            puts("gif file detected");
             break;
         case XXX:
         default:
-            puts("unknown file type :(");
+            fprintf(stderr, "unknown file type\n");
             break;
     }
 
@@ -156,7 +160,86 @@ int gifcmp(const void *bufptr) {
 
 
 int analyze_png(const void *bufptr) {
-    (void) bufptr;  // TODO
+    if (!bufptr) return 1;
+
+
+    printf("%s\n", "analyzing png file...");
+
+    uint8_t *ptr = (uint8_t*)bufptr;
+
+    // Skip header
+    ptr += 8;
+
+    // https://en.wikipedia.org/wiki/Portable_Network_Graphics#%22Chunks%22_within_the_file
+    //
+    // After the header comes a series of chunks,
+    // each of which conveys certain information about the image.
+    struct {
+        uint32_t length;
+        union {
+            uint32_t type;
+            char name[4];
+        };
+        void *data;
+        uint32_t crc;
+    } chunk;
+
+    do {
+        chunk.length = ntohl(*(uint32_t*)ptr);
+        ptr += 4;
+        printf("chunk.length: %u\n", (uint32_t)chunk.length);
+
+        memcpy(chunk.name, ptr, sizeof chunk.name);
+        ptr += 4;
+        printf("chunk.name: %c%c%c%c\n",
+                chunk.name[0], chunk.name[1],
+                chunk.name[2], chunk.name[3]);
+
+        // Break if image end
+        if (!memcmp(chunk.name, "IEND", sizeof chunk.name)) {
+            DEBUG_PRINTF("%s\n", "END OF IMAGE");
+            break;
+        }
+        // Allocate chunk data buffer
+        uint8_t chunk_data[chunk.length];
+
+        printf("%s", "chunk.data: uint8_t { ");
+        for (int i = 0, n = chunk.length; n; --n, ++i) {
+            printf("%02X ", ptr[i]);
+            chunk_data[i] = ptr[i];
+        }
+        printf("%s\n", "}");
+        chunk.data = chunk_data;
+        ptr += chunk.length;
+
+        // TODO: CRC
+        ptr += 4;
+
+        if (!memcmp(chunk.name, "IHDR", sizeof chunk.name)) {
+            uint32_t width = ntohl(*(uint32_t*)chunk_data);
+            printf("image width: %u\n", width);
+
+            uint32_t height = ntohl(*(uint32_t*)&chunk_data[4]);
+            printf("image height: %u\n", height);
+
+            uint8_t bit_depth = chunk_data[8];
+            printf("bit depth: %u\n", bit_depth);
+
+            uint8_t color_type = chunk_data[9];
+            printf("color type: %u\n", color_type);
+
+            uint8_t compression_method = chunk_data[10];
+            printf("compression method: %u\n", compression_method);
+
+            uint8_t filter_method = chunk_data[11];
+            printf("filter method: %u\n", filter_method);
+
+            uint8_t interlace_method = chunk_data[12];
+            printf("interlace method: %u\n", interlace_method);
+        }
+    // TODO: Add image file structure type to keep reference safety
+    // e.g. Add file size property
+    } while (1);
 
     return 0;
 }
