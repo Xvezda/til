@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (int i = 1; i < argc; ++i) {
-        analyze_image(argv[i]);
+        if (analyze_image(argv[i])) return 1;
     }
     return 0;
 }
@@ -63,7 +63,10 @@ int main(int argc, char *argv[]) {
 
 int analyze_image(const char *path) {
     FILE *image_fp = fopen(path, "rb");
-    if (!image_fp) return 1;
+    if (!image_fp) {
+        fprintf(stderr, "error occurred while open file '%s'\n", path);
+        return 1;
+    }
 
     fseek(image_fp, 0, SEEK_END);
     long image_size = ftell(image_fp);
@@ -138,19 +141,17 @@ int pngcmp(const void *bufptr) {
 
 
 int gifcmp(const void *bufptr) {
-#define SIZEOF_ARRAY(arr) (sizeof (arr) / sizeof ((arr)[0]))
-    const uint8_t magics[][sizeof("GIF8Xa")-1] = {
-        { 'G', 'I', 'F', '8', '7', 'a' },
-        { 'G', 'I', 'F', '8', '9', 'a' },
+    // GIF has multiple magic numbers
+    const char *magics[] = {
+        "GIF87a", "GIF89a", NULL
     };
 
-    int result = ~0;  // Fill bits with 1
-    for (int i = 0; i < (int)SIZEOF_ARRAY(magics); ++i) {
-        // If any of magic matches, result becomes 0
-        result &= memcmp(bufptr, magics[i], sizeof magics[0]);
+    int result;
+    for (int i = 0; magics[i]; ++i) {
+        result = memcmp(bufptr, magics[i], strlen(magics[i]));
+        if (!result) break;
     }
     return result;
-#undef SIZEOF_ARRAY
 }
 
 
