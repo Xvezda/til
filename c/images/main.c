@@ -21,28 +21,30 @@
 #endif
 
 
-static const uint8_t jpg_magic[] = {
-    0XFF, 0xD8, 0xFF
-};
-
-static const uint8_t png_magic[] = {
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
-};
-
 typedef enum IMAGE_TYPE {
-    XXX = -1, JPG, PNG
+    XXX = -1, JPG, PNG, GIF
 } IMAGE_TYPE;
 
-static const uint8_t *magic_table[] = {
-    [JPG] = jpg_magic,
-    [PNG] = png_magic,
-    NULL
-};
+typedef int (*imgcmp_cb)(const void *bufptr);
 
 
 int analyze_image(const char *path);
 IMAGE_TYPE imgcmp(const void *bufptr);
+
+static int jpgcmp(const void *bufptr);
+static int pngcmp(const void *bufptr);
+static int gifcmp(const void *bufptr);
+
 int analyze_png(const void *bufptr);
+
+
+// Keep explicit and synchronized
+static const imgcmp_cb imgcmp_table[] = {
+    [JPG] = jpgcmp,
+    [PNG] = pngcmp,
+    [GIF] = gifcmp,
+    NULL
+};
 
 
 int main(int argc, char *argv[]) {
@@ -82,7 +84,8 @@ int analyze_image(const char *path) {
     // It is safe to access byte range 0-3
     // Because buffer size must be at least BUFSIZ
     DEBUG_PRINTF("first 4 bytes: %02X %02X %02X %02X\n",
-        image_buffer[0], image_buffer[1], image_buffer[2], image_buffer[3]);
+        image_buffer[0], image_buffer[1],
+        image_buffer[2], image_buffer[3]);
 
     IMAGE_TYPE image_type = imgcmp(image_buffer);
     switch (image_type) {
@@ -91,6 +94,9 @@ int analyze_image(const char *path) {
             break;
         case JPG:
             puts("this is jpg :)");
+            break;
+        case GIF:
+            puts("this is gif :)");
             break;
         case XXX:
         default:
@@ -107,12 +113,44 @@ int analyze_image(const char *path) {
 IMAGE_TYPE imgcmp(const void *bufptr) {
     if (!bufptr) goto error;
 
-    for (int i = 0; magic_table[i]; ++i) {
-        if (!memcmp(bufptr, magic_table[i], sizeof *magic_table[i]))
-            return i;
+    for (int i = 0; imgcmp_table[i]; ++i) {
+        imgcmp_cb callback = imgcmp_table[i];
+        if (!callback(bufptr)) return i;
     }
+
 error:
     return XXX;
+}
+
+
+int jpgcmp(const void *bufptr) {
+    const uint8_t magic[] = { 0XFF, 0xD8, 0xFF };
+    return memcmp(bufptr, magic, sizeof magic);
+}
+
+
+int pngcmp(const void *bufptr) {
+    const uint8_t magic[] = {
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
+    };
+    return memcmp(bufptr, magic, sizeof magic);
+}
+
+
+int gifcmp(const void *bufptr) {
+#define SIZEOF_ARRAY(arr) (sizeof (arr) / sizeof ((arr)[0]))
+    const uint8_t magics[][sizeof("GIF8Xa")-1] = {
+        { 'G', 'I', 'F', '8', '7', 'a' },
+        { 'G', 'I', 'F', '8', '9', 'a' },
+    };
+
+    int result = ~0;  // Fill bits with 1
+    for (int i = 0; i < (int)SIZEOF_ARRAY(magics); ++i) {
+        // If any of magic matches, result becomes 0
+        result &= memcmp(bufptr, magics[i], sizeof magics[0]);
+    }
+    return result;
+#undef SIZEOF_ARRAY
 }
 
 
