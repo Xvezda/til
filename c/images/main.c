@@ -30,6 +30,15 @@ typedef enum IMAGE_TYPE {
 
 typedef int (*imgcmp_cb)(const void *bufptr);
 
+typedef struct IMAGE_FILE {
+    IMAGE_TYPE type;
+    size_t size;
+    size_t capacity;
+    uint8_t *data;
+} IMAGE_FILE;
+
+IMAGE_FILE *image_open(const char *path);
+int image_close(IMAGE_FILE *fp);
 
 int analyze_image(const char *path);
 IMAGE_TYPE imgcmp(const void *bufptr);
@@ -38,7 +47,7 @@ static int jpgcmp(const void *bufptr);
 static int pngcmp(const void *bufptr);
 static int gifcmp(const void *bufptr);
 
-int analyze_png(const void *bufptr);
+int png_info(IMAGE_FILE *png);
 
 
 // Keep explicit and synchronized
@@ -64,40 +73,67 @@ int main(int argc, char *argv[]) {
 }
 
 
+IMAGE_FILE *image_open(const char *path) {
+    FILE *fp = fopen(path, "rb");
+    if (!fp) goto error;
+
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);
+    rewind(fp);
+
+    IMAGE_FILE *ret = malloc(sizeof *ret);
+    if (!ret) goto error;
+
+    size_t capacity = size / BUFSIZ + BUFSIZ;
+    ret->data = malloc(capacity);
+
+    if (!ret->data) {
+        free(ret);
+        goto error;
+    }
+
+    ret->capacity = capacity;
+    ret->size = size;
+
+    fread(ret->data, 1, ret->size, fp);
+    fclose(fp);
+
+    ret->type = imgcmp(ret->data);
+
+    return ret;
+
+error:
+    return NULL;
+}
+
+
+int image_close(IMAGE_FILE *fp) {
+    if (!fp) return 1;
+
+    free(fp->data);
+    free(fp);
+
+    return 0;
+}
+
+
 int analyze_image(const char *path) {
-    FILE *image_fp = fopen(path, "rb");
-    if (!image_fp) {
+    IMAGE_FILE *image = image_open(path);
+    if (!image) {
         fprintf(stderr, "error occurred while open file '%s'\n", path);
         return 1;
     }
 
-    fseek(image_fp, 0, SEEK_END);
-    long image_size = ftell(image_fp);
-    rewind(image_fp);
-
-    // Make buffer with image size
-    int is_malloc = 0;
-    uint8_t stack_buffer[BUFSIZ];
-    uint8_t *image_buffer = stack_buffer;
-
-    if (image_size > BUFSIZ) {
-        image_buffer = malloc(image_size);
-        if (!image_buffer) return 1;
-        is_malloc = 1;
-    }
-    fread(image_buffer, 1, image_size, image_fp);
-
-    // It is safe to access byte range 0-3
+    // It should be safe to access byte range 0-3
     // Because buffer size must be at least BUFSIZ
     DEBUG_PRINTF("first 4 bytes: %02X %02X %02X %02X\n",
-        image_buffer[0], image_buffer[1],
-        image_buffer[2], image_buffer[3]);
+        image->data[0], image->data[1],
+        image->data[2], image->data[3]);
 
-    IMAGE_TYPE image_type = imgcmp(image_buffer);
-    switch (image_type) {
+    switch (image->type) {
         case PNG:
             puts("png file detected");
-            analyze_png(image_buffer);
+            png_info(image);
             break;
         case JPG:
             puts("jpg file detected");
@@ -110,8 +146,7 @@ int analyze_image(const char *path) {
             fprintf(stderr, "unknown file type\n");
             break;
     }
-
-    if (is_malloc) free(image_buffer);
+    image_close(image);
 
     return 0;
 }
@@ -159,16 +194,26 @@ int gifcmp(const void *bufptr) {
 }
 
 
-int analyze_png(const void *bufptr) {
-    if (!bufptr) return 1;
+int png_info(IMAGE_FILE *png) {
+#define CHECK_EOF(ptr, amount, eofptr) \
+    (!(ptr) || !(eofptr) || (ptr) > (eofptr))
 
+#define FORWARD(ptr, amount, eofptr) \
+    (/* IF */ !CHECK_EOF((ptr), (amount), (eofptr)) ?  \
+     /* TRUE: INC */ (ptr) += (amount) : \
+     /* FALSE: NOP */ 0, \
+     /* ENDIF, RET ERR */ CHECK_EOF((ptr), (amount), (eofptr)))
+
+    if (!png) return 1;
 
     printf("%s\n", "analyzing png file...");
 
-    uint8_t *ptr = (uint8_t*)bufptr;
+    if (png->size < 8) return 1;
+    uint8_t *ptr = png->data;
+    uint8_t *eofptr = ptr + png->size;
 
     // Skip header
-    ptr += 8;
+    if (FORWARD(ptr, 8, eofptr)) return 1;
 
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#%22Chunks%22_within_the_file
     //
@@ -186,11 +231,13 @@ int analyze_png(const void *bufptr) {
 
     do {
         chunk.length = ntohl(*(uint32_t*)ptr);
-        ptr += 4;
+        if (FORWARD(ptr, 4, eofptr)) return 1;
+
         printf("chunk.length: %u\n", (uint32_t)chunk.length);
 
         memcpy(chunk.name, ptr, sizeof chunk.name);
-        ptr += 4;
+
+        if (FORWARD(ptr, 4, eofptr)) return 1;
         printf("chunk.name: %c%c%c%c\n",
                 chunk.name[0], chunk.name[1],
                 chunk.name[2], chunk.name[3]);
@@ -210,10 +257,11 @@ int analyze_png(const void *bufptr) {
         }
         printf("%s\n", "}");
         chunk.data = chunk_data;
-        ptr += chunk.length;
+
+        if (FORWARD(ptr, chunk.length, eofptr)) return 1;
 
         // TODO: CRC
-        ptr += 4;
+        if (FORWARD(ptr, 4, eofptr)) return 1;
 
         if (!memcmp(chunk.name, "IHDR", sizeof chunk.name)) {
             uint32_t width = ntohl(*(uint32_t*)chunk_data);
@@ -237,9 +285,9 @@ int analyze_png(const void *bufptr) {
             uint8_t interlace_method = chunk_data[12];
             printf("interlace method: %u\n", interlace_method);
         }
-    // TODO: Add image file structure type to keep reference safety
-    // e.g. Add file size property
     } while (1);
 
     return 0;
+#undef CHECK_EOF
+#undef FORWARD
 }
