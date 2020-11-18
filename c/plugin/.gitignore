@@ -1,0 +1,4 @@
+main
+*.so
+*.o
+a.out
