@@ -104,7 +104,7 @@ inherits(egg, foo)
 
 egg.$prototype.hello = function() {
   // super.hello()
-  return parent(this, foo, 'hello')() + ' and this is inherted method!'
+  return parent(this, foo, 'hello')() + ' and this is inherited method!'
 }
 
 
