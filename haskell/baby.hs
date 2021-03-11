@@ -31,6 +31,18 @@ factorial' :: (Integral a) => a -> a
 factorial' 0 = 1
 factorial' n = n * factorial' (n - 1)
 
+fibonacci :: Int -> Int
+fibonacci 0 = 0
+fibonacci 1 = 1
+fibonacci 2 = 1
+fibonacci x =
+    if x < 0
+       then error "x must be positive number"
+       else fibonacci (x-1) + fibonacci (x-2)
+
+fibonacci' :: Int -> [Int]
+fibonacci' n = [fibonacci x | x <- [1..n]]
+
 addVectors :: (Num a) => (a, a) -> (a, a) -> (a, a)
 -- addVectors a b = (fst a + fst b, snd a + snd b)
 addVectors (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
