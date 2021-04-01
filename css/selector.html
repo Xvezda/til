@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>CSS Selector</title>
+  </head>
+  <body>
+    <style>
+    /* Select which contains substring of foo */
+    p[data-text*="foo"] {
+      color: red;
+    }
+
+    /* Select white space separated foo */
+    p[data-text~="foo"] {
+      color: green;
+    }
+    </style>
+    <p data-text="foo bar">I'm foo :)</p>
+    <p data-text="fool bar">I'm fool :(</p>
+
+    <style>
+    /* All li element under list */
+    #list li {
+      color: blue;
+    }
+
+    /* Select only li element which has list as parent */
+    #list > li {
+      color: red;
+    }
+    </style>
+    <ul id="list">
+      <li>foo
+        <ol>
+          <li>egg</li>
+          <li>ham</li>
+        </ol>
+      </li>
+      <li>bar</li>
+      <li>baz</li>
+    </ul>
+
+    <style>
+    #list2 > .active ~ li {
+      color: green;
+    }
+    </style>
+    <ul id="list2">
+      <li>foo</li>
+      <li>bar</li>
+      <li class="active">baz</li>
+      <li>egg</li>
+      <li>ham</li>
+      <li>spam</li>
+    </ul>
+
+    <style>
+    #special-checkbox:checked + label {
+      color: red;
+    }
+
+    #special-checkbox:checked ~ #another-special-checkbox:checked + label {
+      color: blue;
+    }
+    </style>
+
+    <input id="special-checkbox" type="checkbox">
+    <label for="special-checkbox">I'm red when checkbox is checked</label>
+
+    <input id="another-special-checkbox" type="checkbox">
+    <label for="another-special-checkbox">And I'm blue when two checkboxes are checked</label>
+
+    <style>
+    .has-p p:only-of-type {
+      color: red;
+    }
+
+    /* Does it work with class? */
+    .has-p .egg:only-of-type {
+      color: green;
+    }
+
+    .has-p p:only-child {
+      color: blue;
+    }
+
+    </style>
+    <div class="has-p">
+      <p>hello</p>
+      <p>world</p>
+    </div>
+    <div class="has-p">
+      <p>hi</p>
+    </div>
+    <div class="has-p">
+      <p>foo</p>
+      <span>bar</span>
+    </div>
+
+    <div class="has-p">
+      <p class="egg">ham</p>
+      <span>:)</span>
+    </div>
+
+    <div class="has-p">
+      <p class="egg">spam</p>
+      <p>:(</p>
+    </div>
+  </body>
+</html>
