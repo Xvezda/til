@@ -48,7 +48,14 @@
         <path id="greenBoxPath" d="M153.456,312.333c0,0,4.362-135.948,66.667-135.965
 	c62.28-0.017,54.83,128.649,54.83,128.649s-14.48,133.433,64.468,128.509c68.629-4.28,56.141-128.509,56.141-128.509" />
     </defs>
-    <rect transform="translate(-143.456, 0)" fill="green" width="100" height="100">
+    <rect
+        x="153.456"
+        y="312.333"
+        transform="translate(-143.456, 0)"
+        fill="green"
+        width="100"
+        height="100"
+    >
         <animateMotion
             id="pathMotion"
             fill="freeze"
@@ -61,8 +68,8 @@
         >
             <mpath href="#greenBoxPath" />
         </animateMotion>
-        <!-- For initial positioning -->
-        <set attributeName="x" to="153.456" begin="0s" end="pathMotion.begin" />
-        <set attributeName="y" to="312.333" begin="0s" end="pathMotion.begin" />
+        <!-- Resetting coordinate -->
+        <set attributeName="x" to="0" begin="pathMotion.begin" end="indefinite" />
+        <set attributeName="y" to="0" begin="pathMotion.begin" end="indefinite" />
     </rect>
 </svg>
