@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>XMLHttpRequest Example</title>
+  </head>
+  <body>
+    <script>
+      function handleResponse(xml) {
+        var hof = xml.getElementsByTagName('hof')[0];
+        var entries = hof.getElementsByTagName('entry');
+
+        var tabular = [];
+        Array.prototype.forEach.call(entries, function (entry) {
+          var year = entry.getElementsByTagName('year')[0];
+          var winner = entry.getElementsByTagName('winner')[0];
+
+          tabular.push([
+            year.childNodes[0].nodeValue,
+            winner.childNodes[0].nodeValue,
+          ]);
+        });
+        console.log(tabular);
+
+        document.body.appendChild(buildTable(tabular));
+      }
+
+      function buildTable(tabular) {
+        var i, j, len;
+        var table = document.createElement('table');
+        for (i = 0, len = tabular.length; i < len; ++i) {
+          var row = document.createElement('tr');
+          table.appendChild(row);
+
+          var cells = tabular[i];
+          cells.forEach(function (cell) {
+            var td = document.createElement('td');
+            td.textContent = cell;
+
+            row.appendChild(td);
+          });
+        }
+        return table;
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function (evt) {
+        if (this.status === 200 && this.readyState === this.DONE) {
+          handleResponse(this.responseXML);
+        }
+      };
+      xhr.open('GET', 'tiobe_hof.xml');
+      xhr.send(null);
+    </script>
+  </body>
+</html>
