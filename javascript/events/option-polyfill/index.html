@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>AddEventListener Polyfill Test</title>
+  </head>
+  <body>
+    <button id="count" type="button">one</button>
+    <script type="module" src="polyfill.js"></script>
+    <script type="module">
+      window.addEventListener('load',
+        (evt) => console.log('window loaded'),
+        {capture: false, once: true})
+
+      const controller = new AbortController()
+      const countBtn = document.getElementById('count')
+      countBtn.addEventListener('click', function (evt) {
+        console.log('hello :)')
+        const textContent = this.textContent.trim()
+        switch (textContent) {
+          case 'one':
+            this.textContent = 'two'
+            break
+          case 'two':
+            this.textContent = 'three'
+            break
+          case 'three':
+            controller.abort()
+            this.textContent = 'four'
+            break
+          default:
+            alert('this should not be triggered')
+            break
+        }
+      }, {capture: false, signal: controller.signal})
+    </script>
+  </body>
+</html>
