@@ -2,7 +2,16 @@ import { checkSupport } from './detect.js'
 
 if (EventTarget.prototype.addEventListener) {
   const shims = {
-    'signal': function (type, listener, options) {
+    once: function (type, listener, options) {
+      const onceHandler = () => {
+        // Remove listener
+        this.removeEventListener(type, listener, options)
+        // Then remove itself
+        this.removeEventListener(type, onceHandler, options)
+      }
+      this.addEventListener(type, onceHandler, options)
+    },
+    signal: function (type, listener, options) {
       const signal = options.signal
       signal.addEventListener('abort', (evt) => {
         this.removeEventListener(type, listener, options)
