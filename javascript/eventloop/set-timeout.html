@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Testing eventloop</title>
+  </head>
+  <body>
+    <p>Simple test to proof of: https://youtu.be/cCOL7MC4Pl0?t=912</p>
+    <hr>
+    <button>click to check render</button>
+    <script>
+      var times = [];
+      var before = null;
+      function tick() {
+        var now = Date.now();
+        if (before !== null) {
+          times.push(now - before);
+        }
+        before = now;
+
+        setTimeout(tick, 0);
+      }
+      tick();
+
+      function printLogs() {
+        var avg = times.reduce(function (a, b) {
+          return a + b;
+        }, 0) / times.length;
+        times = [];
+
+        console.log('average:', avg);
+      }
+      setInterval(printLogs, 1000);
+    </script>
+  </body>
+</html>
