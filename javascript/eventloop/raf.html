@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>requestAnimationFrame</title>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: gray;
+      }
+      #container {
+        margin: 25px;
+      }
+      #box {
+        width: 100px;
+        height: 100px;
+        background-color: white;
+      }
+      #move {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="box"></div>
+      <button id="move">Move</button>
+    </div>
+    <script>
+      // https://youtu.be/cCOL7MC4Pl0?t=1241
+      move.addEventListener('click', (evt) => {
+
+        // {{{1
+        /*
+        box.style.transform = 'translateX(1000px)';
+        getComputedStyle(box).transform;  // Triggers style calculation
+        box.style.transition = 'transform 1s ease-in-out';
+
+        box.style.transform = 'translateX(500px)';
+        */
+        // 1}}}
+
+
+        // {{{2
+        /*
+        box.style.transform = 'translateX(1000px)';
+
+        // Queue transition to task queue
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions#javascript_examples
+        setTimeout(() => {
+          box.style.transition = 'transform 1s ease-in-out';
+          box.style.transform = 'translateX(500px)';
+        }, 0);
+        */
+        // 2}}}
+
+        // {{{3
+        box.style.transform = 'translateX(1000px)';
+
+        // Queue transition to animation callback queue
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            box.style.transition = 'transform 1s ease-in-out';
+            box.style.transform = 'translateX(500px)';
+          });
+        });
+
+        // 3}}}
+      }, { once: true });
+    </script>
+  </body>
+</html>
