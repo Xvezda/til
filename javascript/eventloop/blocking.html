@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Blocking test</title>
+    <style>
+      #gif {
+        display: block;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      function infiniteLoop() {
+        while (true) {}
+      }
+
+      function recursiveTimeout() {
+        setTimeout(recursiveTimeout, 0);
+      }
+
+      function recursiveRAF() {
+        requestAnimationFrame(recursiveRAF);
+      }
+
+      function recursivePromise() {
+        Promise.resolve().then(() => recursivePromise());
+      }
+    </script>
+    <img src="https://media.giphy.com/media/HMSLfCl5BsXoQ/giphy.gif" id="gif">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam convallis accumsan purus nec dignissim. Pellentesque convallis odio ac dapibus rutrum. Praesent eget lectus blandit, imperdiet dui id, luctus eros. Pellentesque eu lorem et tellus volutpat dignissim a sit amet massa. In arcu nisi, cursus eget augue a, finibus laoreet est. Suspendisse faucibus tincidunt enim ac ullamcorper. Fusce eu massa ac nibh interdum interdum. Donec tempus iaculis ligula vehicula sollicitudin. Nullam id turpis magna. Cras vestibulum mollis neque eu sagittis. Morbi ac aliquet massa. Proin nec mauris sapien.</p>
+    <button onclick="infiniteLoop()">infinite loop</button>
+    <button onclick="recursiveTimeout()">recursive timeout</button>
+    <button onclick="recursiveRAF()">recursive rAF</button>
+    <button onclick="recursivePromise()">recursive promise</button>
+  </body>
+</html>
