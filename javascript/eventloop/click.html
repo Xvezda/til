@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Click and microtasks</title>
+  </head>
+  <body>
+    <button id="direct">direct</button>
+    <button id="indirect">indirect</button>
+    <script>
+      /* See: https://youtu.be/cCOL7MC4Pl0?t=1824 */
+      direct.addEventListener('click', (evt) => {
+        Promise.resolve().then(() => console.log('Microtask 1'));
+        console.log('Listener 1');
+      });
+
+      direct.addEventListener('click', (evt) => {
+        Promise.resolve().then(() => console.log('Microtask 2'));
+        console.log('Listener 2');
+      });
+
+      // WebAPI; which in this case: DOMEvent, calls the synchronous method "click"
+      // It will stays on callstack until every "click" listeners been invoked
+      indirect.onclick = (evt) => direct.click();  // Synchronous
+    </script>
+  </body>
+</html>
