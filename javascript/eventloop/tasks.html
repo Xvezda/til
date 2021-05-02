@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Tasks test</title>
+  </head>
+  <body>
+    <button id="run">run</button>
+    <script>
+      function delay() {
+        var _;
+        for (var i = 0; i < 0x10000000; ++i)
+          _ = Math.random();  // To prevent optimization such as JIT
+      }
+
+      function createTask(n) {
+        return function task() {
+          delay();
+          console.log('Task ' + n);
+        }
+      }
+
+      function runTask(expect, callback) {
+        var start = Date.now();
+        setTimeout(() => {
+          callback();
+          console.log(`expect: ${expect}ms, actual: ${Date.now() - start}ms`);
+        }, expect);
+      }
+
+      var task1 = createTask(1);
+      var task2 = createTask(2);
+      var task3 = createTask(3);
+
+      run.onclick = (evt) => {
+        runTask(0, task1);
+        runTask(0, task2);
+        runTask(0, task3);
+        // Each task gets delayed by previous tasks
+      };
+    </script>
+  </body>
+</html>
