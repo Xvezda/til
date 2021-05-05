@@ -42,6 +42,10 @@ int main(void)
     data.msg = "child";
     data.id = 0;
 
+    // TODO:
+    // Since fork() is multiprocess,
+    // it would be better to use CreateProcess() rather than CreateThread()
+    // CreateProcess: https://msdn.microsoft.com/en-us/library/ms682425.aspx
     hThread = CreateThread(
         NULL,
         0,
