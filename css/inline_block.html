@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Block &amp; Inline &amp; Inline Block</title>
+    <style>
+    .colorize > :nth-child(1) {
+      background-color: red;
+    }
+    .colorize > :nth-child(2) {
+      background-color: green;
+    }
+    .bigger {
+      border: 1px solid black;
+      /* Below properties are ignored when display is inline */
+      width: 100px;
+      height: 100px;
+    }
+    .iblockify {
+      display: inline-block;
+    }
+    .blockify {
+      display: block;
+    }
+    .printit > *:after {
+      content: " [" attr(class) "]";
+    }
+    </style>
+  </head>
+  <body>
+    <div class="colorize">
+      <div>Block Element</div>
+      <span>Inline Element</span>
+    </div>
+    <hr>
+    <div class="printit">
+      <span class="bigger">Scale me up!</span>
+      <span class="bigger iblockify">Scale me up!</span>
+      <span class="bigger blockify">Scale me up!</span>
+    </div>
+  </body>
+</html>
