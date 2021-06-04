@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Block &amp; Inline &amp; Inline Block</title>
     <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+    }
     .colorize > :nth-child(1) {
       background-color: red;
     }
@@ -12,19 +19,31 @@
       background-color: green;
     }
     .bigger {
-      border: 1px solid black;
       /* Below properties are ignored when display is inline */
       width: 100px;
       height: 100px;
     }
-    .iblockify {
+    .biggest {
+      width: 250px;
+      height: 250px;
+    }
+    .borderize * {
+      border: 1px solid black;
+    }
+    .inline-block {
       display: inline-block;
     }
-    .blockify {
+    .block {
       display: block;
     }
-    .printit > *:after {
+    .print-class *:not(.no-print):after {
       content: " [" attr(class) "]";
+    }
+    .padding-20 {
+      padding: 20px;
+    }
+    .margin-20 {
+      margin: 20px;
     }
     </style>
   </head>
@@ -34,10 +53,28 @@
       <span>Inline Element</span>
     </div>
     <hr>
-    <div class="printit">
+    <div class="borderize print-class">
       <span class="bigger">Scale me up!</span>
-      <span class="bigger iblockify">Scale me up!</span>
-      <span class="bigger blockify">Scale me up!</span>
+      <span class="bigger inline-block">Scale me up!</span>
+      <span class="bigger block">Scale me up!</span>
+    </div>
+    <hr>
+    <div class="colorize print-class">
+      <!-- with block property -->
+      <div class="borderize no-print">
+        <span class="biggest block padding-20"></span>
+        <span class="biggest block padding-20"></span>
+        <span class="biggest block margin-20 padding-20"></span>
+        <span class="biggest block margin-20 padding-20"></span>
+      </div>
+      <!-- inline tag ignores `.biggest` and
+           left and right of `.(margin|padding)-20` -->
+      <div class="borderize no-print">
+        <span class="biggest padding-20"></span>
+        <span class="biggest padding-20"></span>
+        <span class="biggest margin-20 padding-20"></span>
+        <span class="biggest margin-20 padding-20"></span>
+      </div>
     </div>
   </body>
 </html>
