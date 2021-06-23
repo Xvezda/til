@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -pedantic
+CFLAGS = -std=c99 -Wall -Wextra
 SRCS = $(wildcard *.c)
 BINS = $(patsubst %.c, %, $(SRCS))
 
