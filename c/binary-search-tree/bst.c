@@ -58,17 +58,18 @@ void add_node(struct node *root, int value) {
 }
 
 void rem_node(struct node *root, int value) {
-    struct node *cursor = root,
-                *parent = NULL;
-
-#define replace_cursor(parent__, cursor__, value__)  \
+#define aorb(a, b) ((a) ? (a) : (b))
+#define replace_branch(parent__, cursor__, node__)   \
     do {                                             \
         if ((cursor__)->value < (parent__)->value) { \
-            (parent__)->left = (value__);            \
+            (parent__)->left = (node__);             \
         } else {                                     \
-            (parent__)->right = (value__);           \
+            (parent__)->right = (node__);            \
         }                                            \
     } while (0)
+
+    struct node *cursor = root,
+                *parent = NULL;
 
     while (cursor) {
         if (value == cursor->value) {  // Found
@@ -78,7 +79,7 @@ void rem_node(struct node *root, int value) {
             }
 
             if (!cursor->left && !cursor->right) {  // Leaf node
-                replace_cursor(parent, cursor, NULL);
+                replace_branch(parent, cursor, NULL);
             } else if (cursor->left && cursor->right) {
                 struct node *tmp = cursor->right,
                             *tmp_parent = cursor;
@@ -87,17 +88,16 @@ void rem_node(struct node *root, int value) {
                     tmp_parent = tmp;
                     tmp = tmp->left;
                 }
-                replace_cursor(parent, cursor, tmp);
+                replace_branch(parent, cursor, tmp);
                 tmp->left = cursor->left;
-                replace_cursor(tmp_parent, tmp,
-                        tmp->right ? tmp->right : NULL);
+                replace_branch(tmp_parent, tmp, aorb(tmp->right, NULL));
 
                 if (tmp != cursor->right) {
                     tmp->right = cursor->right;
                 }
             } else if (cursor->left || cursor->right) {
-                replace_cursor(parent, cursor,
-                        cursor->left ? cursor->left : cursor->right);
+                replace_branch(parent, cursor,
+                        aorb(cursor->left, cursor->right));
             }
             free(cursor);
             break;
@@ -109,10 +109,8 @@ void rem_node(struct node *root, int value) {
             cursor = cursor->right;
         }
     }
-    if (root && !parent) {
-        del_node(root);
-    }
-#undef replace_cursor
+#undef aorb
+#undef replace_branch
 }
 
 struct node *find_node(struct node *root, int value) {
