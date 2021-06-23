@@ -66,6 +66,9 @@ int main() {
     SHOW_VAL("John");
     SHOW_VAL("Mike");
 
+    // Not exists
+    SHOW_VAL("Chris");
+
 #undef SHOW_VAL
     return 0;
 }
