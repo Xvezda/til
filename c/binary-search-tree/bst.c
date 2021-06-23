@@ -57,16 +57,43 @@ void add_node(struct node *root, int value) {
     }
 }
 
-void rem_node(struct node *root, int value) {
+static inline void set_branch(struct node *parent,
+                              struct node *cursor, struct node *value)
+{
+    if (cursor->value < parent->value)
+        parent->left = value;
+    else
+        parent->right = value;
+}
+
+void replace_branch(struct node *parent, struct node *cursor)
+{
 #define aorb(a, b) ((a) ? (a) : (b))
-#define replace_branch(parent__, cursor__, node__)   \
-    do {                                             \
-        if ((cursor__)->value < (parent__)->value) { \
-            (parent__)->left = (node__);             \
-        } else {                                     \
-            (parent__)->right = (node__);            \
-        }                                            \
-    } while (0)
+
+    if (!cursor->left && !cursor->right) {  // Leaf node
+        set_branch(parent, cursor, NULL);
+    } else if (cursor->left && cursor->right) {
+        struct node *tmp = cursor->right,
+                    *tmp_parent = cursor;
+        // Find smallest
+        while (tmp && tmp->left) {
+            tmp_parent = tmp;
+            tmp = tmp->left;
+        }
+        set_branch(parent, cursor, tmp);
+        tmp->left = cursor->left;
+        set_branch(tmp_parent, tmp, aorb(tmp->right, NULL));
+
+        if (tmp != cursor->right) {
+            tmp->right = cursor->right;
+        }
+    } else if (cursor->left || cursor->right) {
+        set_branch(parent, cursor, aorb(cursor->left, cursor->right));
+    }
+#undef aorb
+}
+
+void rem_node(struct node *root, int value) {
 
     struct node *cursor = root,
                 *parent = NULL;
@@ -77,28 +104,7 @@ void rem_node(struct node *root, int value) {
                 assert(parent == NULL);
                 break;
             }
-
-            if (!cursor->left && !cursor->right) {  // Leaf node
-                replace_branch(parent, cursor, NULL);
-            } else if (cursor->left && cursor->right) {
-                struct node *tmp = cursor->right,
-                            *tmp_parent = cursor;
-                // Find smallest
-                while (tmp && tmp->left) {
-                    tmp_parent = tmp;
-                    tmp = tmp->left;
-                }
-                replace_branch(parent, cursor, tmp);
-                tmp->left = cursor->left;
-                replace_branch(tmp_parent, tmp, aorb(tmp->right, NULL));
-
-                if (tmp != cursor->right) {
-                    tmp->right = cursor->right;
-                }
-            } else if (cursor->left || cursor->right) {
-                replace_branch(parent, cursor,
-                        aorb(cursor->left, cursor->right));
-            }
+            replace_branch(parent, cursor);
             free(cursor);
             break;
         } else if (value < cursor->value) {
@@ -109,8 +115,6 @@ void rem_node(struct node *root, int value) {
             cursor = cursor->right;
         }
     }
-#undef aorb
-#undef replace_branch
 }
 
 struct node *find_node(struct node *root, int value) {
