@@ -20,6 +20,18 @@ struct node *new_node(int value) {
 }
 
 void del_node(struct node *root) {
+    if (!root)
+        return;
+
+    fprintf(stderr, "del: %d\n", root->value);
+
+    if (root->left) {
+        del_node(root->left);
+    }
+    if (root->right) {
+        del_node(root->right);
+    }
+    free(root);
 }
 
 void add_node(struct node *root, int value) {
@@ -49,6 +61,15 @@ void rem_node(struct node *root, int value) {
     struct node *cursor = root,
                 *parent = NULL;
 
+#define replace_cursor(parent__, cursor__, value__)  \
+    do {                                             \
+        if ((cursor__)->value < (parent__)->value) { \
+            (parent__)->left = (value__);            \
+        } else {                                     \
+            (parent__)->right = (value__);           \
+        }                                            \
+    } while (0)
+
     while (cursor) {
         if (value == cursor->value) {  // Found
             if (cursor == root) {
@@ -57,11 +78,7 @@ void rem_node(struct node *root, int value) {
             }
 
             if (!cursor->left && !cursor->right) {  // Leaf node
-                if (cursor->value < parent->value) {
-                    parent->left = NULL;
-                } else {
-                    parent->right = NULL;
-                }
+                replace_cursor(parent, cursor, NULL);
             } else if (cursor->left && cursor->right) {
                 struct node *tmp = cursor->right,
                             *tmp_parent = cursor;
@@ -70,24 +87,17 @@ void rem_node(struct node *root, int value) {
                     tmp_parent = tmp;
                     tmp = tmp->left;
                 }
-                if (cursor->value < parent->value) {
-                    parent->left = tmp;
-                } else {
-                    parent->right = tmp;
-                }
+                replace_cursor(parent, cursor, tmp);
                 tmp->left = cursor->left;
-                if (tmp->right) {
-                    tmp_parent->left = tmp->right;
-                }
+                replace_cursor(tmp_parent, tmp,
+                        tmp->right ? tmp->right : NULL);
+
                 if (tmp != cursor->right) {
                     tmp->right = cursor->right;
                 }
             } else if (cursor->left || cursor->right) {
-                if (cursor->value < parent->value) {
-                    parent->left = cursor->left ? cursor->left : cursor->right;
-                } else {
-                    parent->right = cursor->left ? cursor->left : cursor->right;
-                }
+                replace_cursor(parent, cursor,
+                        cursor->left ? cursor->left : cursor->right);
             }
             free(cursor);
             break;
@@ -102,6 +112,7 @@ void rem_node(struct node *root, int value) {
     if (root && !parent) {
         del_node(root);
     }
+#undef replace_cursor
 }
 
 struct node *find_node(struct node *root, int value) {
@@ -217,6 +228,55 @@ int main() {
     ptr = find_node(root, 12);
     printf("find 12: %p -> %d\n", ptr, ptr->value);
     rem_node(root, 12);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 10);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 7);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 13);
+    show_nodes(root);
+
+    del_node(root);
+    puts("=");
+
+    root = new_node(1);
+    add_node(root, 2);
+    add_node(root, 3);
+    add_node(root, 6);
+    add_node(root, 5);
+    add_node(root, 4);
+    add_node(root, 7);
+
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 2);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 6);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 7);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 3);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 5);
+    show_nodes(root);
+
+    puts("=");
+    rem_node(root, 4);
     show_nodes(root);
 
     del_node(root);
