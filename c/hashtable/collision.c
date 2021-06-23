@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define TABLE_SIZE 8
+#define TABLE_SIZE 4
 int table[TABLE_SIZE];
 
 #define get_key(s) (*s)
@@ -20,11 +20,19 @@ int table[TABLE_SIZE];
 int main() {
     set_value("Andy", 42);
     set_value("Bob", 1337);
-    set_value("Andrew", 777);
+    set_value("Ian", 777);
 
-    printf("Andy: %d\n", get_value("Andy"));  // Expect: 42
-    printf("Bob: %d\n", get_value("Bob"));
-    printf("Andrew: %d\n", get_value("Andrew"));
+    printf("Andy: %d (hash: %d)\n",
+            get_value("Andy"),
+            hash_func(get_key("Andy")));  // Expect: 42
+
+    printf("Bob: %d (hash: %d)\n",
+            get_value("Bob"),
+            hash_func(get_key("Bob")));
+
+    printf("Ian: %d (hash: %d)\n",
+            get_value("Ian"),
+            hash_func(get_key("Ian")));
 
     return 0;
 }
