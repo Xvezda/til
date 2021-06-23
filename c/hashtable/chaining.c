@@ -7,6 +7,7 @@ struct node {
     struct node *next;
 };
 
+// Reduced table size to cause intended collisions
 #define TABLE_SIZE 4
 struct node *table[TABLE_SIZE];
 
@@ -72,6 +73,8 @@ int main() {
     set_value("Andy", 42);
     set_value("Bob", 1337);
     set_value("Ian", 777);
+    set_value("John", 123);
+    set_value("Mike", 456);
 
 #define SHOW_VAL(data)                     \
     do {                                   \
@@ -83,6 +86,8 @@ int main() {
     SHOW_VAL("Andy");
     SHOW_VAL("Bob");
     SHOW_VAL("Ian");
+    SHOW_VAL("John");
+    SHOW_VAL("Mike");
 
 #undef SHOW_VAL
     return 0;
