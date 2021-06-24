@@ -12,7 +12,8 @@ struct node {
 struct node *new_node(int value)
 {
     struct node *root = malloc(sizeof(*root));
-    if (!root) return NULL;
+    if (!root)
+        return NULL;
 
     root->left = NULL;
     root->value = value;
@@ -73,12 +74,15 @@ static inline void replace_child(struct node *parent,
 
 struct node *find_min(struct node *node, struct node **parent)
 {
+    struct node *prev = node;
     while (node && node->left) {
-        if (parent) {
-            *parent = node;
-        }
+        prev = node;
         node = node->left;
     }
+
+    if (parent)
+        *parent = prev;
+
     return node;
 }
 
@@ -150,13 +154,13 @@ void show_nodes(struct node *root)
     if (!root)
         return;
 
-    if (root->left) {
+    if (root->left)
         show_nodes(root->left);
-    }
+
     printf("%p -> value: %d\n", root, root->value);
-    if (root->right) {
+
+    if (root->right)
         show_nodes(root->right);
-    }
 }
 
 
