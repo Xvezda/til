@@ -8,6 +8,7 @@ struct node {
     struct node *right;
 };
 
+
 struct node *new_node(int value)
 {
     struct node *root = malloc(sizeof(*root));
@@ -27,12 +28,12 @@ void del_node(struct node *root)
 
     fprintf(stderr, "del: %d\n", root->value);
 
-    if (root->left) {
+    if (root->left)
         del_node(root->left);
-    }
-    if (root->right) {
+
+    if (root->right)
         del_node(root->right);
-    }
+
     free(root);
 }
 
@@ -70,6 +71,17 @@ static inline void replace_child(struct node *parent,
         parent->right = new_child;
 }
 
+struct node *find_min(struct node *node, struct node **parent)
+{
+    while (node && node->left) {
+        if (parent) {
+            *parent = node;
+        }
+        node = node->left;
+    }
+    return node;
+}
+
 void remove_child(struct node *parent, struct node *child)
 {
 #define aorb(a, b) ((a) ? (a) : (b))
@@ -77,23 +89,21 @@ void remove_child(struct node *parent, struct node *child)
     if (!child->left && !child->right) {  // Leaf node
         replace_child(parent, NULL, child);
     } else if (child->left && child->right) {
-        struct node *tmp = child->right,
-                    *tmp_parent = child;
-        // Find smallest
-        while (tmp && tmp->left) {
-            tmp_parent = tmp;
-            tmp = tmp->left;
-        }
-        replace_child(parent, tmp, child);
-        tmp->left = child->left;
-        replace_child(tmp_parent, aorb(tmp->right, NULL), tmp);
+        struct node *repl = child->right,
+                    *repl_parent = child;
 
-        if (tmp != child->right) {
-            tmp->right = child->right;
-        }
+        repl = find_min(child->right, &repl_parent);
+        replace_child(parent, repl, child);
+
+        repl->left = child->left;
+        replace_child(repl_parent, aorb(repl->right, NULL), repl);
+        if (repl != child->right)
+            repl->right = child->right;
+
     } else if (child->left || child->right) {
         replace_child(parent, aorb(child->left, child->right), child);
     }
+    free(child);
 #undef aorb
 }
 
@@ -109,7 +119,6 @@ void remove_value(struct node *root, int value)
                 break;
             }
             remove_child(parent, cursor);
-            free(cursor);
             break;
         } else if (value < cursor->value) {
             parent = cursor;
@@ -298,6 +307,30 @@ int main()
     show_nodes(root);
 
     del_node(root);
+
+    puts("=");
+    root = new_node(10);
+    add_node(root, 15);
+    add_node(root, 13);
+    add_node(root, 18);
+    add_node(root, 19);
+
+    show_nodes(root);
+
+    puts("=");
+    remove_value(root, 15);
+
+    show_nodes(root);
+#if defined(UNSAFE_ACCESS)
+    ptr = find_node(root, 19);
+    printf("find 19: %p -> %d\n", ptr, ptr->value);
+
+    ptr = find_node(root, 13);
+    printf("find 13: %p -> %d\n", ptr, ptr->value);
+
+    ptr = find_node(root, 18);
+    printf("find 18: %p -> %d\n", ptr, ptr->value);
+#endif  // defined(UNSAFE_ACCESS)
 
     return 0;
 }
