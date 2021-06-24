@@ -8,7 +8,8 @@ struct node {
     struct node *right;
 };
 
-struct node *new_node(int value) {
+struct node *new_node(int value)
+{
     struct node *root = malloc(sizeof(*root));
     if (!root) return NULL;
 
@@ -19,7 +20,8 @@ struct node *new_node(int value) {
     return root;
 }
 
-void del_node(struct node *root) {
+void del_node(struct node *root)
+{
     if (!root)
         return;
 
@@ -34,7 +36,8 @@ void del_node(struct node *root) {
     free(root);
 }
 
-void add_node(struct node *root, int value) {
+void add_node(struct node *root, int value)
+{
     struct node *node = new_node(value);
 
     struct node *cursor = root;
@@ -57,44 +60,45 @@ void add_node(struct node *root, int value) {
     }
 }
 
-static inline void set_branch(struct node *parent,
-                              struct node *cursor, struct node *value)
+static inline void replace_child(struct node *parent,
+                                 struct node *new_child,
+                                 struct node *old_child)
 {
-    if (cursor->value < parent->value)
-        parent->left = value;
+    if (old_child->value < parent->value)
+        parent->left = new_child;
     else
-        parent->right = value;
+        parent->right = new_child;
 }
 
-void replace_branch(struct node *parent, struct node *cursor)
+void remove_child(struct node *parent, struct node *child)
 {
 #define aorb(a, b) ((a) ? (a) : (b))
 
-    if (!cursor->left && !cursor->right) {  // Leaf node
-        set_branch(parent, cursor, NULL);
-    } else if (cursor->left && cursor->right) {
-        struct node *tmp = cursor->right,
-                    *tmp_parent = cursor;
+    if (!child->left && !child->right) {  // Leaf node
+        replace_child(parent, NULL, child);
+    } else if (child->left && child->right) {
+        struct node *tmp = child->right,
+                    *tmp_parent = child;
         // Find smallest
         while (tmp && tmp->left) {
             tmp_parent = tmp;
             tmp = tmp->left;
         }
-        set_branch(parent, cursor, tmp);
-        tmp->left = cursor->left;
-        set_branch(tmp_parent, tmp, aorb(tmp->right, NULL));
+        replace_child(parent, tmp, child);
+        tmp->left = child->left;
+        replace_child(tmp_parent, aorb(tmp->right, NULL), tmp);
 
-        if (tmp != cursor->right) {
-            tmp->right = cursor->right;
+        if (tmp != child->right) {
+            tmp->right = child->right;
         }
-    } else if (cursor->left || cursor->right) {
-        set_branch(parent, cursor, aorb(cursor->left, cursor->right));
+    } else if (child->left || child->right) {
+        replace_child(parent, aorb(child->left, child->right), child);
     }
 #undef aorb
 }
 
-void rem_node(struct node *root, int value) {
-
+void remove_value(struct node *root, int value)
+{
     struct node *cursor = root,
                 *parent = NULL;
 
@@ -104,7 +108,7 @@ void rem_node(struct node *root, int value) {
                 assert(parent == NULL);
                 break;
             }
-            replace_branch(parent, cursor);
+            remove_child(parent, cursor);
             free(cursor);
             break;
         } else if (value < cursor->value) {
@@ -117,7 +121,8 @@ void rem_node(struct node *root, int value) {
     }
 }
 
-struct node *find_node(struct node *root, int value) {
+struct node *find_node(struct node *root, int value)
+{
     struct node *cursor = root;
     while (cursor) {
         if (value == cursor->value) {
@@ -131,7 +136,8 @@ struct node *find_node(struct node *root, int value) {
     return cursor;
 }
 
-void show_nodes(struct node *root) {
+void show_nodes(struct node *root)
+{
     if (!root)
         return;
 
@@ -145,14 +151,18 @@ void show_nodes(struct node *root) {
 }
 
 
-int main() {
+int main()
+{
+#define UNSAFE_ACCESS
     struct node *root = new_node(5);
 
     add_node(root, 3);
     add_node(root, 7);
 
+#if defined(UNSAFE_ACCESS)
     printf("left: %d\n", root->left->value);
     printf("right: %d\n", root->right->value);
+#endif  // defined(UNSAFE_ACCESS)
 
     puts("=");
 
@@ -163,7 +173,7 @@ int main() {
 
     puts("=");
 
-    rem_node(root, 4);
+    remove_value(root, 4);
     show_nodes(root);
 
     del_node(root);
@@ -182,6 +192,7 @@ int main() {
 
     puts("=");
 
+#if defined(UNSAFE_ACCESS)
     struct node *ptr = find_node(root, 10);
     printf("find 10: %p -> %d\n", ptr, ptr->value);
     printf("10->left: %d\n", ptr->left->value);
@@ -190,8 +201,9 @@ int main() {
     ptr = find_node(root, 12);
     printf("find 12: %p -> %d\n", ptr, ptr->value);
     printf("12->right: %p -> %d\n", ptr->right, ptr->right->value);
+#endif  // defined(UNSAFE_ACCESS)
 
-    rem_node(root, 10);
+    remove_value(root, 10);
     show_nodes(root);
 
     del_node(root);
@@ -214,34 +226,38 @@ int main() {
 
     puts("=");
     // Remove right
-    rem_node(root, 6);
+    remove_value(root, 6);
     show_nodes(root);
 
 
     puts("=");
-    rem_node(root, 5);
+    remove_value(root, 5);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 14);
+    remove_value(root, 14);
     show_nodes(root);
 
     puts("=");
+
+#if defined(UNSAFE_ACCESS)
     ptr = find_node(root, 12);
     printf("find 12: %p -> %d\n", ptr, ptr->value);
-    rem_node(root, 12);
+#endif  // defined(UNSAFE_ACCESS)
+
+    remove_value(root, 12);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 10);
+    remove_value(root, 10);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 7);
+    remove_value(root, 7);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 13);
+    remove_value(root, 13);
     show_nodes(root);
 
     del_node(root);
@@ -258,27 +274,27 @@ int main() {
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 2);
+    remove_value(root, 2);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 6);
+    remove_value(root, 6);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 7);
+    remove_value(root, 7);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 3);
+    remove_value(root, 3);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 5);
+    remove_value(root, 5);
     show_nodes(root);
 
     puts("=");
-    rem_node(root, 4);
+    remove_value(root, 4);
     show_nodes(root);
 
     del_node(root);
