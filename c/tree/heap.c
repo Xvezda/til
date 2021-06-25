@@ -22,10 +22,11 @@ void heap_del(struct heap *heap);
 
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
-#define swap(a, b)            \
-    ({ typeof(a) __tmp = (a); \
-       (a) = (b);             \
-       (b) = __tmp; })
+// https://stackoverflow.com/a/3982397
+#define swap(a, b)           \
+    ({ typeof(a) swap = (a); \
+       (a) = (b);            \
+       (b) = swap; })
 
 
 #define paren_idx_of(idx)          ((int)((idx) / 2))
