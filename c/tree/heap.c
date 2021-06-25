@@ -4,12 +4,6 @@
 #include <assert.h>
 
 
-struct heap *new_heap(int value);
-bool move_up(struct heap *heap, int idx);
-void insert_value(struct heap *heap, int value);
-void del_heap(struct heap *heap);
-
-
 struct heap {
     size_t size;
     size_t capacity;
@@ -17,42 +11,123 @@ struct heap {
 };
 
 
-struct heap *new_heap(int value)
+struct heap *heap_new(int value);
+int heap_resiz(struct heap *heap, size_t size);
+bool move_up(struct heap *heap, int idx);
+bool move_down(struct heap *heap, int idx);
+void heap_ins(struct heap *heap, int value);
+int heap_pop(struct heap *heap);
+void heap_show(struct heap *heap);
+void heap_del(struct heap *heap);
+
+
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define swap(a, b)            \
+    ({ typeof(a) __tmp = (a); \
+       (a) = (b);             \
+       (b) = __tmp; })
+
+
+#define paren_idx_of(idx)          ((int)((idx) / 2))
+#define left_idx_of(idx)           ((int)((idx) * 2))
+#define right_idx_of(idx)          ((int)((idx) * 2) + 1)
+#define last_idx_of(heap)          ((int)(heap)->size)
+#define heap_get(heap, idx)        ((heap)->nodes[idx])
+#define heap_set(heap, idx, value) ((heap)->nodes[idx] = (value))
+
+enum { HEAP_UNUSED = 0, HEAP_ROOT = 1 };
+
+
+struct heap *heap_new(int value)
 {
-    struct heap *heap = malloc(sizeof(*heap));
+    struct heap *heap = calloc(1, sizeof(*heap));
     if (!heap)
         goto error;
 
-    heap->capacity = 1 << 4;
-    heap->nodes = malloc(heap->capacity * sizeof(*heap->nodes));
-    if (!heap->nodes)
+    if (heap_resiz(heap, 1) < 0)
         goto alloc_error;
 
-    heap->nodes[0] = 0;  // Unused
+    heap_set(heap, HEAP_UNUSED, -1);
 
-    heap->size = 1;
-    heap->nodes[heap->size] = value;
+    heap->size = HEAP_ROOT;
+    heap_set(heap, last_idx_of(heap), value);
 
     return heap;
 
 alloc_error:
-    del_heap(heap);
+    heap_del(heap);
 error:
     return NULL;
 }
 
 
-bool move_up(struct heap *heap, int idx)
+int heap_resiz(struct heap *heap, size_t size)
 {
-    if (!heap || idx <= 1)
-        return false;
+    if (!heap)
+        goto error;
 
-    int parent_idx = idx / 2;
-    return heap->nodes[idx] > heap->nodes[parent_idx];
+    if (!size) {
+        free(heap->nodes);
+        heap->nodes = NULL;
+
+        heap->size = 0;
+        heap->capacity = 0;
+    } else {
+        size_t capacity = heap->capacity ?
+            heap->capacity << 1 :
+            sizeof(*heap->nodes) << 4;
+
+        while (capacity < size) {
+            if (capacity<<1 < capacity)
+                goto error;
+            capacity <<= 1;
+        }
+
+        int *new_node = realloc(heap->nodes, capacity);
+        if (!new_node)
+            goto error;
+
+        if (new_node != heap->nodes)
+            heap->nodes = new_node;
+
+        heap->capacity = capacity;
+    }
+    return 0;
+
+error:
+    return -1;
 }
 
 
-void insert_value(struct heap *heap, int value)
+bool move_up(struct heap *heap, int idx)
+{
+    if (!heap || idx <= HEAP_ROOT)
+        return false;
+
+    int pidx = paren_idx_of(idx);
+    return heap_get(heap, idx) > heap_get(heap, pidx);
+}
+
+
+bool move_down(struct heap *heap, int idx)
+{
+    if (!heap)
+        return false;
+
+    if (left_idx_of(idx) > last_idx_of(heap)) {
+        return false;
+    } else if (right_idx_of(idx) > last_idx_of(heap)) {
+        return heap_get(heap, left_idx_of(idx)) > heap_get(heap, idx);
+    } else {
+        int left_child = heap_get(heap, left_idx_of(idx));
+        int right_child = heap_get(heap, right_idx_of(idx));
+        int max_child = max(left_child, right_child);
+        return max_child > heap_get(heap, idx);
+    }
+}
+
+
+void heap_ins(struct heap *heap, int value)
 {
     if (!heap)
         return;
@@ -61,68 +136,104 @@ void insert_value(struct heap *heap, int value)
     ++heap->size;
 
     assert(heap->capacity > 0);
-    if (heap->size > heap->capacity) {
-        int *new_nodes = realloc(heap->nodes, heap->capacity << 1);
-        if (!new_nodes) {
-            --heap->size;
-            return;
-        }
-
-        if (new_nodes != heap->nodes)
-            heap->nodes = new_nodes;
-
-        heap->capacity <<= 1;
+    if (heap->size > heap->capacity && heap_resiz(heap, heap->size) < 0) {
+        --heap->size;
+        return;
     }
-    heap->nodes[heap->size] = value;
+    heap_set(heap, last_idx_of(heap), value);
 
-    int idx = heap->size;
-#define swap(a, b)             \
-    ({                         \
-        typeof(a) tmp__ = (a); \
-        (a) = (b);             \
-        (b) = tmp__;           \
-     })
+    int idx = last_idx_of(heap);
     while (move_up(heap, idx)) {
-        int parent_idx = idx / 2;
-        swap(heap->nodes[idx], heap->nodes[parent_idx]);
-        idx = parent_idx;
+        int pidx = paren_idx_of(idx);
+        swap(heap_get(heap, idx), heap_get(heap, pidx));
+        idx = pidx;
     }
-#undef swap
 }
 
 
-void del_heap(struct heap *heap)
+int heap_pop(struct heap *heap)
+{
+    if (!heap || last_idx_of(heap) < HEAP_ROOT)
+        return -1;
+
+    int popidx = HEAP_ROOT;
+    int ret = heap_get(heap, popidx);
+
+    heap_set(heap, popidx, heap_get(heap, last_idx_of(heap)));
+    --heap->size;
+
+    while (move_down(heap, popidx)) {
+        if (right_idx_of(popidx) > last_idx_of(heap)) {
+            swap(heap_get(heap, left_idx_of(popidx)), heap_get(heap, popidx));
+            popidx = left_idx_of(popidx);
+        } else {
+            int right_idx = right_idx_of(popidx);
+            int left_idx = left_idx_of(popidx);
+            if (heap_get(heap, left_idx) > heap_get(heap, right_idx)) {
+                swap(heap_get(heap, left_idx), heap_get(heap, popidx));
+                popidx = left_idx;
+            } else {
+                swap(heap_get(heap, right_idx), heap_get(heap, popidx));
+                popidx = right_idx;
+            }
+        }
+    }
+    return ret;
+}
+
+
+void heap_show(struct heap *heap)
 {
     if (!heap)
         return;
 
-    free(heap->nodes);
-    heap->capacity = 0;
-    heap->size = 0;
+    for (int i = HEAP_ROOT; i <= last_idx_of(heap); ++i) {
+        printf("%d ", heap_get(heap, i));
+    }
+    puts("");
+}
 
+
+void heap_del(struct heap *heap)
+{
+    if (!heap)
+        return;
+
+    heap_resiz(heap, 0);
     free(heap);
 }
 
 
 int main()
 {
-    struct heap *heap = new_heap(15);
+    struct heap *heap = heap_new(15);
+    if (!heap)
+        return 1;
 
-    insert_value(heap, 10);
-    insert_value(heap, 8);
-    insert_value(heap, 5);
-    insert_value(heap, 4);
-    insert_value(heap, 20);
+    heap_ins(heap, 10);
+    heap_ins(heap, 8);
+    heap_ins(heap, 5);
+    heap_ins(heap, 4);
+    heap_ins(heap, 20);
 
-    assert(heap->size == 6);
-    assert(heap->capacity == 1 << 4);
+    assert(last_idx_of(heap) == 6);
+    assert(heap->capacity > heap->size);
+    heap_show(heap);
 
-    for (int i = 1; i <= (int)heap->size; ++i) {
-        printf("%d ", heap->nodes[i]);
-    }
-    puts("");
+    puts("=");
+    printf("max: %d\n", heap_pop(heap));
+    heap_show(heap);
 
-    del_heap(heap);
+    puts("=");
+    printf("max: %d\n", heap_pop(heap));
+    heap_show(heap);
+
+    puts("=");
+    printf("max: %d\n", heap_pop(heap));
+    heap_show(heap);
+
+    heap_del(heap);
 
     return 0;
 }
+
