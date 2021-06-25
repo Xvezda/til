@@ -1,11 +1,15 @@
+.SUFFIXES: .c
+
 CC = gcc
 CFLAGS = -std=gnu99 -Wall -Wextra
-TARGET = bst
+SRCS = $(wildcard *.c)
+BINS = $(patsubst %.c, %, $(SRCS))
 
-all: $(TARGET)
 
-$(TARGET): bst.c
+all: $(BINS)
+
+%: %.c
 
 clean:
-	$(RM) $(TARGET)
+	$(RM) $(BINS)
 
