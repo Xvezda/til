@@ -1,5 +1,6 @@
 .SUFFIXES: .c
 
+
 CC = gcc
 CFLAGS = -std=gnu99 -Wall -Wextra
 SRCS = $(wildcard *.c)
@@ -8,7 +9,9 @@ BINS = $(patsubst %.c, %, $(SRCS))
 
 all: $(BINS)
 
-%: %.c
+debug: CC = clang
+debug: CFLAGS += -g -O0 -fsanitize=address -DDEBUG
+debug: all
 
 clean:
 	$(RM) $(BINS)
