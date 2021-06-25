@@ -35,6 +35,8 @@ void heap_del(struct heap *heap);
 #define heap_get(heap, idx)        ((heap)->nodes[idx])
 #define heap_set(heap, idx, value) ((heap)->nodes[idx] = (value))
 
+#define HEAP_ALLOC_OK   0
+#define HEAP_ALLOC_FAIL 1
 enum { HEAP_UNUSED = 0, HEAP_ROOT = 1 };
 
 
@@ -44,7 +46,7 @@ struct heap *heap_new(int value)
     if (!heap)
         goto error;
 
-    if (heap_resiz(heap, 1) < 0)
+    if (heap_resiz(heap, 1) != HEAP_ALLOC_OK)
         goto alloc_error;
 
     heap_set(heap, HEAP_UNUSED, -1);
@@ -93,10 +95,10 @@ int heap_resiz(struct heap *heap, size_t size)
 
         heap->capacity = capacity;
     }
-    return 0;
+    return HEAP_ALLOC_OK;
 
 error:
-    return -1;
+    return -HEAP_ALLOC_FAIL;
 }
 
 
@@ -133,11 +135,12 @@ void heap_ins(struct heap *heap, int value)
     if (!heap)
         return;
 
-    assert(heap->size > 0);
+    assert(heap->size >= HEAP_ROOT);
     ++heap->size;
 
-    assert(heap->capacity > 0);
-    if (heap->size >= heap->capacity && heap_resiz(heap, heap->size) < 0) {
+    assert(heap->capacity > HEAP_UNUSED);
+    if (heap->size >= heap->capacity &&
+            heap_resiz(heap, heap->size) != HEAP_ALLOC_OK) {
         --heap->size;
         return;
     }
