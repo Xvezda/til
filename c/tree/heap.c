@@ -75,7 +75,7 @@ int heap_resiz(struct heap *heap, size_t size)
     } else {
         size_t capacity = heap->capacity ?
             heap->capacity << 1 :
-            sizeof(*heap->nodes) << 4;
+            1 << 4;
 
         while (capacity < size) {
             if (capacity<<1 < capacity)
@@ -83,7 +83,8 @@ int heap_resiz(struct heap *heap, size_t size)
             capacity <<= 1;
         }
 
-        int *new_node = realloc(heap->nodes, capacity);
+        int *new_node = realloc(heap->nodes,
+                                capacity * sizeof(*heap->nodes));
         if (!new_node)
             goto error;
 
@@ -136,7 +137,7 @@ void heap_ins(struct heap *heap, int value)
     ++heap->size;
 
     assert(heap->capacity > 0);
-    if (heap->size > heap->capacity && heap_resiz(heap, heap->size) < 0) {
+    if (heap->size >= heap->capacity && heap_resiz(heap, heap->size) < 0) {
         --heap->size;
         return;
     }
