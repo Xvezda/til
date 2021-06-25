@@ -168,20 +168,24 @@ int heap_pop(struct heap *heap)
     --heap->size;
 
     while (move_down(heap, popidx)) {
-        if (right_idx_of(popidx) > last_idx_of(heap)) {
-            swap(heap_get(heap, left_idx_of(popidx)), heap_get(heap, popidx));
-            popidx = left_idx_of(popidx);
+        int left_idx = left_idx_of(popidx);
+        int right_idx = right_idx_of(popidx);
+
+        if (right_idx > last_idx_of(heap)) {
+            goto swap_left;
         } else {
-            int right_idx = right_idx_of(popidx);
-            int left_idx = left_idx_of(popidx);
-            if (heap_get(heap, left_idx) > heap_get(heap, right_idx)) {
-                swap(heap_get(heap, left_idx), heap_get(heap, popidx));
-                popidx = left_idx;
-            } else {
-                swap(heap_get(heap, right_idx), heap_get(heap, popidx));
-                popidx = right_idx;
-            }
+            if (heap_get(heap, left_idx) > heap_get(heap, right_idx))
+                goto swap_left;
+            else
+                goto swap_right;
         }
+swap_left:
+        swap(heap_get(heap, left_idx), heap_get(heap, popidx));
+        popidx = left_idx;
+        continue;
+swap_right:
+        swap(heap_get(heap, right_idx), heap_get(heap, popidx));
+        popidx = right_idx;
     }
     return ret;
 }
@@ -193,9 +197,10 @@ void heap_show(struct heap *heap)
         return;
 
     for (int i = HEAP_ROOT; i <= last_idx_of(heap); ++i) {
-        printf("%d ", heap_get(heap, i));
+        printf("%d%c",
+                heap_get(heap, i),
+                i == last_idx_of(heap) ? '\n' : ' ');
     }
-    puts("");
 }
 
 
