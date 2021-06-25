@@ -336,6 +336,8 @@ int main()
     printf("find 18: %p -> %d\n", ptr, ptr->value);
 #endif  // defined(UNSAFE_ACCESS)
 
+    del_node(root);
+
     return 0;
 }
 
