@@ -47,13 +47,11 @@ struct heap *heap_new(int value)
     if (!heap)
         goto error;
 
-    if (heap_resiz(heap, 1) != HEAP_ALLOC_OK)
+    if (heap_resiz(heap, HEAP_ROOT) != HEAP_ALLOC_OK)
         goto alloc_error;
 
     heap_set(heap, HEAP_UNUSED, -1);
-
-    heap->size = HEAP_ROOT;
-    heap_set(heap, last_idx_of(heap), value);
+    heap_set(heap, HEAP_ROOT, value);
 
     return heap;
 
@@ -75,12 +73,18 @@ int heap_resiz(struct heap *heap, size_t size)
 
         heap->size = 0;
         heap->capacity = 0;
+    } else if (0 < heap->size && size < heap->size) {
+        // Trim
+        heap->size = size;
     } else {
+        if (!heap->size)
+            heap->size = HEAP_ROOT;
+
         size_t capacity = heap->capacity ?
             heap->capacity << 1 :
             1 << 4;
 
-        while (capacity < size) {
+        while (capacity <= max(size, heap->size) + (HEAP_UNUSED+1)) {
             if (capacity<<1 < capacity)
                 goto error;
             capacity <<= 1;
@@ -96,6 +100,8 @@ int heap_resiz(struct heap *heap, size_t size)
 
         heap->capacity = capacity;
     }
+    assert(heap->size ? heap->size < heap->capacity : heap->capacity == 0);
+
     return HEAP_ALLOC_OK;
 
 error:
@@ -240,6 +246,43 @@ int main()
 
     puts("=");
     printf("max: %d\n", heap_pop(heap));
+    heap_show(heap);
+
+    heap_del(heap);
+
+    puts("=");
+
+    heap = heap_new(20);
+    if (!heap)
+        return 1;
+
+    heap_ins(heap, 5);
+    heap_ins(heap, 15);
+    heap_ins(heap, 10);
+    heap_ins(heap, 12);
+    heap_ins(heap, 8);
+    heap_ins(heap, 7);
+    heap_ins(heap, 6);
+
+    heap_show(heap);
+
+    puts("=");
+    heap_resiz(heap, 3);
+    heap_show(heap);
+
+    puts("=");
+    heap_resiz(heap, 1);
+    heap_show(heap);
+
+    puts("=");
+    heap_resiz(heap, 3);
+    heap_show(heap);
+
+    puts("=");
+    heap_ins(heap, 5);
+    heap_ins(heap, 30);
+    heap_ins(heap, 15);
+    heap_ins(heap, 10);
     heap_show(heap);
 
     heap_del(heap);

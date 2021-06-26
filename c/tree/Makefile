@@ -10,8 +10,11 @@ BINS = $(patsubst %.c, %, $(SRCS))
 all: $(BINS)
 
 debug: CC = clang
-debug: CFLAGS += -g -O0 -fsanitize=address,alignment,undefined -DDEBUG
+debug: CFLAGS += -fsanitize=address,alignment,undefined -DDEBUG
 debug: all
+
+profile: CFLAGS += -g
+profile: all
 
 clean:
 	$(RM) $(BINS)
