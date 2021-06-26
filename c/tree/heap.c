@@ -23,10 +23,10 @@ void heap_del(struct heap *heap);
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 // https://stackoverflow.com/a/3982397
-#define swap(a, b)           \
-    ({ typeof(a) swap = (a); \
+#define SWAP(a, b)           \
+    ({ typeof(a) SWAP = (a); \
        (a) = (b);            \
-       (b) = swap; })
+       (b) = SWAP; })
 
 
 #define paren_idx_of(idx)          ((int)((idx) / 2))
@@ -156,7 +156,7 @@ void heap_ins(struct heap *heap, int value)
     int idx = last_idx_of(heap);
     while (move_up(heap, idx)) {
         int pidx = paren_idx_of(idx);
-        swap(heap_get(heap, idx), heap_get(heap, pidx));
+        SWAP(heap_get(heap, idx), heap_get(heap, pidx));
         idx = pidx;
     }
 }
@@ -186,11 +186,11 @@ int heap_pop(struct heap *heap)
                 goto swap_right;
         }
 swap_left:
-        swap(heap_get(heap, left_idx), heap_get(heap, popidx));
+        SWAP(heap_get(heap, left_idx), heap_get(heap, popidx));
         popidx = left_idx;
         continue;
 swap_right:
-        swap(heap_get(heap, right_idx), heap_get(heap, popidx));
+        SWAP(heap_get(heap, right_idx), heap_get(heap, popidx));
         popidx = right_idx;
     }
     return ret;
