@@ -24,9 +24,11 @@ void heap_del(struct heap *heap);
 #define max(a, b) ((a) > (b) ? (a) : (b))
 // https://stackoverflow.com/a/3982397
 #define SWAP(a, b)           \
-    ({ typeof(a) SWAP = (a); \
+    do {                     \
+       typeof(a) SWAP = (a); \
        (a) = (b);            \
-       (b) = SWAP; })
+       (b) = SWAP;           \
+    } while (0)
 
 
 #define paren_idx_of(idx)          ((int)((idx) / 2))
