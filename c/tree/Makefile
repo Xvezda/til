@@ -2,7 +2,7 @@
 
 
 CC = gcc
-CFLAGS = -std=gnu99 -Wall -Wextra
+CFLAGS = -std=gnu11 -Wall -Wextra
 SRCS = $(wildcard *.c)
 BINS = $(patsubst %.c, %, $(SRCS))
 

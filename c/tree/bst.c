@@ -88,8 +88,6 @@ struct node *find_min(struct node *node, struct node **parent)
 
 void remove_child(struct node *parent, struct node *child)
 {
-#define aorb(a, b) ((a) ? (a) : (b))
-
     if (!child->left && !child->right) {  // Leaf node
         replace_child(parent, NULL, child);
     } else if (child->left && child->right) {
@@ -100,15 +98,14 @@ void remove_child(struct node *parent, struct node *child)
         replace_child(parent, repl, child);
 
         repl->left = child->left;
-        replace_child(repl_parent, aorb(repl->right, NULL), repl);
+        replace_child(repl_parent, repl->right ?: NULL, repl);
         if (repl != child->right)
             repl->right = child->right;
 
     } else if (child->left || child->right) {
-        replace_child(parent, aorb(child->left, child->right), child);
+        replace_child(parent, child->left ?: child->right, child);
     }
     free(child);
-#undef aorb
 }
 
 void remove_value(struct node *root, int value)
