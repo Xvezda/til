@@ -7,7 +7,7 @@ class Qux extends Foo {}
 
 "use strict";
 
-// Use typeof operator alternative with symbol check
+// Use typeof operator alternative with check type of symbol primitive support
 function _typeof(obj) {
   "@babel/helpers - typeof";
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -17,35 +17,39 @@ function _typeof(obj) {
     };
   } else {
     _typeof = function _typeof(obj) {
-      return obj &&
-        typeof Symbol === "function" &&
-        obj.constructor === Symbol &&
-        obj !== Symbol.prototype
-        ? "symbol"
-        : typeof obj;
+      return obj &&  // if obj is not falsy
+        typeof Symbol === "function" &&  // check symbol exists
+        obj.constructor === Symbol &&    // (probably a symbol polyfill)
+        obj !== Symbol.prototype         // same here
+        ? "symbol"     // then return symbol string
+        : typeof obj;  // otherwise use typeof operator
     };
   }
   return _typeof(obj);
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: { value: subClass, writable: true, configurable: true }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
 }
 
 function _setPrototypeOf(o, p) {
   _setPrototypeOf =
     Object.setPrototypeOf ||
     function _setPrototypeOf(o, p) {
-      o.__proto__ = p;
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/proto
+      o.__proto__ = p;  // __proto__ is lagacy feature
       return o;
     };
   return _setPrototypeOf(o, p);
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  // superClass could be function or null
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    // class has constructor property as default
+    constructor: { value: subClass, writable: true, configurable: true }
+  });
+  // subClass.__proto__ === superClass
+  if (superClass) _setPrototypeOf(subClass, superClass);
 }
 
 function _isNativeReflectConstruct() {
