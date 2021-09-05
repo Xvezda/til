@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>CSS Varaibles</title>
+  </head>
+  <body>
+    <!-- Test variable scopes -->
+    <style>
+    div {
+      background-color: white;
+    }
+    .limited-scope {
+      --background-color: red;
+    }
+    .substitute-bgcolor {
+      background-color: var(--background-color);
+    }
+    </style>
+    <div class="substitute-bgcolor">
+      foo
+      <div class="limited-scope substitute-bgcolor">
+        bar
+        <div class="substitute-bgcolor">
+          baz
+        </div>
+      </div>
+    </div>
+    <hr>
+  </body>
+</html>
