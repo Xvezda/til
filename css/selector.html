@@ -108,5 +108,26 @@
       <p class="egg">spam</p>
       <p>:(</p>
     </div>
+
+    <hr>
+
+    <div class="foo bar baz">
+      <span>I'm foo bar baz</span>
+    </div>
+
+    <div class="baz bar foo">
+      <span>And I'm baz bar foo</span>
+    </div>
+
+    <style>
+    .foo.bar.baz {
+      color: red;
+    }
+    </style>
+
+    <script>
+    Array.from(document.querySelectorAll('.foo.bar.baz > span'))
+      .forEach(e => console.log(e.textContent));
+    </script>
   </body>
 </html>
