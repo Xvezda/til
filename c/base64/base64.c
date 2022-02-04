@@ -17,10 +17,10 @@ char* base64_encode(const char *str)
   // Re allocate buffer size (mul of 3)
   size_t buf_size = PADDING_SIZE(len, UNIT_SIZE);
 
-  uint8_t *buffer = malloc(buf_size);
+  uint8_t buffer[buf_size];
   uint8_t *result = malloc(re_len);
 
-  assert(buffer != NULL && result != NULL);
+  assert(result != NULL);
 
   // Initialize
   memset(buffer, 0, buf_size);
@@ -99,10 +99,6 @@ char* base64_encode(const char *str)
     buffer_ptr += UNIT_SIZE;
   }
   assert(result[result_len] != '\0');
-
-  // Clean up
-  free(buffer);
-  buffer = NULL;
 
   return (char*) result;
 }
