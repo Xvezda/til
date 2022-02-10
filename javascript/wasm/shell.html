@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Base64 WASM</title>
+    <style>
+      #textarea {
+        display: block;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <textarea id="textarea" cols="80" rows="25"></textarea>
+      <button id="encode">encode</button>
+    </div>
+    <script>
+      var _base64encode;
+
+      var Module = {
+        print: function (text) {
+          console.log(Array.prototype.slice.call(arguments).join(' '));
+        },
+        onRuntimeInitialized: function () {
+          _base64encode = Module.cwrap('base64_encode', 'number', ['string']);
+        }
+      };
+
+      function base64encode(text) {
+        if (!text)
+          return text;
+
+        var ptr = _base64encode(text);
+        var encoded = UTF8ToString(ptr);
+        Module._free(ptr);
+
+        return encoded;
+      }
+
+      var textarea = document.getElementById('textarea');
+      var encodeButton = document.getElementById('encode');
+      encodeButton.onclick = function () {
+        textarea.value = base64encode(textarea.value);
+      };
+    </script>
+    {{{ SCRIPT }}}
+  </body>
+</html>

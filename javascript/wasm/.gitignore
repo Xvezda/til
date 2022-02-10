@@ -1,0 +1,4 @@
+*.wasm
+*.js
+*.html
+!shell.html
